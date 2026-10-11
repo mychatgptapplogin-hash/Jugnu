@@ -489,7 +489,20 @@ const JX={
   sPhone:'{c} customers have no phone number. Add numbers so I can send reminders.',sGood:'MashaAllah, the accounts are healthy. Keep it up.',more:'More advice (AI)',offline:'No internet'}
 };
 ['roman','ur','ps','en'].forEach(k=>Object.assign(J[k],JX[k]));
-const aiOn=()=>!!SAMPLE&&navigator.onLine!==false;
+Object.assign(J.roman,{aiBasic:'Munshi (basic)'});Object.assign(J.ur,{aiBasic:'منشی (بنیادی)'});Object.assign(J.ps,{aiBasic:'منشي (بنسټیز)'});Object.assign(J.en,{aiBasic:'Munshi (basic)'});
+/* Jugnu AI server (free Cloudflare Workers AI). Paste the worker link between the quotes after deploying. */
+const AI_URL='';
+const aiOn=()=>(!!SAMPLE||!!AI_URL)&&navigator.onLine!==false;
+function looseJSON(t){if(t&&typeof t==='object')return t;t=String(t||'').trim();try{return JSON.parse(t);}catch(e){}
+  const m=t.match(/```(?:json)?\s*([\s\S]*?)```/);if(m){try{return JSON.parse(m[1]);}catch(e){}}
+  const a=t.indexOf('{'),b=t.lastIndexOf('}');if(a>=0&&b>a){try{return JSON.parse(t.slice(a,b+1));}catch(e){}}
+  return t?{reply:t}:null;}
+async function aiJSON(prompt){
+  if(SAMPLE)return SAMPLE.json(prompt,{modelTier:'quick',cache:false});
+  const ctl=new AbortController();const tm=setTimeout(()=>ctl.abort(),25000);
+  try{const r=await fetch(AI_URL,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({prompt}),signal:ctl.signal});
+    if(!r.ok)throw{code:'http_'+r.status};const j=await r.json();return looseJSON(j.text);}finally{clearTimeout(tm);}
+}
 function joinL(arr,l){return arr.join(l==='ur'||l==='ps'?'، ':', ');}
 function shopHealth(l){
   if(!D.entries.length)return jt('hNo',l);
@@ -792,7 +805,7 @@ function settingsView(){
     <button class="btn ghost full" data-act="copyBackup">${esc(t('bkCopy'))}</button>
     <label for="importFile" class="btn ghost full" style="margin:0;color:var(--ink)">${esc(t('bkRestoreF'))}</label><input id="importFile" type="file" accept=".json,application/json,text/plain" hidden>
     <button class="btn ghost full" data-act="pasteRestore">${esc(t('bkRestoreP'))}</button></div>
-   <div class="page stack"><h2 style="margin-top:0">${esc(t('danger'))}</h2><button class="btn danger full" data-act="wipe">${esc(t('wipe'))}</button><p class="note">Jugnu Munshi · ConceptAI · v0.5</p></div></div>`;
+   <div class="page stack"><h2 style="margin-top:0">${esc(t('danger'))}</h2><button class="btn danger full" data-act="wipe">${esc(t('wipe'))}</button><p class="note">Jugnu Munshi · ConceptAI · v0.6</p></div></div>`;
 }
 function pilotView(){
   const now=Date.now(),wk=7*86400000;
@@ -813,7 +826,8 @@ let jBusy=false,SAMPLE=null;
 const sleep=ms=>new Promise(r=>setTimeout(r,ms));
 const RTL=l=>l==='ur'||l==='ps';
 function jState(s){const w=$('jFF');if(w)w.className='ffw '+s;const st=$('jStat');if(st)st.textContent=jt(s==='happy'?'done':s==='idle'?'ready':s);}
-function updMode(){const m=$('jMode');if(m){m.textContent=isStudent()?(aiOn()?'AI ustad':'Offline ustad'):jt(aiOn()?'aiOn':'aiOff');m.className='jmode'+(aiOn()?' on':'');}}
+function updMode(){const m=$('jMode');if(m){const st=aiOn()?'on':(navigator.onLine===false?'off':'basic');
+    m.textContent=isStudent()?({on:'AI ustad',off:'Offline ustad',basic:'Ustad (basic)'}[st]):jt({on:'aiOn',off:'aiOff',basic:'aiBasic'}[st]);m.className='jmode'+(aiOn()?' on':'');}}
 window.addEventListener('online',updMode);window.addEventListener('offline',updMode);
 async function jMore(l){if(jBusy||!aiOn())return;jBusy=true;jState('thinking');
   const ask={roman:'Mere khate ko dekh kar 3 practical mashware do.',ur:'میرے کھاتے کو دیکھ کر 3 عملی مشورے دو۔',ps:'زما کهاته وګوره او 3 عملي مشورې راکړه.',en:'Look at my khata and give me 3 practical suggestions.'}[l]||'';
@@ -920,7 +934,7 @@ Recent chat:
 ${hist||'(none)'}
 Shopkeeper's new message: """${q}"""
 Reply with only JSON like {"reply":"...","entry":null,"customer":null,"action":null}`;
-    const r=await SAMPLE.json(prompt,{modelTier:'quick',cache:false});
+    const r=await aiJSON(prompt);
     if(!r||typeof r.reply!=='string'||!r.reply.trim())return null;
     const out={text:r.reply.trim().slice(0,900)};const e=r.entry;
     if(e&&typeof e==='object'){const amt=Math.round(Number(toAsciiDigits(String(e.amount||'')).replace(/[^\d.]/g,'')));const ty=['credit','payment','goods','paid'].includes(e.type)?e.type:null;const nm=String(e.name||'').trim().slice(0,60);
@@ -1164,7 +1178,7 @@ Recent chat:
 ${hist||'(none)'}
 Student's new message: """${q}"""
 Reply with only JSON like {"reply":"..."}`;
-    const r=await SAMPLE.json(prompt,{modelTier:'quick',cache:false});
+    const r=await aiJSON(prompt);
     return r&&typeof r.reply==='string'&&r.reply.trim()?r.reply.trim().slice(0,1200):null;
   }catch(err){if(err&&['not_granted','unavailable','capability_disabled','capability_removed'].includes(err.code)){SAMPLE=null;updMode();}return null;}
 }
