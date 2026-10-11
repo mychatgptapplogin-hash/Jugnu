@@ -1,7 +1,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Jugnu Munshi</title>
-<meta name="theme-color" content="#0C0B12">
+<meta name="theme-color" content="#0B5D45">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="icon-192.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -256,6 +256,97 @@ body{overflow-x:hidden}
 }
 button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,a:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
 @media (prefers-reduced-motion:reduce){*{animation:none!important}}
+/* ===== v0.12 theme: emerald + saffron, clean white, soft depth ===== */
+:root{
+  --desk:#F3F6F4;--paper:#FFFFFF;--rule:#E3EBE7;--margin:#0E7A5B;--ink:#0F1D18;--ink2:#46574F;
+  --cover:#0B5D45;--cover2:#0E7A5B;--gold:#F2A516;--goldsoft:#FFE3A3;
+  --udhaar:#B42318;--wasooli:#0E7A5B;--amber:#B45309;--line:#DCE5E0;
+  --brand-soft:#E2F3EB;--accent-soft:#FFF3D6;--r:18px;
+  --sh:0 1px 2px rgba(15,29,24,.05),0 10px 28px rgba(15,29,24,.08);
+}
+body{background:radial-gradient(1200px 500px at 10% -10%,#E2F3EB 0,transparent 60%),var(--desk)}
+header{background:linear-gradient(135deg,#0E7A5B,#08503C);box-shadow:0 8px 24px rgba(8,80,60,.22);border-bottom:none}
+.logo,.icon{color:#FFFFFF}
+.icon{border-color:rgba(255,255,255,.28);background:rgba(255,255,255,.12)}
+.page{border-radius:var(--r);border-color:var(--line);box-shadow:var(--sh)}
+.page.ruled{background-image:none}
+h2{color:var(--cover)}
+.shopname{border-bottom-color:var(--brand-soft)}
+.tiles{border-radius:var(--r);box-shadow:var(--sh)}
+.btn{border-radius:14px;background:var(--cover2);color:#FFFFFF;box-shadow:0 2px 0 rgba(8,80,60,.25)}
+.btn.gold{background:var(--gold);color:#2B1A00;box-shadow:0 2px 0 rgba(140,90,0,.25)}
+.btn.ghost{background:#FFFFFF;color:var(--ink);border:1px solid var(--line);box-shadow:none}
+.btn.wa{background:#128C4A}
+input,select,textarea{border-radius:12px;border-color:var(--line)}
+input:focus,select:focus,textarea:focus{border-color:var(--cover2);box-shadow:0 0 0 3px rgba(14,122,91,.15);outline:none}
+.tag{background:var(--accent-soft);color:#7A4E00;border-radius:999px;padding:0 8px}
+.confirm{border-color:var(--gold)}
+table.reg th{background:var(--brand-soft);color:var(--cover);border-bottom:2px solid var(--cover2)}
+table.reg tr.tap:hover td{background:#F1F8F4}
+table.reg td.no{border-inline-end:2px solid var(--brand-soft)}
+table.reg tr.tot td{background:#F1F8F4}
+.fab{box-shadow:0 10px 28px rgba(242,165,22,.45)}
+.warnbox{background:var(--accent-soft);border-color:#F5CF7A;color:#6B4400;border-radius:12px}
+.seg button{border-radius:14px}
+.seg button[aria-pressed="true"]{background:var(--cover2);border-color:var(--cover2);color:#FFFFFF}
+.modal{background:rgba(8,30,22,.45);backdrop-filter:blur(3px)}
+.modal .page{border-radius:24px 24px 18px 18px}
+pre.rep{background:#F6FAF8;border-color:var(--line);border-radius:12px}
+.cm.ok{background:var(--brand-soft);border-color:var(--cover2);color:var(--cover)}
+/* Jugnu home: light, friendly chat */
+body.night{background:linear-gradient(180deg,#EAF5EF 0,#F6F8F7 220px,#F6F8F7 100%);color:var(--ink)}
+.jhome{gap:12px}
+.jhero{background:linear-gradient(135deg,#0E7A5B 0,#08503C 100%);border-radius:24px;padding:12px 14px;box-shadow:0 12px 30px rgba(8,80,60,.25);position:relative;overflow:hidden}
+.jhero::after{content:"";position:absolute;inset:auto -40px -60px auto;width:160px;height:160px;border-radius:50%;background:radial-gradient(circle,rgba(242,165,22,.35),transparent 70%)}
+.jhero .ffw{width:76px;height:76px}
+.jname{color:#FFFFFF}
+.jname small{color:#FFD873}
+.jstat{color:#D9F2E6}
+.jmode{border-color:rgba(255,255,255,.35);color:#E6F5EE;background:rgba(255,255,255,.08)}
+.jmode.on{border-color:#FFD873;color:#FFD873}
+.pchip{border-color:rgba(255,255,255,.35);background:rgba(255,255,255,.14);color:#FFFFFF;position:relative;z-index:1}
+.jhome .jchat{background:#FFFFFF;border:1px solid var(--line);border-radius:22px;padding:12px;box-shadow:var(--sh)}
+.jai{background:#F2F6F4;border:1px solid #E3EBE7;color:var(--ink)}
+.jme{background:linear-gradient(135deg,#0E7A5B,#0B5D45);color:#FFFFFF}
+.jchip{background:#FFFFFF;border:1px solid var(--line);color:var(--ink);box-shadow:0 1px 2px rgba(15,29,24,.05)}
+.jbtns .jchip{background:#FFFFFF;border-color:#CFDDD6;color:var(--ink)}
+.jbtns .jyes,.jcard .jbtns .jyes{background:var(--cover2);border-color:var(--cover2);color:#FFFFFF}
+.jcard{background:#FFFFFF;color:var(--ink);border:1px solid #CFDDD6;border-radius:16px;box-shadow:0 4px 14px rgba(15,29,24,.06)}
+.jcard .jr{border-bottom-color:#E3EBE7}
+.jcard .jr span{color:var(--ink2)}
+.jcard .jnew{color:#7A4E00}
+.jcard .jdone{color:var(--wasooli)}
+.jform input,.jhome .jform input{background:#FFFFFF;border:1px solid var(--line);color:var(--ink);border-radius:16px}
+.jform input::placeholder{color:#6B7C74}
+.jform .btn{background:var(--gold);color:#2B1A00;border-radius:16px}
+.vbtn{background:#FFFFFF;border:1px solid var(--line);color:var(--cover2);border-radius:16px}
+.jhint{color:var(--ink2)}
+body.night .tabs,.tabs{background:rgba(255,255,255,.96);backdrop-filter:blur(8px);border-top:1px solid var(--line);box-shadow:0 -6px 20px rgba(15,29,24,.06)}
+body.night .tabs button,.tabs button{color:var(--ink2)}
+body.night .tabs button[aria-current="page"],.tabs button[aria-current="page"]{color:var(--cover2);font-weight:700}
+.tabs button[aria-current="page"] svg,.tabs button[aria-current="page"] .tdot{transform:translateY(-1px)}
+/* Ustad keeps its own calm blue accent */
+.ustadT .jhero,body.stu .jhero{background:linear-gradient(135deg,#1D5FA8,#123E72)}
+.ustadT .jme{background:linear-gradient(135deg,#1D5FA8,#123E72);color:#FFFFFF}
+.ustadT .jform .btn{background:#1D5FA8;color:#FFFFFF}
+.ustadT .vbtn{color:#1D5FA8}
+body.night.stu .tabs button[aria-current="page"]{color:#1D5FA8}
+.ustadT .jname small,.ustadT .jstat{color:#CFE3FA}
+/* account */
+.acc-top{display:flex;gap:12px;align-items:center}
+.acc-badge{width:56px;height:56px;border-radius:18px;background:linear-gradient(135deg,#0E7A5B,#08503C);display:grid;place-items:center;flex-shrink:0;box-shadow:var(--sh)}
+.acc-badge .ff,.acc-badge svg{width:46px;height:46px}
+.acc-tabs button{min-height:44px;font-weight:600}
+.acc-row{display:flex;gap:10px;align-items:center}
+.acc-dot{width:12px;height:12px;border-radius:50%;background:#16A34A;box-shadow:0 0 0 4px #DCFCE7;flex-shrink:0}
+.acc-dot.off{background:#B45309;box-shadow:0 0 0 4px #FEF3C7}
+.acc-card{border:1px solid #BFE3D2}
+.acc-choice{display:flex;flex-direction:column;gap:10px}
+.jhero>div:not(.ffw){min-width:0}
+.pchip{max-width:42%;flex-shrink:1}
+.pchip span[dir]{min-width:0}
+.jcard .jbtns .jchip{background:#FFFFFF;color:var(--ink);border-color:#CFDDD6}
+.jbtns .jchip{border-color:#CFDDD6}
 </style>
 
 <div class="wrap">
@@ -774,7 +865,8 @@ function setupView(){
      <p class="note">${esc(t('payNote'))}</p>
      <button class="btn full" type="submit">${esc(t('start'))}</button>
    </form>
-   <button class="btn ghost full" data-act="demo">${esc(t('demo'))}</button></div>`;
+   <button class="btn ghost full" data-act="demo">${esc(t('demo'))}</button>
+   <button class="btn ghost full" data-act="accLogin">${esc(at('have'))}</button></div>`;
 }
 function homeView(){
   const custs=D.customers.map(c=>({c,b:balance(c.id),d:oldestUnpaidDays(c.id)}));
@@ -837,6 +929,7 @@ function settingsView(){
   const s=D.shop;
   return `<div class="stack"><button class="btn ghost sm" data-act="home" style="align-self:flex-start">${esc(t('back'))}</button>
    <div class="page stack"><h1>${esc(t('settings'))}</h1><h2>${esc(t('lang'))}</h2>${langButtons()}</div>
+   ${accCardHTML()}
    <div class="page ruled stack"><h2 style="margin-top:0">${esc(t('shop'))}</h2>
     <form id="shopForm" class="stack">
      <div><label for="sName">${esc(t('shopName'))}</label><input id="sName" dir="auto" required value="${esc(s.name)}"></div>
@@ -857,7 +950,8 @@ function settingsView(){
     <button class="btn ghost full" data-act="copyBackup">${esc(t('bkCopy'))}</button>
     <label for="importFile" class="btn ghost full" style="margin:0;color:var(--ink)">${esc(t('bkRestoreF'))}</label><input id="importFile" type="file" accept=".json,application/json,text/plain" hidden>
     <button class="btn ghost full" data-act="pasteRestore">${esc(t('bkRestoreP'))}</button></div>
-   <div class="page stack"><h2 style="margin-top:0">${esc(t('danger'))}</h2><button class="btn danger full" data-act="wipe">${esc(t('wipe'))}</button><p class="note">Jugnu Munshi · ConceptAI · v0.11.1</p></div></div>`;
+   ${fbCardHTML()}
+   <div class="page stack"><h2 style="margin-top:0">${esc(t('danger'))}</h2><button class="btn danger full" data-act="wipe">${esc(t('wipe'))}</button><p class="note">Jugnu Munshi · ConceptAI · v0.12</p></div></div>`;
 }
 function pilotView(){
   const now=Date.now(),wk=7*86400000;
@@ -900,14 +994,14 @@ function jugnuView(){
    <p class="jhint">${esc(t('hint'))}</p></div>`;
 }
 function jGreet(){
-  const l=D.lang;let tx=jt('greet',l);
+  const l=D.lang;let tx=brainVal('greet_'+l)||jt('greet',l);
   if(D.customers.length){const td=todayISO();const aaj=D.entries.filter(e=>e.type==='payment'&&e.date===td).reduce((s,e)=>s+e.amount,0);
     const lene=D.customers.map(c=>balance(c.id)).filter(b=>b>0).reduce((s,b)=>s+b,0);tx+='\n'+fill(jt('sum',l),{a:rs(aaj),b:rs(lene)});}
   S.chat.push({who:'ai',text:tx,l});
-  if(D.entries.length>=10&&(!D.lastBackup||Date.now()-D.lastBackup>7*86400000)&&!isStudent())S.chat.push({who:'ai',text:jt('bkNudge',l),btns:[{act:'bkShare',id:'',label:jt('bkBtn',l)}],l});
+  if(D.entries.length>=10&&!(typeof accGet==='function'&&accGet())&&(!D.lastBackup||Date.now()-D.lastBackup>7*86400000)&&!isStudent())S.chat.push({who:'ai',text:jt('bkNudge',l),btns:[{act:'accOpen',id:'',label:at('accT')},{act:'bkShare',id:'',label:jt('bkBtn',l)}],l});
 }
 function jugnuMount(){
-  if(!S.chat.length)jGreet();
+  if(!S.chat.length){jGreet();brainAnnounce();}
   renderChat();updMode();
   $('jForm').onsubmit=e=>{e.preventDefault();const v=$('jIn').value;$('jIn').value='';jSend(v);};
   setTimeout(()=>{if($('jFF')&&!jBusy)jState('idle');},1500);
@@ -1461,21 +1555,21 @@ async function fontsReady(){
 }
 function mkCtx(w,h){const c=document.createElement('canvas');c.width=w;c.height=h;const x=c.getContext('2d');x.fillStyle='#FFFFFF';x.fillRect(0,0,w,h);x.textBaseline='middle';return{c,x};}
 function F(size,weight,latin){return `${weight||400} ${size}px ${latin?'Sora':(DOCFONT[D.lang]||'Sora')}, Sora, sans-serif`;}
-function txt(x,s,px,py,o){o=o||{};x.save();x.font=F(o.size||28,o.weight,o.latin);x.fillStyle=o.color||'#1F1A17';x.direction=o.latin?'ltr':(isRTL()?'rtl':'ltr');x.textAlign=o.align||'left';x.fillText(s,px,py,o.max||undefined);x.restore();}
-function line(x,x1,y1,x2,y2,c,w,dash){x.save();x.strokeStyle=c||'#D8C9A6';x.lineWidth=w||2;if(dash)x.setLineDash(dash);x.beginPath();x.moveTo(x1,y1);x.lineTo(x2,y2);x.stroke();x.restore();}
+function txt(x,s,px,py,o){o=o||{};x.save();x.font=F(o.size||28,o.weight,o.latin);x.fillStyle=o.color||'#0F1D18';x.direction=o.latin?'ltr':(isRTL()?'rtl':'ltr');x.textAlign=o.align||'left';x.fillText(s,px,py,o.max||undefined);x.restore();}
+function line(x,x1,y1,x2,y2,c,w,dash){x.save();x.strokeStyle=c||'#CFDDD6';x.lineWidth=w||2;if(dash)x.setLineDash(dash);x.beginPath();x.moveTo(x1,y1);x.lineTo(x2,y2);x.stroke();x.restore();}
 function docHeader(x,W,title,sub){
-  x.fillStyle='#5E1A1A';x.fillRect(0,0,W,190);x.fillStyle='#E2B04A';x.fillRect(0,190,W,8);
+  x.fillStyle='#0B5D45';x.fillRect(0,0,W,190);x.fillStyle='#F2A516';x.fillRect(0,190,W,8);
   const s=D.shop,r=isRTL(),edge=r?W-60:60,far=r?60:W-60;
-  txt(x,s.name,edge,72,{size:46,weight:700,color:'#FFF6E3',align:r?'right':'left',max:W-420});
+  txt(x,s.name,edge,72,{size:46,weight:700,color:'#FFFFFF',align:r?'right':'left',max:W-420});
   const contact=[s.city,s.jc?`JazzCash ${s.jc}`:'',s.ep?`Easypaisa ${s.ep}`:''].filter(Boolean).join('   ·   ');
-  txt(x,contact,edge,140,{size:24,color:'#F6DFA6',align:r?'right':'left',max:W-360,latin:!/[؀-ۿ]/.test(s.city||'')});
-  txt(x,title,far,72,{size:44,weight:700,color:'#E2B04A',align:r?'left':'right'});
-  if(sub)txt(x,sub,far,140,{size:24,color:'#F6DFA6',align:r?'left':'right',latin:true});
+  txt(x,contact,edge,140,{size:24,color:'#FFE3A3',align:r?'right':'left',max:W-360,latin:!/[؀-ۿ]/.test(s.city||'')});
+  txt(x,title,far,72,{size:44,weight:700,color:'#F2A516',align:r?'left':'right'});
+  if(sub)txt(x,sub,far,140,{size:24,color:'#FFE3A3',align:r?'left':'right',latin:true});
 }
 function docFooter(x,W,H,pg){
-  line(x,60,H-90,W-60,H-90,'#E2B04A',3);
-  const r=isRTL();txt(x,t('made'),r?W-60:60,H-55,{size:22,color:'#4A3F36',align:r?'right':'left'});
-  txt(x,'jugnu · ConceptAI'+(pg?`   ${pg}`:''),r?60:W-60,H-55,{size:20,color:'#4A3F36',align:r?'left':'right',latin:true});
+  line(x,60,H-90,W-60,H-90,'#F2A516',3);
+  const r=isRTL();txt(x,t('made'),r?W-60:60,H-55,{size:22,color:'#46574F',align:r?'right':'left'});
+  txt(x,'jugnu · ConceptAI'+(pg?`   ${pg}`:''),r?60:W-60,H-55,{size:20,color:'#46574F',align:r?'left':'right',latin:true});
 }
 async function receiptCanvas(e){
   await fontsReady();
@@ -1483,25 +1577,25 @@ async function receiptCanvas(e){
   const edge=r?W-80:80,far=r?80:W-80,A=r?'right':'left',B=r?'left':'right';
   docHeader(x,W,t('receipt'),`${t('receiptNo')==='Receipt no.'?'No.':'#'} R-${String(e.rno||0).padStart(4,'0')}   ${dmy(e.date)}`);
   const rowsY=[300,400,500];
-  const lab=(s,y)=>txt(x,s,edge,y,{size:28,color:'#4A3F36',align:A});
-  lab(t('from'),rowsY[0]);txt(x,cu?cu.name:'',far,rowsY[0],{size:38,weight:700,align:B,latin:!/[؀-ۿ]/.test(cu?.name||'')});line(x,80,rowsY[0]+45,W-80,rowsY[0]+45,'#E6D9BC',2,[6,6]);
-  lab(t('method'),rowsY[1]);txt(x,e.note||t('cash'),far,rowsY[1],{size:32,align:B,latin:!/[؀-ۿ]/.test(e.note||t('cash'))});line(x,80,rowsY[1]+45,W-80,rowsY[1]+45,'#E6D9BC',2,[6,6]);
-  lab(t('date'),rowsY[2]);txt(x,dmy(e.date),far,rowsY[2],{size:32,align:B,latin:true});line(x,80,rowsY[2]+45,W-80,rowsY[2]+45,'#E6D9BC',2,[6,6]);
+  const lab=(s,y)=>txt(x,s,edge,y,{size:28,color:'#46574F',align:A});
+  lab(t('from'),rowsY[0]);txt(x,cu?cu.name:'',far,rowsY[0],{size:38,weight:700,align:B,latin:!/[؀-ۿ]/.test(cu?.name||'')});line(x,80,rowsY[0]+45,W-80,rowsY[0]+45,'#E3EBE7',2,[6,6]);
+  lab(t('method'),rowsY[1]);txt(x,e.note||t('cash'),far,rowsY[1],{size:32,align:B,latin:!/[؀-ۿ]/.test(e.note||t('cash'))});line(x,80,rowsY[1]+45,W-80,rowsY[1]+45,'#E3EBE7',2,[6,6]);
+  lab(t('date'),rowsY[2]);txt(x,dmy(e.date),far,rowsY[2],{size:32,align:B,latin:true});line(x,80,rowsY[2]+45,W-80,rowsY[2]+45,'#E3EBE7',2,[6,6]);
   // amount box
-  x.fillStyle='#FBF3DE';x.fillRect(80,600,W-160,190);x.strokeStyle='#17643A';x.lineWidth=4;x.strokeRect(80,600,W-160,190);
-  txt(x,t('amtRecv'),edge+(r?-30:30),655,{size:30,color:'#4A3F36',align:A});
-  txt(x,rs(e.amount),W/2,730,{size:76,weight:700,color:'#17643A',align:'center',latin:true});
+  x.fillStyle='#F1F8F4';x.fillRect(80,600,W-160,190);x.strokeStyle='#0E7A5B';x.lineWidth=4;x.strokeRect(80,600,W-160,190);
+  txt(x,t('amtRecv'),edge+(r?-30:30),655,{size:30,color:'#46574F',align:A});
+  txt(x,rs(e.amount),W/2,730,{size:76,weight:700,color:'#0E7A5B',align:'center',latin:true});
   const remain=balanceAfter(e);
-  txt(x,t('remain'),edge,860,{size:30,color:'#4A3F36',align:A});
-  txt(x,rs(remain)+(remain<0?' (advance)':''),far,860,{size:40,weight:700,color:remain>0?'#A61E14':'#17643A',align:B,latin:true});
+  txt(x,t('remain'),edge,860,{size:30,color:'#46574F',align:A});
+  txt(x,rs(remain)+(remain<0?' (advance)':''),far,860,{size:40,weight:700,color:remain>0?'#B42318':'#0E7A5B',align:B,latin:true});
   // signature + stamp
-  line(x,r?80:W-480,1030,r?480:W-80,1030,'#1F1A17',2);
-  txt(x,t('sign'),r?280:W-280,1065,{size:24,color:'#4A3F36',align:'center'});
-  txt(x,t('thanks'),edge,1040,{size:28,color:'#5E1A1A',align:A,weight:600});
+  line(x,r?80:W-480,1030,r?480:W-80,1030,'#0F1D18',2);
+  txt(x,t('sign'),r?280:W-280,1065,{size:24,color:'#46574F',align:'center'});
+  txt(x,t('thanks'),edge,1040,{size:28,color:'#0B5D45',align:A,weight:600});
   x.save();x.translate(W/2,960);x.rotate(-0.12);x.strokeStyle='rgba(23,100,58,.55)';x.lineWidth=5;x.strokeRect(-130,-48,260,96);x.restore();
   txt(x,'PAID',W/2,955,{size:46,weight:700,color:'rgba(23,100,58,.6)',align:'center',latin:true});
   docFooter(x,W,H);
-  x.strokeStyle='#D8C9A6';x.lineWidth=3;x.setLineDash([14,10]);x.strokeRect(20,20,W-40,H-40);
+  x.strokeStyle='#CFDDD6';x.lineWidth=3;x.setLineDash([14,10]);x.strokeRect(20,20,W-40,H-40);
   return c;
 }
 async function statementCanvases(cid){
@@ -1518,30 +1612,30 @@ async function statementCanvases(cid){
     docHeader(x,W,t('statement'),dmy(todayISO()));
     const isLatinName=!/[؀-ۿ]/.test(cu.name);
     txt(x,cu.name,r?W-60:60,260,{size:40,weight:700,align:r?'right':'left',latin:isLatinName});
-    if(cu.phone)txt(x,cu.phone,r?60:W-60,260,{size:26,color:'#4A3F36',align:r?'left':'right',latin:true});
+    if(cu.phone)txt(x,cu.phone,r?60:W-60,260,{size:26,color:'#46574F',align:r?'left':'right',latin:true});
     let y=330;
-    x.fillStyle='#F4E8CC';x.fillRect(60,y,W-120,64);line(x,60,y+64,W-60,y+64,'#C0392B',4);
-    head.forEach((h,i)=>{const cc=colX(i);txt(x,h,cc.x+cc.w/2,y+33,{size:24,weight:700,color:'#5E1A1A',align:'center'});});
+    x.fillStyle='#E2F3EB';x.fillRect(60,y,W-120,64);line(x,60,y+64,W-60,y+64,'#0E7A5B',4);
+    head.forEach((h,i)=>{const cc=colX(i);txt(x,h,cc.x+cc.w/2,y+33,{size:24,weight:700,color:'#0B5D45',align:'center'});});
     y+=64;
     const rowH=44;
     for(let k=0;k<per&&idx<es.length;k++,idx++){
       const e=es[idx],sg=SIGN[e.type];run+=sg*e.amount;if(sg>0)tc+=e.amount;else tr+=e.amount;
-      if(k%2===1){x.fillStyle='#FFFBF0';x.fillRect(60,y,W-120,rowH);}
+      if(k%2===1){x.fillStyle='#FFFFFF';x.fillRect(60,y,W-120,rowH);}
       const cells=[String(idx+1),dmy(e.date),t(e.type+'S')+(e.note?' · '+e.note:''),sg>0?num(e.amount):'',sg<0?num(e.amount):'',num(run)+(run<0?' ↓':'')];
       cells.forEach((v,i)=>{const cc=colX(i);const isTxt=i===2;const latin=i!==2||!/[؀-ۿ]/.test(v);
-        txt(x,v,isTxt?(r?cc.x+cc.w-12:cc.x+12):cc.x+cc.w/2,y+rowH/2,{size:isTxt?22:24,align:isTxt?(r?'right':'left'):'center',latin,color:i===3?'#A61E14':i===4?'#17643A':'#1F1A17',weight:i===5?700:400,max:cc.w-20});});
-      line(x,60,y+rowH,W-60,y+rowH,'#E6D9BC',2);y+=rowH;
+        txt(x,v,isTxt?(r?cc.x+cc.w-12:cc.x+12):cc.x+cc.w/2,y+rowH/2,{size:isTxt?22:24,align:isTxt?(r?'right':'left'):'center',latin,color:i===3?'#B42318':i===4?'#0E7A5B':'#0F1D18',weight:i===5?700:400,max:cc.w-20});});
+      line(x,60,y+rowH,W-60,y+rowH,'#E3EBE7',2);y+=rowH;
     }
     // red margin + column rules
-    const top=330,bottom=y;cols.forEach((cc0,i)=>{if(i===0)return;const cc=colX(i);const lx=r?cc.x+cc.w:cc.x;line(x,lx,top,lx,bottom,i===1?'#C0392B':'#E6D9BC',i===1?3:2);});
-    x.strokeStyle='#D8C9A6';x.lineWidth=2;x.strokeRect(60,top,W-120,bottom-top);
+    const top=330,bottom=y;cols.forEach((cc0,i)=>{if(i===0)return;const cc=colX(i);const lx=r?cc.x+cc.w:cc.x;line(x,lx,top,lx,bottom,i===1?'#0E7A5B':'#E3EBE7',i===1?3:2);});
+    x.strokeStyle='#CFDDD6';x.lineWidth=2;x.strokeRect(60,top,W-120,bottom-top);
     if(p===pages-1){
-      y+=30;x.fillStyle='#FBF3DE';x.fillRect(60,y,W-120,170);line(x,60,y,W-60,y,'#1F1A17',3);line(x,60,y+170,W-60,y+170,'#1F1A17',3);line(x,60,y+176,W-60,y+176,'#1F1A17',3);
-      const L=(lab,val,yy,col)=>{txt(x,lab,r?W-90:90,yy,{size:28,color:'#4A3F36',align:r?'right':'left'});txt(x,val,r?90:W-90,yy,{size:32,weight:700,color:col,align:r?'left':'right',latin:true});};
-      L(t('totCr'),rs(tc),y+40,'#A61E14');L(t('totRv'),rs(tr),y+90,'#17643A');
-      const b=balance(cid);L(b>=0?t('owesMe'):t('iOwe'),rs(b),y+140,b>0?'#A61E14':'#17643A');
+      y+=30;x.fillStyle='#F1F8F4';x.fillRect(60,y,W-120,170);line(x,60,y,W-60,y,'#0F1D18',3);line(x,60,y+170,W-60,y+170,'#0F1D18',3);line(x,60,y+176,W-60,y+176,'#0F1D18',3);
+      const L=(lab,val,yy,col)=>{txt(x,lab,r?W-90:90,yy,{size:28,color:'#46574F',align:r?'right':'left'});txt(x,val,r?90:W-90,yy,{size:32,weight:700,color:col,align:r?'left':'right',latin:true});};
+      L(t('totCr'),rs(tc),y+40,'#B42318');L(t('totRv'),rs(tr),y+90,'#0E7A5B');
+      const b=balance(cid);L(b>=0?t('owesMe'):t('iOwe'),rs(b),y+140,b>0?'#B42318':'#0E7A5B');
       const pay=[D.shop.jc?`JazzCash ${D.shop.jc}`:'',D.shop.ep?`Easypaisa ${D.shop.ep}`:'',D.shop.iban?`IBAN ${D.shop.iban}`:''].filter(Boolean).join('   ·   ');
-      if(pay)txt(x,pay,W/2,y+240,{size:24,color:'#5E1A1A',align:'center',latin:true});
+      if(pay)txt(x,pay,W/2,y+240,{size:24,color:'#0B5D45',align:'center',latin:true});
     }
     docFooter(x,W,H,`${p+1}/${pages}`);
     out.push(c);
@@ -1607,7 +1701,8 @@ function reminderText(c){
 /* ================= binding & actions ================= */
 function shopFromForm(){return{name:$('sName').value.trim(),owner:$('sOwner').value.trim(),city:$('sCity').value.trim(),jc:$('sJc').value.trim(),ep:$('sEp').value.trim(),iban:$('sIban').value.trim()};}
 function bindAfter(){
-  const sf=$('setupForm');if(sf)sf.onsubmit=e=>{e.preventDefault();D.shop=Object.assign(shopFromForm(),{created:Date.now()});save();S.chat=[];go('jugnu');toast(t('savedShop'));};
+  bindAcct();
+  const sf=$('setupForm');if(sf)sf.onsubmit=e=>{e.preventDefault();D.shop=Object.assign(shopFromForm(),{created:Date.now()});save();S.chat=[];go('jugnu');toast(t('savedShop'));if(typeof acctPrompt==='function')acctPrompt();};
   const qf=$('quickForm');if(qf)qf.onsubmit=e=>{e.preventDefault();const v=$('quick').value.trim();if(!v)return;const p=parseEntry(v);if(!p){toast(t('parseFail'));return;}S.cid=null;go('entry',{draft:Object.assign(p,{fromQuick:true,raw:v})});};
   const sr=$('search');if(sr)sr.oninput=()=>{S.q=sr.value;const pos=sr.selectionStart;render();const n=$('search');if(n){n.focus();n.setSelectionRange(pos,pos);}};
   const ef=$('entryForm');if(ef){const nm=$('eName'),ty=$('eType');
@@ -1647,6 +1742,7 @@ function loadDemo(){
 document.addEventListener('click',async e=>{
   const lb=e.target.closest('[data-lang]');if(lb){D.lang=lb.dataset.lang;save();if(S.chat.length<=1)S.chat=[];render();return;}
   const el=e.target.closest('[data-act]');if(!el)return;const act=el.dataset.act,id=el.dataset.id;
+  if(acctAct(act,id))return;
   switch(act){
     case 'home':S.cid=null;go('home',{draft:null});break;
     case 'settings':go('settings');break;
@@ -1720,5 +1816,145 @@ document.addEventListener('click',async e=>{
 if('serviceWorker' in navigator&&(location.protocol==='https:'||location.hostname==='localhost')&&!inViewer()){window.addEventListener('load',()=>{navigator.serviceWorker.register('sw.js').catch(()=>{});});}
 document.addEventListener('change',e=>{const el=e.target;if(el&&el.matches&&el.matches('input[data-voice]')){const f=el.files&&el.files[0];el.value='';if(f)handleVoice(f);}});
 document.addEventListener('keydown',e=>{if((e.key==='Enter'||e.key===' ')&&e.target.matches&&e.target.matches('tr.tap')){e.preventDefault();e.target.click();}});
+
+/* ===== v0.12 accounts, cloud backup, usage counts, feedback, owner's brain (Supabase, plain fetch) ===== */
+const SB_URL='https://otctbjuosvefhziuudmy.supabase.co';
+const SB_KEY='sb_publishable_V4TmfCm7NLsJ1bF2gdEpMw_8x3QZIgC';
+const APP_VER='0.12';
+const ACC_KEY='jugnu_account_v1',EVQ_KEY='jugnu_evq',BRAIN_KEY='jugnu_brain';
+const AC={
+ roman:{acc:'Account',accT:'Apna account banayein',accWhy:'Hisaab cloud mein mehfooz rahega. Phone gum ho ya naya le lein, login karte hi sab wapis.',newA:'Naya account',login:'Login',mob:'Mobile number',pin:'PIN (4 se 6 hindse)',pinHint:'Ye PIN yaad rakhein. Is se doosre phone par login hoga.',nm:'Aapka naam',cty:'Shehar',typ:'Aap kaun hain?',tShop:'Dukaandar',tStu:'Student',tFam:'Ghar / family',tOth:'Koi aur',shopN:'Dukaan ka naam (agar hai)',make:'Account banao',doLogin:'Login karo',later:'Abhi nahi',wait:'Ruk jayein…',badPh:'Mobile number theek nahi. Misaal: 03001234567',badPin:'PIN 4 se 6 hindson ka ho.',exists:'Is number ka account pehle se hai. PIN daal kar login karein.',wrong:'Number ya PIN ghalat hai.',noNet:'Is ke liye internet chahiye.',fail:'Abhi nahi ho saka. Thori der baad koshish karein.',ok:'Account tayyar! Hisaab ab cloud mein mehfooz hota rahega.',in:'Login ho gaya.',logged:'Logged in',synced:'Aakhri backup',never:'abhi nahi hua',syncNow:'Abhi backup karo',logout:'Logout',outQ:'Logout karein? Is phone ka hisaab yahin rahega.',restored:'Cloud se hisaab wapis aa gaya.',choose:'Do hisaab mil gaye. Kaunsa rakhna hai?',usePhone:'Is phone wala',useCloud:'Cloud wala',entries:'entries',fb:'Raaye / Shikayat',fbPh:'Jo acha laga, jo bura laga, ya koi naya idea likhein…',fbSend:'Bhejein',fbOk:'Shukriya! Aapki baat pohanch gayi.',fbLogin:'Raaye bhejne ke liye pehle account banayein.',have:'Pehle se account hai? Login karein',other:'Ye phone pehle kisi aur account par tha. Us ka hisaab is phone par alag mehfooz kar diya.'},
+ ur:{acc:'اکاؤنٹ',accT:'اپنا اکاؤنٹ بنائیں',accWhy:'حساب کلاؤڈ میں محفوظ رہے گا۔ فون گم ہو یا نیا لے لیں، لاگ ان کرتے ہی سب واپس۔',newA:'نیا اکاؤنٹ',login:'لاگ ان',mob:'موبائل نمبر',pin:'پن (4 سے 6 ہندسے)',pinHint:'یہ پن یاد رکھیں۔ اس سے دوسرے فون پر لاگ ان ہوگا۔',nm:'آپ کا نام',cty:'شہر',typ:'آپ کون ہیں؟',tShop:'دکاندار',tStu:'طالب علم',tFam:'گھر / فیملی',tOth:'کوئی اور',shopN:'دکان کا نام (اگر ہے)',make:'اکاؤنٹ بناؤ',doLogin:'لاگ ان کرو',later:'ابھی نہیں',wait:'رک جائیں…',badPh:'موبائل نمبر ٹھیک نہیں۔ مثال: 03001234567',badPin:'پن 4 سے 6 ہندسوں کا ہو۔',exists:'اس نمبر کا اکاؤنٹ پہلے سے ہے۔ پن ڈال کر لاگ ان کریں۔',wrong:'نمبر یا پن غلط ہے۔',noNet:'اس کے لیے انٹرنیٹ چاہیے۔',fail:'ابھی نہیں ہو سکا۔ تھوڑی دیر بعد کوشش کریں۔',ok:'اکاؤنٹ تیار! حساب اب کلاؤڈ میں محفوظ ہوتا رہے گا۔',in:'لاگ ان ہو گیا۔',logged:'لاگ ان',synced:'آخری بیک اپ',never:'ابھی نہیں ہوا',syncNow:'ابھی بیک اپ کرو',logout:'لاگ آؤٹ',outQ:'لاگ آؤٹ کریں؟ اس فون کا حساب یہیں رہے گا۔',restored:'کلاؤڈ سے حساب واپس آ گیا۔',choose:'دو حساب مل گئے۔ کون سا رکھنا ہے؟',usePhone:'اس فون والا',useCloud:'کلاؤڈ والا',entries:'اندراج',fb:'رائے / شکایت',fbPh:'جو اچھا لگا، جو برا لگا، یا کوئی نیا آئیڈیا لکھیں…',fbSend:'بھیجیں',fbOk:'شکریہ! آپ کی بات پہنچ گئی۔',fbLogin:'رائے بھیجنے کے لیے پہلے اکاؤنٹ بنائیں۔',have:'پہلے سے اکاؤنٹ ہے؟ لاگ ان کریں',other:'یہ فون پہلے کسی اور اکاؤنٹ پر تھا۔ اس کا حساب اس فون پر الگ محفوظ کر دیا۔'},
+ ps:{acc:'حساب (اکاونټ)',accT:'خپل اکاونټ جوړ کړئ',accWhy:'حساب به په کلاوډ کې خوندي وي. که تلیفون ورک شي یا نوی واخلئ، د ننوتو سره ټول بېرته.',newA:'نوی اکاونټ',login:'ننوتل',mob:'موبایل نمبر',pin:'پن (۴ تر ۶ عددونه)',pinHint:'دا پن په یاد ولرئ. په بل تلیفون به پرې ننوځئ.',nm:'ستاسو نوم',cty:'ښار',typ:'تاسو څوک یاست؟',tShop:'دوکاندار',tStu:'زده کوونکی',tFam:'کور / کورنۍ',tOth:'بل څوک',shopN:'د دوکان نوم (که وي)',make:'اکاونټ جوړ کړه',doLogin:'ننوځه',later:'اوس نه',wait:'لږ صبر…',badPh:'موبایل نمبر سم نه دی. بېلګه: 03001234567',badPin:'پن باید ۴ تر ۶ عددونه وي.',exists:'د دې نمبر اکاونټ شته. پن ولیکئ او ننوځئ.',wrong:'نمبر یا پن غلط دی.',noNet:'د دې لپاره انټرنېټ پکار دی.',fail:'اوس ونه شو. لږ وروسته بیا هڅه وکړئ.',ok:'اکاونټ تیار شو! حساب به اوس په کلاوډ کې خوندي کېږي.',in:'ننوتلئ.',logged:'ننوتلی',synced:'وروستی بیک اپ',never:'لا نه دی شوی',syncNow:'اوس بیک اپ کړه',logout:'وتل',outQ:'وځئ؟ د دې تلیفون حساب به همدلته وي.',restored:'له کلاوډ نه حساب بېرته راغی.',choose:'دوه حسابونه وموندل شول. کوم یو وساتو؟',usePhone:'د دې تلیفون',useCloud:'د کلاوډ',entries:'درجونه',fb:'نظر / شکایت',fbPh:'څه مو خوښ شول، څه نه، یا نوې مشوره ولیکئ…',fbSend:'ولېږئ',fbOk:'مننه! ستاسو خبره ورسېده.',fbLogin:'د نظر لېږلو لپاره لومړی اکاونټ جوړ کړئ.',have:'اکاونټ لرئ؟ ننوځئ',other:'دا تلیفون مخکې په بل اکاونټ و. د هغه حساب بېل خوندي شو.'},
+ en:{acc:'Account',accT:'Create your account',accWhy:'Your hisaab stays safe in the cloud. Lose your phone or get a new one, log in and everything is back.',newA:'New account',login:'Log in',mob:'Mobile number',pin:'PIN (4 to 6 digits)',pinHint:'Remember this PIN. You will use it to log in on another phone.',nm:'Your name',cty:'City',typ:'Who are you?',tShop:'Shopkeeper',tStu:'Student',tFam:'Home / family',tOth:'Other',shopN:'Shop name (if any)',make:'Create account',doLogin:'Log in',later:'Not now',wait:'Please wait…',badPh:'Mobile number is not valid. Example: 03001234567',badPin:'PIN must be 4 to 6 digits.',exists:'This number already has an account. Enter your PIN to log in.',wrong:'Wrong number or PIN.',noNet:'This needs internet.',fail:'Could not do it right now. Please try again later.',ok:'Account ready! Your hisaab will now be backed up to the cloud.',in:'Logged in.',logged:'Logged in',synced:'Last backup',never:'not yet',syncNow:'Back up now',logout:'Log out',outQ:'Log out? This phone keeps its hisaab.',restored:'Your hisaab was restored from the cloud.',choose:'Found two copies of your hisaab. Which one should we keep?',usePhone:'This phone',useCloud:'Cloud copy',entries:'entries',fb:'Feedback / complaint',fbPh:'What you liked, what you did not, or a new idea…',fbSend:'Send',fbOk:'Thank you! Your message reached us.',fbLogin:'Please create an account first to send feedback.',have:'Already have an account? Log in',other:'This phone was on another account before. Its hisaab was saved separately on this phone.'}
+};
+function at(k){const l=D.lang||'roman';return (AC[l]&&AC[l][k])||AC.roman[k]||k;}
+function accGet(){try{return JSON.parse(localStorage.getItem(ACC_KEY)||'null');}catch(e){return null;}}
+function accSet(a){try{if(a)localStorage.setItem(ACC_KEY,JSON.stringify(a));else localStorage.removeItem(ACC_KEY);}catch(e){}}
+function normPK(p){let d=String(p||'').replace(/\D/g,'');if(d.startsWith('0092'))d=d.slice(2);if(d.startsWith('03')&&d.length===11)d='92'+d.slice(1);if(d.startsWith('3')&&d.length===10)d='92'+d;return /^923\d{9}$/.test(d)?d:null;}
+async function sbFetch(url,opt,ms){const ctl=new AbortController();const tm=setTimeout(()=>ctl.abort(),ms||15000);try{return await fetch(url,Object.assign({signal:ctl.signal},opt));}finally{clearTimeout(tm);}}
+async function sbLogin(phone,pin){
+  const r=await sbFetch(SB_URL+'/auth/v1/token?grant_type=password',{method:'POST',headers:{apikey:SB_KEY,'content-type':'application/json'},body:JSON.stringify({email:phone+'@phone.jugnu.app',password:'jugnu-pin-'+pin})});
+  const j=await r.json().catch(()=>({}));if(!r.ok||!j.access_token)return{err:r.status===400?'wrong':'fail'};
+  const old=accGet()||{};
+  const a={phone,uid:j.user.id,access:j.access_token,refresh:j.refresh_token,exp:Date.now()+(j.expires_in||3600)*1000,lastSync:old.uid===j.user.id?old.lastSync||0:0,dirty:old.uid===j.user.id?!!old.dirty:false};
+  accSet(a);return{a};
+}
+async function sbToken(){const a=accGet();if(!a)return null;if(Date.now()<a.exp-60000)return a.access;
+  try{const r=await sbFetch(SB_URL+'/auth/v1/token?grant_type=refresh_token',{method:'POST',headers:{apikey:SB_KEY,'content-type':'application/json'},body:JSON.stringify({refresh_token:a.refresh})});
+    const j=await r.json().catch(()=>({}));if(!r.ok||!j.access_token){if(r.status===400||r.status===401){a.expired=true;accSet(a);}return null;}
+    Object.assign(a,{access:j.access_token,refresh:j.refresh_token,exp:Date.now()+(j.expires_in||3600)*1000,expired:false});accSet(a);return a.access;}catch(e){return null;}}
+async function sbRest(path,opt){const tk=await sbToken();if(!tk)throw{code:'auth'};
+  const o=opt||{};const h={apikey:SB_KEY,Authorization:'Bearer '+tk,'content-type':'application/json'};if(o.prefer)h.Prefer=o.prefer;
+  const r=await sbFetch(SB_URL+'/rest/v1/'+path,{method:o.method||'GET',headers:h,body:o.body!==undefined?JSON.stringify(o.body):undefined});
+  if(!r.ok)throw{code:'http_'+r.status};const tx=await r.text();return tx?JSON.parse(tx):null;}
+const online=()=>navigator.onLine!==false;
+function hasData(d){return !!(d&&((d.entries&&d.entries.length)||(d.customers&&d.customers.filter(c=>c.type==='customer'||c.type==='supplier').length)));}
+/* ---- usage counts (numbers only, never names or amounts) ---- */
+function evt(kind,n){try{const q=JSON.parse(localStorage.getItem(EVQ_KEY)||'{}');q[kind]=Math.min((q[kind]||0)+(n||1),1000);localStorage.setItem(EVQ_KEY,JSON.stringify(q));}catch(e){}}
+async function evFlush(){const a=accGet();if(!a||a.expired||!online())return;let q;try{q=JSON.parse(localStorage.getItem(EVQ_KEY)||'{}');}catch(e){q={};}
+  const rows=Object.keys(q).filter(k=>q[k]>0).map(k=>({user_id:a.uid,kind:k,n:q[k],app_version:APP_VER}));if(!rows.length)return;
+  try{await sbRest('events',{method:'POST',body:rows,prefer:'return=minimal'});localStorage.setItem(EVQ_KEY,'{}');}catch(e){}}
+/* ---- cloud backup ---- */
+let syncTm=null,syncing=false;
+function markDirty(){const a=accGet();if(!a)return;if(!a.dirty){a.dirty=true;accSet(a);}clearTimeout(syncTm);syncTm=setTimeout(syncPush,4000);}
+async function syncPush(force){const a=accGet();if(!a||a.expired||syncing||!online())return false;if(!a.dirty&&!force)return true;if(!hasData(D)&&!D.shop)return true;syncing=true;
+  try{D.uid=a.uid;const now=new Date().toISOString();
+    await sbRest('khata_backups?on_conflict=user_id',{method:'POST',body:{user_id:a.uid,data:D,device:(navigator.userAgent||'').slice(0,90),updated_at:now},prefer:'resolution=merge-duplicates,return=minimal'});
+    const b=accGet();if(b&&b.uid===a.uid){b.dirty=false;b.lastSync=Date.now();accSet(b);}evFlush();return true;
+  }catch(e){return false;}finally{syncing=false;}}
+async function cloudGet(uid){const r=await sbRest('khata_backups?select=data,updated_at&user_id=eq.'+uid);return r&&r[0]?r[0]:null;}
+function adoptData(d){const keepLang=D.lang;D=Object.assign(blank(),d);if(!D.lang)D.lang=keepLang;try{localStorage.setItem(KEY,JSON.stringify(D));}catch(e){}S.chat=[];}
+async function afterLogin(isNew){
+  const a=accGet();if(!a)return;
+  if(D.uid&&D.uid!==a.uid){try{localStorage.setItem('jugnu_khata_prev_'+D.uid,JSON.stringify(D));}catch(e){}toast(at('other'));D=Object.assign(blank(),{lang:D.lang});save0();}
+  let c=null;try{c=await cloudGet(a.uid);}catch(e){}
+  if(c&&hasData(c.data)&&!hasData(D)){adoptData(c.data);a.dirty=false;a.lastSync=Date.now();accSet(a);closeModal();render();toast(at('restored'),true);return;}
+  if(c&&hasData(c.data)&&hasData(D)&&!isNew&&!(D.uid===a.uid&&a.lastSync&&Date.parse(c.updated_at)<=a.lastSync+5000)){chooseCopy(c);return;}
+  if(c&&c.data&&!hasData(D)&&c.data.shop&&!D.shop){adoptData(c.data);a.dirty=false;a.lastSync=Date.now();accSet(a);closeModal();render();return;}
+  D.uid=a.uid;save0();a.dirty=true;accSet(a);await syncPush(true);closeModal();render();toast(isNew?at('ok'):at('in'),true);
+}
+function chooseCopy(c){const n=(c.data.entries||[]).length,m=D.entries.length;const dt=new Date(c.updated_at).toLocaleString();
+  modal(`<h1>${esc(at('choose'))}</h1><div class="acc-choice"><button class="btn full" data-act="keepPhone">${esc(at('usePhone'))} · <span class="num">${m}</span> ${esc(at('entries'))}</button>
+   <button class="btn ghost full" data-act="keepCloud">${esc(at('useCloud'))} · <span class="num">${n}</span> ${esc(at('entries'))}<small class="note" style="display:block">${esc(dt)}</small></button></div>`);
+  window.__cloudCopy=c;}
+/* ---- owner's brain (editable from dashboard) ---- */
+function brainAll(){try{return JSON.parse(localStorage.getItem(BRAIN_KEY)||'{}');}catch(e){return{};}}
+function brainVal(k){const v=brainAll()[k];return v&&String(v).trim()?String(v):'';}
+async function brainPull(){if(!online())return;try{const r=await sbFetch(SB_URL+'/rest/v1/brain?select=key,value',{headers:{apikey:SB_KEY}},10000);if(!r.ok)return;const rows=await r.json();const o={};rows.forEach(x=>o[x.key]=x.value);localStorage.setItem(BRAIN_KEY,JSON.stringify(o));}catch(e){}}
+function brainAnnounce(){const v=brainVal('announce');if(!v||isStudent())return;let seen='';try{seen=localStorage.getItem('jugnu_ann_seen')||'';}catch(e){}
+  if(seen===v)return;try{localStorage.setItem('jugnu_ann_seen',v);}catch(e){}jPush({who:'ai',text:v,l:D.lang});}
+/* ---- UI ---- */
+function acctModal(mode){
+  if(!online()){toast(at('noNet'));return;}
+  const m=mode||'new';const typ=['shop','student','family','other'];
+  modal(`<div class="acc-top"><div class="acc-badge">${ffSVG()}</div><div><h1>${esc(m==='new'?at('accT'):at('login'))}</h1><p class="soft small">${esc(at('accWhy'))}</p></div></div>
+   <div class="seg acc-tabs" role="group"><button data-act="accTab" data-id="new" aria-pressed="${m==='new'}">${esc(at('newA'))}</button><button data-act="accTab" data-id="login" aria-pressed="${m==='login'}">${esc(at('login'))}</button></div>
+   <form id="accForm" class="stack" novalidate>
+    <div><label for="aPh">${esc(at('mob'))}</label><input id="aPh" inputmode="tel" autocomplete="tel" dir="ltr" placeholder="03001234567" required></div>
+    <div><label for="aPin">${esc(at('pin'))}</label><input id="aPin" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="6" autocomplete="${m==='new'?'new-password':'current-password'}" dir="ltr" required><p class="note">${esc(at('pinHint'))}</p></div>
+    ${m==='new'?`<div><label for="aNm">${esc(at('nm'))}</label><input id="aNm" dir="auto" autocomplete="name" value="${esc((D.shop&&D.shop.owner)||'')}"></div>
+    <div class="grid2"><div><label for="aCt">${esc(at('cty'))}</label><input id="aCt" dir="auto" value="${esc((D.shop&&D.shop.city)||'')}"></div>
+    <div><label for="aTy">${esc(at('typ'))}</label><select id="aTy">${typ.map(x=>`<option value="${x}" ${(isStudent()?'student':'shop')===x?'selected':''}>${esc(at({shop:'tShop',student:'tStu',family:'tFam',other:'tOth'}[x]))}</option>`).join('')}</select></div></div>
+    <div><label for="aSh">${esc(at('shopN'))}</label><input id="aSh" dir="auto" value="${esc((D.shop&&D.shop.name)||'')}"></div>`:''}
+    <p class="warnbox" id="aErr" hidden></p>
+    <button class="btn full" type="submit" id="aGo">${esc(m==='new'?at('make'):at('doLogin'))}</button>
+    <button class="btn ghost full" type="button" data-act="accLater">${esc(at('later'))}</button>
+   </form>`);
+  const f=$('accForm');f.onsubmit=async e=>{e.preventDefault();const err=$('aErr'),go=$('aGo');const show=k=>{err.textContent=at(k);err.hidden=false;};
+    const ph=normPK($('aPh').value),pin=$('aPin').value.trim();if(!ph)return show('badPh');if(!/^\d{4,6}$/.test(pin))return show('badPin');
+    if(!online())return show('noNet');go.disabled=true;go.textContent=at('wait');err.hidden=true;
+    try{
+      if(m==='new'){const r=await sbFetch(SB_URL+'/functions/v1/signup',{method:'POST',headers:{apikey:SB_KEY,'content-type':'application/json'},body:JSON.stringify({phone:ph,pin,name:$('aNm').value,city:$('aCt').value,user_type:$('aTy').value,shop_name:$('aSh').value,app_version:APP_VER})},25000);
+        const j=await r.json().catch(()=>({}));if(!r.ok){if(j.error==='exists'){acctModal('login');$('aPh').value=ph;$('aErr').textContent=at('exists');$('aErr').hidden=false;return;}show('fail');go.disabled=false;go.textContent=at('make');return;}}
+      const lr=await sbLogin(ph,pin);if(lr.err){show(lr.err);go.disabled=false;go.textContent=m==='new'?at('make'):at('doLogin');return;}
+      evt('signin');await afterLogin(m==='new');
+    }catch(e2){show('fail');go.disabled=false;go.textContent=m==='new'?at('make'):at('doLogin');}
+  };
+}
+function accCardHTML(){const a=accGet();
+  if(!a)return `<div class="page stack acc-card"><h2 style="margin-top:0">${esc(at('acc'))}</h2><p class="soft small">${esc(at('accWhy'))}</p><button class="btn full" data-act="accOpen">${esc(at('accT'))}</button><button class="btn ghost full" data-act="accLogin">${esc(at('login'))}</button></div>`;
+  const ls=a.lastSync?new Date(a.lastSync).toLocaleString():at('never');
+  return `<div class="page stack acc-card"><h2 style="margin-top:0">${esc(at('acc'))}</h2>
+   <div class="acc-row"><span class="acc-dot ${a.expired?'off':''}"></span><div><b class="num">+${esc(a.phone)}</b><small class="note" style="display:block">${esc(at('synced'))}: ${esc(ls)}${a.dirty?' ·':''}</small></div></div>
+   ${a.expired?`<button class="btn full" data-act="accLogin">${esc(at('login'))}</button>`:`<button class="btn ghost full" data-act="accSync">${esc(at('syncNow'))}</button>`}
+   <button class="btn ghost full" data-act="accOut">${esc(at('logout'))}</button></div>`;}
+function fbCardHTML(){return `<div class="page stack"><h2 style="margin-top:0">${esc(at('fb'))}</h2><form id="fbForm" class="stack"><textarea id="fbTx" dir="auto" maxlength="2000" placeholder="${esc(at('fbPh'))}"></textarea><button class="btn full" type="submit">${esc(at('fbSend'))}</button></form></div>`;}
+function bindAcct(){const f=$('fbForm');if(f)f.onsubmit=async e=>{e.preventDefault();const tx=$('fbTx').value.trim();if(!tx)return;const a=accGet();
+  if(!a){toast(at('fbLogin'));acctModal('new');return;}if(!online()){toast(at('noNet'));return;}
+  try{await sbRest('feedback',{method:'POST',body:{user_id:a.uid,message:tx.slice(0,2000),app_version:APP_VER},prefer:'return=minimal'});$('fbTx').value='';toast(at('fbOk'),true);}catch(e2){toast(e2&&e2.code==='auth'?at('wrong'):at('fail'));if(e2&&e2.code==='auth')acctModal('login');}};}
+function acctAct(act,id){
+  switch(act){
+    case 'accOpen':acctModal('new');return true;
+    case 'accLogin':acctModal('login');return true;
+    case 'accTab':acctModal(id);return true;
+    case 'accLater':try{localStorage.setItem('jugnu_acc_later',String(Date.now()));}catch(e){}closeModal();return true;
+    case 'accSync':syncPush(true).then(ok=>{toast(ok?'✓':at('fail'));render();});return true;
+    case 'accOut':if(confirmSafe(at('outQ'))){accSet(null);render();}return true;
+    case 'keepPhone':{const a=accGet();D.uid=a.uid;save0();a.dirty=true;accSet(a);syncPush(true).then(()=>{closeModal();render();toast(at('in'),true);});return true;}
+    case 'keepCloud':{const a=accGet();adoptData(window.__cloudCopy.data);D.uid=a.uid;a.dirty=false;a.lastSync=Date.now();accSet(a);closeModal();render();toast(at('restored'),true);return true;}
+  }
+  return false;
+}
+function confirmSafe(q){try{return window.confirm(q);}catch(e){return true;}}
+/* ---- hooks into the existing app ---- */
+const save0=save;
+save=function(){save0();markDirty();};
+const _commitEntry=commitEntry;commitEntry=function(d){evt('entry');return _commitEntry(d);};
+const _handleVoice=handleVoice;handleVoice=function(b){evt('voice');return _handleVoice(b);};
+const _aiJSON=aiJSON;aiJSON=function(prompt,model){evt('ai');const ex=brainVal('ai_extra');
+  if(ex&&/^You are (Jugnu|Ustad)/.test(prompt))prompt="Extra guidance from Jugnu's owner (follow it unless it breaks the rules below):\n"+ex.slice(0,3000)+"\n\n"+prompt;return _aiJSON(prompt,model);};
+window.addEventListener('error',()=>evt('error'));
+window.addEventListener('online',()=>{syncPush();evFlush();brainPull();});
+function acctBoot(){evt('open');brainPull();const a=accGet();
+  if(a&&!a.expired&&online()){sbRest('rpc/touch_seen',{method:'POST',body:{v:APP_VER}}).catch(()=>{});
+    if(a.dirty)syncPush();else cloudGet(a.uid).then(c=>{const b=accGet();if(c&&b&&!b.dirty&&hasData(c.data)&&Date.parse(c.updated_at)>(b.lastSync||0)+5000){adoptData(c.data);b.lastSync=Date.now();accSet(b);render();}}).catch(()=>{});
+    evFlush();}
+  acctPrompt();
+}
+function acctPrompt(){const a=accGet();if(!a&&D.shop&&!inViewer()&&online()){let later=0;try{later=+localStorage.getItem('jugnu_acc_later')||0;}catch(e){}if(Date.now()-later>3*86400000)setTimeout(()=>{if(!$('modalHost').innerHTML&&!accGet())acctModal('new');},1500);}}
+const _loadDemo=loadDemo;loadDemo=function(){const r=_loadDemo.apply(this,arguments);acctPrompt();return r;};
+
 render();
+acctBoot();
 </script>

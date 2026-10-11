@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<title>Jugnu Control Room</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700&family=Noto+Nastaliq+Urdu:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#F3F6F4;--surface:#FFFFFF;--ink:#0F1D18;--ink2:#46574F;--line:#DCE5E0;
+  --brand:#0E7A5B;--brand-d:#08503C;--brand-soft:#E2F3EB;--accent:#F2A516;--accent-soft:#FFF3D6;
+  --bad:#B42318;--bad-soft:#FDECEA;--good:#0E7A5B;
+  --r:16px;--sh:0 1px 2px rgba(15,29,24,.06),0 8px 24px rgba(15,29,24,.07);
+  --f:'Sora',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f);font-size:15px;line-height:1.5;padding:0 16px 48px}
+.wrap{max-width:1100px;margin:0 auto}
+header{display:flex;align-items:center;gap:12px;padding:18px 0}
+.logo{width:40px;height:40px;border-radius:12px;background:linear-gradient(135deg,var(--brand),var(--brand-d));display:grid;place-items:center;box-shadow:var(--sh)}
+.logo i{width:12px;height:12px;border-radius:50%;background:var(--accent);box-shadow:0 0 14px 5px rgba(242,165,22,.55)}
+h1{font-size:20px;margin:0;letter-spacing:-.02em}
+header small{display:block;color:var(--ink2);font-size:13px}
+.sp{flex:1}
+.btn{border:none;border-radius:12px;background:var(--brand);color:#fff;font:inherit;font-weight:600;padding:10px 16px;min-height:44px;cursor:pointer}
+.btn.ghost{background:var(--surface);color:var(--ink);border:1px solid var(--line)}
+.btn.sm{min-height:36px;padding:6px 12px;font-size:13px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--sh);padding:18px}
+.login{max-width:400px;margin:8vh auto 0}
+label{display:block;font-size:13px;color:var(--ink2);margin:10px 0 4px}
+input,textarea,select{width:100%;font:inherit;font-size:16px;border:1px solid var(--line);border-radius:12px;padding:10px 12px;min-height:46px;background:#fff;color:var(--ink)}
+textarea{min-height:110px;resize:vertical;line-height:1.6}
+.err{background:var(--bad-soft);color:var(--bad);border-radius:10px;padding:8px 12px;margin-top:10px;font-size:14px}
+.tabs{display:flex;gap:6px;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:5px;margin-bottom:14px;overflow-x:auto}
+.tabs button{border:none;background:none;font:inherit;font-weight:600;color:var(--ink2);padding:9px 14px;border-radius:10px;cursor:pointer;white-space:nowrap;min-height:40px}
+.tabs button[aria-selected="true"]{background:var(--brand);color:#fff}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:14px}
+.kpi{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:14px 16px;box-shadow:var(--sh)}
+.kpi small{color:var(--ink2);font-size:12px;font-weight:600;letter-spacing:.02em;text-transform:uppercase}
+.kpi b{display:block;font-size:28px;letter-spacing:-.03em;font-variant-numeric:tabular-nums;margin-top:2px}
+.kpi span{font-size:12px;color:var(--ink2)}
+.tbl{width:100%;border-collapse:collapse;font-size:14px}
+.tblw{overflow-x:auto;margin:0 -18px;padding:0 18px}
+.tbl th{text-align:start;font-size:12px;color:var(--ink2);font-weight:600;text-transform:uppercase;letter-spacing:.03em;padding:8px 10px;border-bottom:1px solid var(--line);white-space:nowrap}
+.tbl td{padding:10px;border-bottom:1px solid var(--line);vertical-align:top}
+.tbl td.n{text-align:end;font-variant-numeric:tabular-nums}
+.tbl tr:last-child td{border-bottom:none}
+.pill{display:inline-block;border-radius:999px;padding:1px 9px;font-size:12px;font-weight:600;background:var(--brand-soft);color:var(--brand-d)}
+.pill.warm{background:var(--accent-soft);color:#7A4E00}
+.pill.bad{background:var(--bad-soft);color:var(--bad)}
+.pill.mute{background:#EEF2F0;color:var(--ink2)}
+.muted{color:var(--ink2);font-size:13px}
+.fb{border-bottom:1px solid var(--line);padding:12px 0}
+.fb:last-child{border-bottom:none}
+.fb p{margin:6px 0 0;white-space:pre-wrap}
+.fb .meta{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.brain-item{border-bottom:1px solid var(--line);padding:14px 0}
+.brain-item:last-child{border-bottom:none}
+.brain-item h3{font-size:15px;margin:0}
+.brain-item .muted{margin:2px 0 6px}
+.ur{font-family:'Noto Nastaliq Urdu',var(--f);direction:rtl;line-height:2}
+.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--ink);color:#fff;border-radius:999px;padding:9px 18px;font-weight:600;font-size:14px;z-index:9}
+.bar{height:8px;border-radius:4px;background:var(--brand-soft);overflow:hidden;min-width:60px}
+.bar i{display:block;height:100%;background:var(--brand)}
+.empty{text-align:center;color:var(--ink2);padding:24px}
+button:focus-visible,input:focus-visible,textarea:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+</style>
+</head>
+<body>
+<div class="wrap">
+ <header><div class="logo"><i></i></div><div><h1>Jugnu Control Room</h1><small id="who">Owner dashboard</small></div><div class="sp"></div><button class="btn ghost sm" id="outBtn" hidden>Log out</button></header>
+ <main id="app"></main>
+</div>
+<script>
+const SB_URL='https://otctbjuosvefhziuudmy.supabase.co',SB_KEY='sb_publishable_V4TmfCm7NLsJ1bF2gdEpMw_8x3QZIgC',K='jugnu_admin_v1';
+const $=id=>document.getElementById(id);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+let A=null;try{A=JSON.parse(localStorage.getItem(K)||'null');}catch(e){}
+const saveA=()=>{try{A?localStorage.setItem(K,JSON.stringify(A)):localStorage.removeItem(K);}catch(e){}};
+function toast(t){const d=document.createElement('div');d.className='toast';d.textContent=t;document.body.appendChild(d);setTimeout(()=>d.remove(),2200);}
+function normPK(p){let d=String(p||'').replace(/\D/g,'');if(d.startsWith('0092'))d=d.slice(2);if(d.startsWith('03')&&d.length===11)d='92'+d.slice(1);if(d.startsWith('3')&&d.length===10)d='92'+d;return /^923\d{9}$/.test(d)?d:null;}
+async function auth(body,grant){const r=await fetch(SB_URL+'/auth/v1/token?grant_type='+grant,{method:'POST',headers:{apikey:SB_KEY,'content-type':'application/json'},body:JSON.stringify(body)});const j=await r.json().catch(()=>({}));if(!r.ok||!j.access_token)throw new Error('auth');A={access:j.access_token,refresh:j.refresh_token,exp:Date.now()+(j.expires_in||3600)*1000,phone:A&&A.phone||''};saveA();}
+async function token(){if(!A)throw new Error('auth');if(Date.now()>A.exp-60000)await auth({refresh_token:A.refresh},'refresh_token');return A.access;}
+async function api(path,opt={}){const t=await token();const h={apikey:SB_KEY,Authorization:'Bearer '+t,'content-type':'application/json'};if(opt.prefer)h.Prefer=opt.prefer;
+  const r=await fetch(SB_URL+'/rest/v1/'+path,{method:opt.method||'GET',headers:h,body:opt.body!==undefined?JSON.stringify(opt.body):undefined});if(!r.ok)throw new Error('http '+r.status);const tx=await r.text();return tx?JSON.parse(tx):null;}
+const ago=ts=>{if(!ts)return '—';const s=(Date.now()-Date.parse(ts))/1000;if(s<90)return 'just now';if(s<3600)return Math.round(s/60)+' min ago';if(s<86400)return Math.round(s/3600)+' h ago';return Math.round(s/86400)+' d ago';};
+const fmtPh=p=>p?('0'+String(p).slice(2,5)+' '+String(p).slice(5)):'';
+const TYPE={shop:'Shopkeeper',student:'Student',family:'Family',other:'Other'};
+let TAB='overview',DATA={testers:[],feedback:[],brain:{}};
+function loginView(msg){$('outBtn').hidden=true;$('app').innerHTML=`<div class="card login"><h1>Owner login</h1><p class="muted">Use the same mobile number and PIN as your Jugnu account. Only admin accounts can see this dashboard.</p>
+ <form id="lf"><label for="lp">Mobile number</label><input id="lp" inputmode="tel" placeholder="03001234567" autocomplete="tel"><label for="lk">PIN</label><input id="lk" type="password" inputmode="numeric" maxlength="6" autocomplete="current-password">
+ ${msg?`<div class="err">${esc(msg)}</div>`:''}<div style="margin-top:14px"><button class="btn" style="width:100%">Log in</button></div></form></div>`;
+ $('lf').onsubmit=async e=>{e.preventDefault();const ph=normPK($('lp').value),pin=$('lk').value.trim();if(!ph||!/^\d{4,6}$/.test(pin))return loginView('Enter a valid mobile number and 4 to 6 digit PIN.');
+  try{A={phone:ph};await auth({email:ph+'@phone.jugnu.app',password:'jugnu-pin-'+pin},'password');boot();}catch(err){A=null;saveA();loginView('Wrong number or PIN.');}};}
+async function boot(){if(!A)return loginView();$('outBtn').hidden=false;$('who').textContent='Logged in as '+fmtPh(A.phone);
+  $('app').innerHTML='<div class="card empty">Loading…</div>';
+  let ok=false;try{ok=await api('rpc/is_admin',{method:'POST',body:{}});}catch(e){A=null;saveA();return loginView('Session expired. Please log in again.');}
+  if(!ok){$('app').innerHTML=`<div class="card login"><h1>Not an admin yet</h1><p class="muted">This account (${esc(fmtPh(A.phone))}) works, but it has no admin rights. Ask your developer to add it as admin, then reload.</p></div>`;return;}
+  await loadAll();render();}
+async function loadAll(){const [t,f,b]=await Promise.all([api('rpc/admin_testers',{method:'POST',body:{}}),api('feedback?select=id,user_id,message,app_version,status,created_at&order=created_at.desc&limit=300'),api('brain?select=key,value,updated_at')]);
+  DATA.testers=t||[];DATA.feedback=f||[];DATA.brain={};(b||[]).forEach(x=>DATA.brain[x.key]=x);}
+function tabs(){const T=[['overview','Overview'],['testers','Testers ('+DATA.testers.length+')'],['feedback','Feedback ('+DATA.feedback.filter(x=>x.status==='new').length+' new)'],['brain',"Jugnu's brain"]];
+  return `<div class="tabs" role="tablist">${T.map(([k,l])=>`<button role="tab" data-tab="${k}" aria-selected="${TAB===k}">${esc(l)}</button>`).join('')}<div class="sp"></div><button class="btn ghost sm" id="refresh">Refresh</button></div>`;}
+function render(){const v={overview,testers,feedback,brain}[TAB]();$('app').innerHTML=tabs()+v;bind();}
+function overview(){const T=DATA.testers,wk=Date.now()-7*86400000;
+  const active=T.filter(x=>Date.parse(x.last_seen)>wk).length,daily=T.filter(x=>x.days_active_7d>=4).length;
+  const sum=k=>T.reduce((s,x)=>s+Number(x[k]||0),0);const backed=T.filter(x=>x.backup_at).length;
+  const signups=T.filter(x=>Date.parse(x.created_at)>wk).length;
+  const byType={};T.forEach(x=>byType[x.user_type]=(byType[x.user_type]||0)+1);
+  const byCity={};T.forEach(x=>{const c=(x.city||'Unknown').trim()||'Unknown';byCity[c]=(byCity[c]||0)+1;});
+  const top=Object.entries(byCity).sort((a,b)=>b[1]-a[1]).slice(0,6),mx=Math.max(1,...top.map(x=>x[1]));
+  return `<div class="kpis">
+   <div class="kpi"><small>Testers</small><b>${T.length}</b><span>+${signups} this week</span></div>
+   <div class="kpi"><small>Active 7 days</small><b>${active}</b><span>opened Jugnu this week</span></div>
+   <div class="kpi"><small>Daily users</small><b>${daily}</b><span>used it 4+ days this week</span></div>
+   <div class="kpi"><small>Entries 7 days</small><b>${sum('entries_7d')}</b><span>${sum('entries_total')} all time</span></div>
+   <div class="kpi"><small>Voice notes 7 days</small><b>${sum('voice_7d')}</b><span>${sum('ai_7d')} AI replies</span></div>
+   <div class="kpi"><small>Cloud backups</small><b>${backed}</b><span>${sum('errors_7d')} app errors this week</span></div></div>
+   <div class="kpis" style="grid-template-columns:repeat(auto-fit,minmax(280px,1fr))">
+    <div class="card"><h3 style="margin:0 0 10px;font-size:15px">Who is testing</h3>${Object.keys(byType).length?Object.entries(byType).map(([k,n])=>`<div class="row" style="justify-content:space-between;padding:4px 0"><span>${esc(TYPE[k]||k)}</span><b>${n}</b></div>`).join(''):'<p class="muted">No testers yet.</p>'}</div>
+    <div class="card"><h3 style="margin:0 0 10px;font-size:15px">Top cities</h3>${top.length?top.map(([c,n])=>`<div class="row" style="padding:4px 0"><span style="width:110px">${esc(c)}</span><div class="bar" style="flex:1"><i style="width:${n/mx*100}%"></i></div><b style="width:28px;text-align:end">${n}</b></div>`).join(''):'<p class="muted">No data yet.</p>'}</div>
+    <div class="card"><h3 style="margin:0 0 10px;font-size:15px">Pilot goal</h3><p style="margin:0">Daily users: <b>${daily}</b> of ${T.length||0} testers.</p><p class="muted" style="margin-top:6px">Target: 40% of testers using Jugnu 4 or more days a week for 2 weeks before charging.</p><div class="bar" style="margin-top:10px;height:12px"><i style="width:${T.length?Math.min(100,daily/T.length/0.4*100):0}%"></i></div></div>
+   </div>`;}
+function testers(){const T=DATA.testers;if(!T.length)return '<div class="card empty">No testers yet. Share the app link and ask people to create an account.</div>';
+  return `<div class="card"><div class="tblw"><table class="tbl"><thead><tr><th>Name</th><th>Mobile</th><th>Type</th><th>City</th><th>Last seen</th><th class="n">Days active</th><th class="n">Entries 7d</th><th class="n">Voice 7d</th><th class="n">AI 7d</th><th class="n">Errors</th><th>Backup</th><th>Plan</th><th></th></tr></thead><tbody>
+  ${T.map(x=>`<tr><td><b>${esc(x.name||'—')}</b>${x.shop_name?`<div class="muted">${esc(x.shop_name)}</div>`:''}</td><td style="white-space:nowrap"><a href="https://wa.me/${esc(x.phone)}" target="_blank" rel="noopener">${esc(fmtPh(x.phone))}</a></td><td>${esc(TYPE[x.user_type]||x.user_type)}</td><td>${esc(x.city||'—')}</td>
+   <td style="white-space:nowrap">${esc(ago(x.last_seen))}<div class="muted">v${esc(x.app_version||'?')}</div></td><td class="n">${x.days_active_7d}/7</td><td class="n">${x.entries_7d}</td><td class="n">${x.voice_7d}</td><td class="n">${x.ai_7d}</td><td class="n">${x.errors_7d?`<span class="pill bad">${x.errors_7d}</span>`:'0'}</td>
+   <td style="white-space:nowrap">${x.backup_at?`<span class="pill">${esc(ago(x.backup_at))}</span><div class="muted">${x.backup_kb} KB</div>`:'<span class="pill mute">none</span>'}</td>
+   <td><select data-plan="${esc(x.id)}" style="min-height:36px;padding:4px 8px;font-size:13px">${['pilot','free','paid','blocked'].map(p=>`<option ${x.plan===p?'selected':''}>${p}</option>`).join('')}</select></td><td></td></tr>`).join('')}
+  </tbody></table></div><p class="muted" style="margin-top:10px">Only usage counts reach this dashboard. Customer names and amounts stay inside each tester's own account.</p></div>`;}
+function feedback(){const F=DATA.feedback;if(!F.length)return '<div class="card empty">No feedback yet. Testers can send it from Settings → Feedback in the app.</div>';
+  const P={};DATA.testers.forEach(t=>P[t.id]=t);
+  return `<div class="card">${F.map(x=>{const t=P[x.user_id]||{};return `<div class="fb"><div class="meta"><b>${esc(t.name||'Tester')}</b><span class="muted">${esc(fmtPh(t.phone))} · ${esc(t.city||'')} · v${esc(x.app_version)} · ${esc(ago(x.created_at))}</span>
+   <span class="pill ${x.status==='new'?'warm':x.status==='done'?'':'mute'}">${esc(x.status)}</span><div class="sp"></div>
+   ${x.status!=='done'?`<button class="btn ghost sm" data-fb="${x.id}" data-st="done">Mark done</button>`:`<button class="btn ghost sm" data-fb="${x.id}" data-st="new">Reopen</button>`}
+   ${t.phone?`<a class="btn ghost sm" style="text-decoration:none;display:inline-flex;align-items:center" target="_blank" rel="noopener" href="https://wa.me/${esc(t.phone)}">Reply on WhatsApp</a>`:''}</div><p dir="auto">${esc(x.message)}</p></div>`;}).join('')}</div>`;}
+const BRAIN=[
+ ['announce','Announcement','Shown once to every shopkeeper in the Jugnu chat when it changes. Leave empty for none.',false],
+ ['ai_extra','Extra guidance for the AI','Added to every Jugnu and Ustad AI reply. Example: "Always suggest Raast QR for payments. Mention Ramzan stock planning this month." Does not change offline replies.',false],
+ ['greet_roman','Greeting: Roman Urdu','First line Jugnu says when opened. Leave empty to use the built-in greeting.',false],
+ ['greet_ur','Greeting: Urdu','',true],
+ ['greet_ps','Greeting: Pashto','',true],
+ ['greet_en','Greeting: English','',false]];
+function brain(){return `<div class="card"><p class="muted" style="margin-top:0">Changes reach phones the next time they open Jugnu with internet. Offline phones keep the last version.</p>
+  ${BRAIN.map(([k,l,h,rtl])=>{const v=DATA.brain[k];return `<div class="brain-item"><div class="row"><h3>${esc(l)}</h3><div class="sp"></div><span class="muted">${v?'updated '+esc(ago(v.updated_at)):'not set'}</span></div>${h?`<p class="muted">${esc(h)}</p>`:''}
+   <textarea id="b_${k}" dir="${rtl?'rtl':'auto'}" class="${rtl?'ur':''}" maxlength="${k==='ai_extra'?3000:600}">${esc(v?v.value:'')}</textarea><div class="row" style="margin-top:8px"><button class="btn sm" data-save="${k}">Save</button>${v&&v.value?`<button class="btn ghost sm" data-clear="${k}">Clear</button>`:''}</div></div>`;}).join('')}</div>`;}
+function bind(){document.querySelectorAll('[data-tab]').forEach(b=>b.onclick=()=>{TAB=b.dataset.tab;render();});
+  $('refresh').onclick=async()=>{await loadAll();render();toast('Updated');};
+  document.querySelectorAll('[data-save],[data-clear]').forEach(b=>b.onclick=async()=>{const k=b.dataset.save||b.dataset.clear;const val=b.dataset.save?$('b_'+k).value.trim():'';
+    try{await api('brain?on_conflict=key',{method:'POST',body:{key:k,value:val,updated_at:new Date().toISOString()},prefer:'resolution=merge-duplicates,return=minimal'});await loadAll();render();toast('Saved. Live for everyone.');}catch(e){toast('Could not save: '+e.message);}});
+  document.querySelectorAll('[data-fb]').forEach(b=>b.onclick=async()=>{try{await api('feedback?id=eq.'+b.dataset.fb,{method:'PATCH',body:{status:b.dataset.st},prefer:'return=minimal'});await loadAll();render();}catch(e){toast('Could not update');}});
+  document.querySelectorAll('[data-plan]').forEach(s=>s.onchange=async()=>{try{await api('profiles?id=eq.'+s.dataset.plan,{method:'PATCH',body:{plan:s.value},prefer:'return=minimal'});toast('Plan changed to '+s.value);await loadAll();}catch(e){toast('Could not change plan');}});}
+$('outBtn').onclick=()=>{A=null;saveA();loginView();};
+boot();
+</script>
+</body>
+</html>
