@@ -223,6 +223,11 @@ body.night .tabs button[aria-current="page"]{color:#FFD25E}
 .ustadT .jform .btn{background:#5FB8FF;color:#06223A}
 body.night.stu .tabs button[aria-current="page"]{color:#9BE7FF}
 .modal .page{color:var(--ink)}
+.jcard .jover{font-size:13px;font-weight:700;color:#7A1A12;background:#FBE3DF;border-radius:6px;padding:4px 8px;margin-top:6px;line-height:1.6}
+.cmem{display:flex;flex-wrap:wrap;gap:6px}
+.cm{border:1px solid var(--line);background:#FFFFFF;color:var(--ink);font:inherit;font-size:14px;border-radius:999px;padding:6px 12px;min-height:40px;cursor:pointer}
+.cm.ok{background:#DDF3E5;border-color:#17643A;color:#0E3D23;font-weight:700}
+.cm.turn{outline:2px solid var(--gold);outline-offset:1px}
 .jmsg:has(.qcard){width:88%}
 .qcard{margin-top:8px;background:#FFFFFF;color:#1F1A17;border:2px solid #5FB8FF;border-radius:12px;padding:10px;white-space:normal;font-family:var(--latin)}
 .qcard .qq{font-weight:700;font-size:15px;line-height:1.5;margin-bottom:8px}
@@ -520,7 +525,8 @@ function shopHealth(l){
   const top=owe.slice(0,2),topSum=top.reduce((s,x)=>s+x.b,0),p=lene?Math.round(topSum/lene*100):0;
   if(owe.length>=3&&p>=50)L.push('• '+fill(jt('hConc',l),{p,n:joinL(top.map(x=>nameFor(x.c,l)),l)}));
   if(od.length)L.push('• '+fill(jt('hOver',l),{c:od.length,a:rs(od.reduce((s,x)=>s+x.b,0))}));
-  {const ex=expTotal(todayISO(new Date(Date.now()-6*86400000)));if(ex)L.push('• '+fill(jt('hExp',l),{a:rs(ex)}));}
+  {const wk7=todayISO(new Date(Date.now()-6*86400000));const ex=expTotal(wk7),sl=salesTotal(wk7);if(sl)L.push('• '+fill(jt('hSale',l),{s:rs(sl),e:rs(ex)}));else if(ex)L.push('• '+fill(jt('hExp',l),{a:rs(ex)}));}
+  {const ov=D.customers.filter(c=>c.limit&&balance(c.id)>c.limit);if(ov.length)L.push('• '+fill(jt('hLimit',l),{c:ov.length,l:joinL(ov.slice(0,3).map(c=>nameFor(c,l)),l)}));}
   const S2=[];
   if(od.length)S2.push(fill(jt('sRemind',l),{n:joinL(od.slice(0,3).map(x=>nameFor(x.c,l)),l)}));
   if(owe.length>=3&&p>=50)S2.push(fill(jt('sConc',l),{n:nameFor(top[0].c,l)}));
@@ -555,12 +561,14 @@ function detectLang(text){
   return D.lang||'roman';
 }
 /* ---- Munshi rule engine (works offline) ---- */
-function custLine(x,l){if(x.c.type==='expense')return fill(jt('expLine',l),{a:rs(expTotal(todayISO().slice(0,8)+'01'))});const b=x.b,n=nameFor(x.c,l);if(b>0)return fill(jt(x.d>0?'cust':'custS',l),{n,a:rs(b),d:x.d});if(b<0)return fill(jt('custOwe',l),{n,a:rs(b)});return fill(jt('custZero',l),{n});}
+function custLine(x,l){if(x.c.type==='sales')return fill(jt('saleLine',l),{a:rs(salesTotal(todayISO())),m:rs(salesTotal(monthStart()))});if(x.c.type==='expense')return fill(jt('expLine',l),{a:rs(expTotal(todayISO().slice(0,8)+'01'))});const b=x.b,n=nameFor(x.c,l);if(b>0)return fill(jt(x.d>0?'cust':'custS',l),{n,a:rs(b),d:x.d});if(b<0)return fill(jt('custOwe',l),{n,a:rs(b)});return fill(jt('custZero',l),{n});}
 function jugnuAnswer(text,l){
   l=l||detectLang(text);
   const s=' '+toAsciiDigits(text).toLowerCase()+' ';
   const custs=D.customers.map(c=>({c,b:balance(c.id),d:oldestUnpaidDays(c.id)}));
   const hit=nameInText(text);if(hit)learnAlias(hit.c,hit.tok);const named=hit?custs.find(x=>x.c.id===hit.c.id):null;
+  if(named&&/(\bhad\b|limit|حد)/.test(s)&&/\d/.test(s)){const am=pAmounts(pTokens(text)).filter(a=>!a.qty).sort((a,b)=>b.v-a.v)[0];if(am&&am.v>0){named.c.limit=am.v;save();return{text:fill(jt('limitSet',l),{n:nameFor(named.c,l),a:rs(am.v)}),cid:named.c.id};}}
+  if(/(committee|comittee|kameti|kamaiti|\bbc\b|کمیٹی|کمیٹی|کمېټي|کمیټه)/.test(s)){const cs=D.committees||[];return{text:cs.length?cs.map(c=>comSummary(c,l)).join('\n'):ct('none',l),kind:'com'};}
   const isQ=/[?؟]/.test(text)||/(kaise|kaisay|kese|kyun|kyon|kya |kia |kitn|kab |kahan|how |what|why|which|when|batao|bataein|samjhao|کیسے|کیوں|کیا |کتن|بتاؤ|څنګه|ولې|څومره|راته ووایه)/.test(s)||RX.idea.test(s)||RX.health.test(s);
   if(/\d/.test(s)&&!isQ){const p=parseEntry(text);if(p&&p.amount>=10)return{entry:p};}
   if(/(shukriya|thank|شکریہ|مننه|jazak|meherbani)/.test(s))return{text:jt('thanks',l)};
@@ -569,6 +577,7 @@ function jugnuAnswer(text,l){
   if(students().length&&/(padhai|parhai|study|studies|report|school|پڑھائی|رپورٹ|سکول|زده کړ|راپور|ښوونځ)/.test(s)){const ns=students().filter(p=>{const k=skel(words(p.name)[0]);return s.includes(norm(p.name).split(' ')[0])||words(text).some(w=>skel(w)===k&&k.length>=2);});
     const list=ns.length?ns:(/(bach|bachon|bachay|بچ|ماشوم|children|kids|sab)/.test(s)?students():[]);if(list.length)return{text:list.map(p=>famReport(p,l)).join('\n\n'),kind:'fam'};}
   if(RX.health.test(s))return{text:shopHealth(l),kind:'health'};
+  if(/(\bsale\b|\bsales\b|bikri|galla|سیل|بکری|گلہ|خرڅلاو)/.test(s)&&!/\d/.test(s))return{text:fill(jt('saleLine',l),{a:rs(salesTotal(todayISO())),m:rs(salesTotal(monthStart()))})};
   if(/(kharch|kharcha|expense|خرچ|لګښت)/.test(s)&&!/\d/.test(s))return{text:fill(jt('expLine',l),{a:rs(expTotal(todayISO().slice(0,8)+'01'))})};
   if(RX.idea.test(s))return{text:nextTip(l),kind:'idea'};
   if(/(most|zyada|ziada|زیادہ|زیات|تر ټولو|kis ne|کس نے|څوک|د چا|sab se)/.test(s)&&!/(purana|old|پرانا|زوړ|overdue)/.test(s)){
@@ -588,13 +597,13 @@ function jugnuAnswer(text,l){
   if(/(salam|سلام|hello|\bhi\b|assalam|aoa|سلام علیکم)/.test(s))return{text:jt('greet',l)};
   return{text:jt('dont',l)};
 }
-const SIGN={credit:1,payment:-1,goods:-1,paid:1,expense:1};
+const SIGN={credit:1,payment:-1,goods:-1,paid:1,expense:1,sale:1};
 function applyLang(){const l=D.lang||'ur';document.documentElement.lang=l==='roman'?'ur-Latn':l;document.documentElement.dir=(l==='ur'||l==='ps')?'rtl':'ltr';}
 
 /* ================= ledger maths ================= */
 function entriesOf(cid){return D.entries.filter(e=>e.cid===cid).sort((a,b)=>a.date===b.date?a.created-b.created:(a.date<b.date?-1:1));}
 function expTotal(since){const ids=new Set(D.customers.filter(c=>c.type==='expense').map(c=>c.id));return D.entries.filter(e=>ids.has(e.cid)&&(!since||e.date>=since)).reduce((s,e)=>s+e.amount,0);}
-function balance(cid){const cc=D.customers.find(c=>c.id===cid);if(cc&&cc.type==='expense')return 0;return D.entries.reduce((s,e)=>e.cid===cid?s+SIGN[e.type]*e.amount:s,0);}
+function balance(cid){const cc=D.customers.find(c=>c.id===cid);if(cc&&(cc.type==='expense'||cc.type==='sales'))return 0;return D.entries.reduce((s,e)=>e.cid===cid?s+SIGN[e.type]*e.amount:s,0);}
 function balanceAfter(entry){let b=0;for(const e of entriesOf(entry.cid)){b+=SIGN[e.type]*e.amount;if(e.id===entry.id)break;}return b;}
 function oldestUnpaidDays(cid){const es=entriesOf(cid);let pay=es.filter(e=>SIGN[e.type]<0).reduce((s,e)=>s+e.amount,0);for(const e of es){if(SIGN[e.type]>0){if(pay>=e.amount)pay-=e.amount;else return daysBetween(e.date,todayISO());}}return 0;}
 function cust(id){return D.customers.find(c=>c.id===id);}
@@ -668,7 +677,9 @@ function parseEntry(raw){
   /* items + quantity note */
   const items=[];for(let i=0;i<tk.length;i++){if(P_ITEMS.test(tk[i])){let q='';const a=am.find(x=>x.qty&&x.end===i-1);if(a)q=tk.slice(a.i,i).join(' ')+' ';if(!items.includes(q+tk[i]))items.push(q+tk[i]);}}
   /* expense? (no person, a shop cost) */
-  const expM=s.match(P_EXP);const hit=nameInText(raw);
+  const hit=nameInText(raw);
+  if(P_SALE.test(s)&&!hit&&!/\b(ne|ko)\b|نے|کو/.test(s)){const l=detectLang(raw);return{name:SALE_ACC[l]||SALE_ACC.roman,amount,type:'sale',date:todayISO(),note:[items.join(', '),via].filter(Boolean).join(' · ')};}
+  const expM=s.match(P_EXP);
   if(expM&&!hit&&!/\b(ne|ko)\b|نے|کو/.test(s.replace(/\bka bill\b/,''))){
     const l=detectLang(raw);const label=tk.filter(w=>!P_FILL.has(w)&&!P_MARK.has(w)&&!P_VERB.test(w)&&!/^\d/.test(w)&&!UNITW[w]&&!NUMW[w]).slice(0,3).join(' ');
     return{name:EXP_ACC[l]||EXP_ACC.roman,amount,type:'expense',date:todayISO(),note:[cap(label),via].filter(Boolean).join(' · ')};}
@@ -736,6 +747,7 @@ function render(){
   else if(sc==='customer')app.innerHTML=customerView();
   else if(sc==='settings')app.innerHTML=settingsView();
   else if(sc==='pilot')app.innerHTML=pilotView();
+  else if(sc==='committee')app.innerHTML=committeeView();
   $('tabHost').innerHTML=tabBar();
   bindAfter();
   if(sc==='jugnu')jugnuMount();
@@ -766,7 +778,7 @@ function homeView(){
   const aaj=todays.filter(e=>e.type==='payment').reduce((s,e)=>s+e.amount,0);
   const q=norm(S.q);const shown=custs.filter(x=>!q||norm(x.c.name).includes(q)).sort((a,b)=>b.b-a.b);
   const overdue=custs.filter(x=>x.b>0&&x.d>7&&x.c.type==='customer').sort((a,b)=>b.d-a.d);
-  const row=x=>x.c.type==='expense'?`<button class="cust" data-act="openCust" data-id="${x.c.id}"><span><b>${esc(x.c.name)}</b><span class="tag">${esc(t('expenseS'))}</span><small>${D.entries.filter(e=>e.cid===x.c.id).length} ${esc(t('entries'))}</small></span><span class="amt" style="color:var(--amber)"><span class="num">${rs(D.entries.filter(e=>e.cid===x.c.id&&e.date>=todayISO().slice(0,8)+'01').reduce((s,e)=>s+e.amount,0))}</span><small style="display:block">${esc(t('spent'))}</small></span></button>`:`<button class="cust" data-act="openCust" data-id="${x.c.id}"><span><b>${esc(x.c.name)}</b>${x.c.type==='supplier'?`<span class="tag">${esc(t('supplier'))}</span>`:''}${x.b>0&&x.d>7?`<span class="tag late"><span class="num">${x.d}</span> ${esc(t('days'))}</span>`:''}<small>${D.entries.filter(e=>e.cid===x.c.id).length} ${esc(t('entries'))}</small></span><span class="amt ${x.b>0?'w':x.b<0?'u':''}"><span class="num">${rs(x.b)}</span><small style="display:block">${x.b>0?esc(t('owesMe')):x.b<0?esc(t('iOwe')):esc(t('settled'))}</small></span></button>`;
+  const row=x=>x.c.type==='sales'?`<button class="cust" data-act="openCust" data-id="${x.c.id}"><span><b>${esc(x.c.name)}</b><span class="tag" style="background:#DDF3E5;color:#0E3D23">${esc(t('saleS'))}</span><small>${D.entries.filter(e=>e.cid===x.c.id).length} ${esc(t('entries'))}</small></span><span class="amt w"><span class="num">${rs(D.entries.filter(e=>e.cid===x.c.id&&e.date>=monthStart()).reduce((s2,e)=>s2+e.amount,0))}</span><small style="display:block">${esc(t('saleS'))}</small></span></button>`:x.c.type==='expense'?`<button class="cust" data-act="openCust" data-id="${x.c.id}"><span><b>${esc(x.c.name)}</b><span class="tag">${esc(t('expenseS'))}</span><small>${D.entries.filter(e=>e.cid===x.c.id).length} ${esc(t('entries'))}</small></span><span class="amt" style="color:var(--amber)"><span class="num">${rs(D.entries.filter(e=>e.cid===x.c.id&&e.date>=todayISO().slice(0,8)+'01').reduce((s,e)=>s+e.amount,0))}</span><small style="display:block">${esc(t('spent'))}</small></span></button>`:`<button class="cust" data-act="openCust" data-id="${x.c.id}"><span><b>${esc(x.c.name)}</b>${x.c.type==='supplier'?`<span class="tag">${esc(t('supplier'))}</span>`:''}${x.b>0&&x.d>7?`<span class="tag late"><span class="num">${x.d}</span> ${esc(t('days'))}</span>`:''}<small>${D.entries.filter(e=>e.cid===x.c.id).length} ${esc(t('entries'))}</small></span><span class="amt ${x.b>0?'w':x.b<0?'u':''}"><span class="num">${rs(x.b)}</span><small style="display:block">${x.b>0?esc(t('owesMe')):x.b<0?esc(t('iOwe')):esc(t('settled'))}</small></span></button>`;
   return `<div class="stack">${storageWarn()}
    <div class="page">
      <div class="shopname"><div><h1>${esc(D.shop.name)}</h1><p class="soft small">${esc([D.shop.owner,D.shop.city].filter(Boolean).join(' · '))}</p></div><span class="num soft small">${dmy(td)}</span></div>
@@ -780,7 +792,7 @@ function homeView(){
      <div class="list">${shown.length?shown.map(row).join(''):`<div class="empty">${esc(t('none'))}</div>`}</div></div>
   </div>`;
 }
-function typeOptions(sel){return['credit','payment','goods','paid','expense'].map(k=>`<option value="${k}" ${k===sel?'selected':''}>${esc(t(k))}</option>`).join('');}
+function typeOptions(sel){return['credit','payment','goods','paid','expense','sale'].map(k=>`<option value="${k}" ${k===sel?'selected':''}>${esc(t(k))}</option>`).join('');}
 function entryView(){
   const d=S.draft||{name:'',amount:'',type:'credit',date:todayISO(),note:''};
   const isNew=d.name&&!findByName(d.name);
@@ -805,7 +817,7 @@ function customerView(){
     return `<tr class="tap" data-act="rowMenu" data-id="${e.id}" tabindex="0" role="button" aria-label="${esc(t(e.type+'S'))} ${num(e.amount)}"><td class="no num">${i+1}</td><td class="num dt">${dmy(e.date).slice(0,5)}</td><td class="det">${esc(t(e.type+'S'))}${e.type==='payment'?' '+ICON.rcpt:''}${e.note?`<small dir="auto">${esc(e.note)}</small>`:''}</td><td class="num u">${sg>0?num(e.amount):''}</td><td class="num w">${sg<0?num(e.amount):''}</td><td class="num" style="font-weight:700">${num(run)}${run<0?' ↓':''}</td></tr>`;}).join('');
   return `<div class="stack"><button class="btn ghost sm" data-act="home" style="align-self:flex-start">${esc(t('back'))}</button>
    <div class="page"><div class="shopname"><div><h1>${esc(c.name)}</h1><p class="soft small">${esc(c.type==='supplier'?t('supplier'):t('customer'))}${c.phone?` · <span class="num">${esc(c.phone)}</span>`:''}</p></div><button class="btn ghost sm" data-act="editCust">${esc(t('edit'))}</button></div>
-    <div class="row" style="justify-content:space-between;align-items:flex-end"><div>${c.type==='expense'?`<small class="soft">${esc(t('expenseS'))} · ${esc(t('spent'))}</small><div class="num" style="font-size:30px;font-weight:700;line-height:1.3;color:var(--amber)">${rs(es.filter(e=>e.date>=todayISO().slice(0,8)+'01').reduce((s2,e)=>s2+e.amount,0))}</div>`:`<small class="soft">${b>0?esc(t('owesMe')):b<0?esc(t('iOwe')):esc(t('settled'))}</small><div class="num ${b>0?'w':b<0?'u':''}" style="font-size:30px;font-weight:700;line-height:1.3">${rs(b)}</div>`}</div>${b>0&&od?`<span class="tag ${od>7?'late':''}"><span class="num">${od}</span> ${esc(t('days'))}</span>`:''}</div>
+    <div class="row" style="justify-content:space-between;align-items:flex-end"><div>${c.type==='sales'?`<small class="soft">${esc(t('saleS'))}</small><div class="num w" style="font-size:30px;font-weight:700;line-height:1.3">${rs(es.filter(e=>e.date>=monthStart()).reduce((s2,e)=>s2+e.amount,0))}</div>`:c.type==='expense'?`<small class="soft">${esc(t('expenseS'))} · ${esc(t('spent'))}</small><div class="num" style="font-size:30px;font-weight:700;line-height:1.3;color:var(--amber)">${rs(es.filter(e=>e.date>=todayISO().slice(0,8)+'01').reduce((s2,e)=>s2+e.amount,0))}</div>`:`<small class="soft">${b>0?esc(t('owesMe')):b<0?esc(t('iOwe')):esc(t('settled'))}</small><div class="num ${b>0?'w':b<0?'u':''}" style="font-size:30px;font-weight:700;line-height:1.3">${rs(b)}</div>`}</div>${b>0&&od?`<span class="tag ${od>7?'late':''}"><span class="num">${od}</span> ${esc(t('days'))}</span>`:''}</div>
     <div class="row" style="margin-top:12px">${b>0&&c.type==='customer'?`<button class="btn wa" data-act="remind" style="flex:1">${esc(t('remind'))}</button>`:''}<button class="btn" data-act="addFor" style="flex:1">${esc(t('addEntry'))}</button></div>
     <div class="row" style="margin-top:8px"><button class="btn ghost sm" data-act="statement" style="flex:1">${ICON.rcpt} ${esc(t('pdfS'))}</button></div>
     ${lastR?`<p class="note" style="margin-top:6px">${esc(t('lastRem'))}: <span class="num">${esc(dmy(todayISO(new Date(lastR.at))))}</span></p>`:''}
@@ -840,7 +852,7 @@ function settingsView(){
     <button class="btn ghost full" data-act="copyBackup">${esc(t('bkCopy'))}</button>
     <label for="importFile" class="btn ghost full" style="margin:0;color:var(--ink)">${esc(t('bkRestoreF'))}</label><input id="importFile" type="file" accept=".json,application/json,text/plain" hidden>
     <button class="btn ghost full" data-act="pasteRestore">${esc(t('bkRestoreP'))}</button></div>
-   <div class="page stack"><h2 style="margin-top:0">${esc(t('danger'))}</h2><button class="btn danger full" data-act="wipe">${esc(t('wipe'))}</button><p class="note">Jugnu Munshi · ConceptAI · v0.6</p></div></div>`;
+   <div class="page stack"><h2 style="margin-top:0">${esc(t('danger'))}</h2><button class="btn danger full" data-act="wipe">${esc(t('wipe'))}</button><p class="note">Jugnu Munshi · ConceptAI · v0.8</p></div></div>`;
 }
 function pilotView(){
   const now=Date.now(),wk=7*86400000;
@@ -850,7 +862,7 @@ function pilotView(){
   const first=D.entries.length?todayISO(new Date(Math.min(...D.entries.map(e=>e.created)))):todayISO();
   const code=String(D.shop.created||'0000').slice(-5);
   window.__pilotRows=[['Shop code',code],['Using since',first],['Customers',D.customers.filter(c=>c.type==='customer').length],['Entries this week',eWeek],['Days used this week',activeDays+' / 7'],['Reminders this week',remWeek],['Receipts made',D.receiptsMade||0],['Reminders followed by payment within 7 days',totalRem?`${paidAfter} of ${totalRem} (${Math.round(paidAfter/totalRem*100)}%)`:'0']];
-  return `<div class="stack">${famSection()}
+  return `<div class="stack"><button class="page cust" data-act="comOpen" style="min-height:64px"><span><b>${esc(ct('t'))}</b><small>${esc((D.committees||[]).length?(D.committees||[]).map(c=>c.name).join(', '):ct('nw'))}</small></span><span class="amt">›</span></button>${famSection()}
    <div class="page stack"><h1>${esc(t('pilot'))}</h1><p class="note">${esc(t('pilotNote'))}</p>
    <div dir="ltr" style="font-family:var(--latin)">${window.__pilotRows.map(r=>`<div class="today"><span>${esc(r[0])}</span><b class="num">${esc(r[1])}</b></div>`).join('')}</div>
    <button class="btn full" data-act="copyPilot">${esc(t('copyRep'))}</button></div></div>`;
@@ -869,7 +881,7 @@ async function jMore(l){if(jBusy||!aiOn())return;jBusy=true;jState('thinking');
   const r=await askAI(ask,l,'advice');jPush({who:'ai',text:r?r.text:jt('needNet',l),l});jState(r?'happy':'idle');setTimeout(()=>{if(!jBusy)jState('idle');},1400);jBusy=false;}
 (async()=>{try{if(window.claude&&window.claude.use){SAMPLE=await window.claude.use('sample');updMode();}}catch(e){SAMPLE=null;}})();
 function tabBar(){
-  const cur=S.screen==='customer'||S.screen==='entry'?(S.draft&&S.draft.fromJugnu?'jugnu':'khata'):S.screen;
+  const cur=S.screen==='committee'?'pilot':S.screen==='customer'||S.screen==='entry'?(S.draft&&S.draft.fromJugnu?'jugnu':'khata'):S.screen;
   const b=(k,lab,ic)=>`<button data-act="tab" data-t="${k}" ${cur===k?'aria-current="page"':''}>${ic}<span>${esc(lab)}</span></button>`;
   if(isStudent())return `<nav class="tabs stuTabs" aria-label="Ustad">${b('ustad',ft('ustad'),'<span class="tdot" aria-hidden="true"></span>')}${b('progress',ft('progress'),ICON.chart)}<button data-act="profiles">${ICON.user}<span>${esc(ft('switchB'))}</span></button></nav>`;
   return `<nav class="tabs" aria-label="Jugnu">${b('jugnu',t('tabJ'),'<span class="tdot" aria-hidden="true"></span>')}${b('khata',t('tabK'),ICON.book)}${b('pilot',t('tabR'),ICON.chart)}${b('settings',t('tabS'),ICON.gear)}</nav>`;
@@ -887,6 +899,7 @@ function jGreet(){
   if(D.customers.length){const td=todayISO();const aaj=D.entries.filter(e=>e.type==='payment'&&e.date===td).reduce((s,e)=>s+e.amount,0);
     const lene=D.customers.map(c=>balance(c.id)).filter(b=>b>0).reduce((s,b)=>s+b,0);tx+='\n'+fill(jt('sum',l),{a:rs(aaj),b:rs(lene)});}
   S.chat.push({who:'ai',text:tx,l});
+  if(D.entries.length>=10&&(!D.lastBackup||Date.now()-D.lastBackup>7*86400000)&&!isStudent())S.chat.push({who:'ai',text:jt('bkNudge',l),btns:[{act:'bkShare',id:'',label:jt('bkBtn',l)}],l});
 }
 function jugnuMount(){
   if(!S.chat.length)jGreet();
@@ -899,6 +912,7 @@ function cardHTML(d,id,l){
   const ex=findByName(d.name);
   return `<div class="jcard">${r('name',ex?nameFor(ex,l):d.name)}${r('type',tL(d.type+'S',l))}${r('amount',rs(d.amount),1)}${r('date',dmy(d.date),1)}${d.note?r('noteL',d.note):''}
    ${!d.status&&!findByName(d.name)?`<p class="jnew">${esc(tL('newName',l))}</p>`:''}
+   ${(()=>{if(d.status||d.type!=='credit')return'';const c=findByName(d.name);if(!c||!c.limit)return'';const nb=balance(c.id)+d.amount;return nb>c.limit?`<p class="jover">⚠ ${esc(fill(jt('overLimit',l),{n:nameFor(c,l),l:rs(c.limit),b:rs(nb)}))}</p>`:'';})()}
    ${d.status?`<p class="jdone ${d.status==='no'?'no':''}">${d.status==='yes'?'✓':'✕'}</p>`:`<div class="jbtns"><button class="jchip jyes" data-act="jYes" data-id="${id}">${esc(jt('yes',l))}</button><button class="jchip" data-act="jEdit" data-id="${id}">${esc(jt('editB',l))}</button><button class="jchip" data-act="jNo" data-id="${id}">${esc(jt('noB',l))}</button></div>`}</div>`;
 }
 function msgHTML(m){
@@ -927,18 +941,19 @@ function custBtns(cid,l){const c=cust(cid);if(!c)return[];const b=balance(cid);c
 function jHandle(a,q,l){
   if(a.entry){const id=uid();S.drafts[id]=Object.assign({},a.entry,{type:a.entry.type||'credit',raw:q,l});
     jPush({who:'ai',text:a.text||jt('confirmQ',l),card:id,l});jState('idle');return;}
-  const btns=a.cid?custBtns(a.cid,l):[];if(a.kind==='health'&&aiOn())btns.push({act:'jMore',id:l,label:jt('more',l)});
+  const btns=a.cid?custBtns(a.cid,l):[];if(a.kind==='com')btns.push({act:'comOpen',id:'',label:ct('open',l)});if(a.kind==='health'&&aiOn())btns.push({act:'jMore',id:l,label:jt('more',l)});
   jPush({who:'ai',text:a.text,btns,l});
   jState(a.text===jt('dont',l)?'idle':'happy');setTimeout(()=>{if(!jBusy)jState('idle');},1400);
 }
 function commitEntry(d){
-  let c=findByName(d.name);if(!c){c={id:uid(),name:cap(d.name),phone:'',type:d.type==='expense'?'expense':(d.type==='goods'||d.type==='paid')?'supplier':'customer',created:Date.now()};D.customers.push(c);}
+  let c=findByName(d.name);if(!c){c={id:uid(),name:cap(d.name),phone:'',type:d.type==='expense'?'expense':d.type==='sale'?'sales':(d.type==='goods'||d.type==='paid')?'supplier':'customer',created:Date.now()};D.customers.push(c);}
   let saved;
   if(d.id){saved=D.entries.find(x=>x.id===d.id);if(saved)Object.assign(saved,{cid:c.id,amount:d.amount,type:d.type,date:d.date,note:d.note||''});if(saved&&d.type==='payment'&&!saved.rno)saved.rno=D.seq++;}
   else{saved={id:uid(),cid:c.id,amount:d.amount,type:d.type,date:d.date||todayISO(),note:d.note||'',created:Date.now()};if(d.type==='payment')saved.rno=D.seq++;D.entries.push(saved);}
   save();return{c,saved};
 }
 function jSaved(c,saved,l){
+  if(c.type==='sales'){jPush({who:'ai',text:fill(jt('savedSale',l),{a:rs(salesTotal(todayISO()))}),btns:[{act:'jOpen',id:c.id,label:jt('openB',l)}],l});jState('happy');setTimeout(()=>{if(!jBusy)jState('idle');},1400);return;}
   if(c.type==='expense'){jPush({who:'ai',text:fill(jt('savedExp',l),{a:rs(expTotal(todayISO().slice(0,8)+'01'))}),btns:[{act:'jOpen',id:c.id,label:jt('openB',l)}],l});jState('happy');setTimeout(()=>{if(!jBusy)jState('idle');},1400);return;}
   const b=balance(c.id);const btns=[{act:'jOpen',id:c.id,label:jt('openB',l)}];
   if(saved&&saved.type==='payment')btns.push({act:'receipt',id:saved.id,label:tL('pdfR',l)});
@@ -954,13 +969,14 @@ async function refineEntry(q,l,d){
     const prompt=`You read one sentence a Pakistani shopkeeper said about his khata (ledger) and extract the entry. It may be Roman Urdu, Urdu, Pashto or English.
 Existing accounts: ${accts}
 Sentence: <<${q}>>
-Rules: "name" is ONLY the person or business the money is with (never words like aaj, kal, maine, naya, gaahak; titles like bhai, sahib, baji may stay). If it matches an existing account, copy that exact name. "type" is one of: credit (customer took goods or cash on udhaar), payment (customer paid the shop), goods (supplier delivered stock to the shop), paid (shop paid a supplier), expense (shop cost with no person: bijli, bill, kiraya, rent, salary, petrol; then name is the cost, e.g. "Bijli bill"). "amount" in rupees as an integer. "note" is short: items bought or the reason, plus payment method if said (JazzCash, Easypaisa, bank), else "".
+Rules: "name" is ONLY the person or business the money is with (never words like aaj, kal, maine, naya, gaahak; titles like bhai, sahib, baji may stay). If it matches an existing account, copy that exact name. "type" is one of: credit (customer took goods or cash on udhaar), payment (customer paid the shop), goods (supplier delivered stock to the shop), paid (shop paid a supplier), expense (shop cost with no person: bijli, bill, kiraya, rent, salary, petrol; then name is the cost, e.g. "Bijli bill"), sale (total cash sales of the day, no person, e.g. "aaj ki sale 15000"). "amount" in rupees as an integer. "note" is short: items bought or the reason, plus payment method if said (JazzCash, Easypaisa, bank), else "".
 Reply with only JSON like {"name":"","amount":0,"type":"","note":""}`;
     const r=await aiJSON(prompt);if(!r||typeof r!=='object')return d;
-    const ty=['credit','payment','goods','paid','expense'].includes(r.type)?r.type:d.type;
+    const ty=['credit','payment','goods','paid','expense','sale'].includes(r.type)?r.type:d.type;
     const nd=Object.assign({},d,{type:ty});
     const amt=Math.round(Number(r.amount));if(!d.amount&&amt>0)nd.amount=amt;
     const note=String(r.note||'').trim().slice(0,60);if(note&&note.length>=2)nd.note=note;
+    if(ty==='sale'){nd.name=SALE_ACC[l]||SALE_ACC.roman;return nd;}
     if(ty==='expense'){nd.name=EXP_ACC[l]||EXP_ACC.roman;if(!note&&r.name)nd.note=String(r.name).slice(0,40);return nd;}
     if(d.type==='expense'&&ty!=='expense'&&!r.name)return d;
     const nm=String(r.name||'').trim();
@@ -994,7 +1010,7 @@ Reply with only JSON like {"reply":"...","entry":null,"customer":null,"action":n
     const r=await aiJSON(prompt);
     if(!r||typeof r.reply!=='string'||!r.reply.trim())return null;
     const out={text:r.reply.trim().slice(0,900)};const e=r.entry;
-    if(e&&typeof e==='object'){const amt=Math.round(Number(toAsciiDigits(String(e.amount||'')).replace(/[^\d.]/g,'')));const ty=['credit','payment','goods','paid','expense'].includes(e.type)?e.type:null;const nm=String(e.name||'').trim().slice(0,60);
+    if(e&&typeof e==='object'){const amt=Math.round(Number(toAsciiDigits(String(e.amount||'')).replace(/[^\d.]/g,'')));const ty=['credit','payment','goods','paid','expense','sale'].includes(e.type)?e.type:null;const nm=String(e.name||'').trim().slice(0,60);
       if(amt>0&&ty&&nm){const ex=findByName(nm);let t2=ty;if(ex&&ex.type==='supplier'){if(t2==='credit')t2='goods';if(t2==='payment')t2='paid';}out.entry=t2==='expense'?{name:EXP_ACC[l]||EXP_ACC.roman,amount:amt,type:'expense',date:td,note:String(e.note||nm).slice(0,60)}:{name:ex?ex.name:cap(nm),amount:amt,type:t2,date:td,note:String(e.note||'').slice(0,60)};}}
     if(!out.entry&&r.customer){const c=findByName(String(r.customer));if(c){out.cid=c.id;if(r.action==='remind'||r.action==='statement')out.action=r.action;}}
     return out;
@@ -1247,6 +1263,66 @@ function progressView(){const p=activeP();const w=weekSummary(p);const l=D.lang;
 function famSection(){const st=students();const l=D.lang;
   return `<div class="page stack"><h2 style="margin-top:0">${esc(ft('famTitle'))}</h2>${st.length?st.map(p=>{const tx=famReport(p,l);return `<pre class="rep" dir="auto">${esc(tx)}</pre><a class="btn wa full" href="https://wa.me/?text=${encodeURIComponent(tx)}" target="_blank" rel="noopener">${esc(ft('sendWa'))}</a>`;}).join(''):`<p class="soft">${esc(ft('noStu'))}</p>`}</div>`;}
 
+/* ================= v0.8: galla (cash sales), udhaar limit, committee (BC), backup nudge ================= */
+const SALE_ACC={roman:'Naqad sale (galla)',ur:'نقد سیل (گلہ)',ps:'نغدې خرڅلاو',en:'Cash sales'};
+const P_SALE=/(?:^|\s)(sale|sales|seal|bikri|bikree|galla|gala|kamai|kamaai|نقد سیل|سیل|بکری|گلہ|گلے|کمائی|خرڅلاو|بکرى)(?=\s|$)/;
+function salesTotal(since){const ids=new Set(D.customers.filter(c=>c.type==='sales').map(c=>c.id));return D.entries.filter(e=>ids.has(e.cid)&&(!since||e.date>=since)).reduce((s,e)=>s+e.amount,0);}
+const monthStart=()=>todayISO().slice(0,8)+'01';
+Object.assign(T.ur,{sale:'نقد سیل (گلہ)',saleS:'سیل',limitL:'ادھار کی حد (روپے، اختیاری)',overL:'حد سے آگے'});
+Object.assign(T.ps,{sale:'نغدې خرڅلاو',saleS:'خرڅلاو',limitL:'د پور حد (روپۍ، اختیاري)',overL:'له حد تېر'});
+Object.assign(T.en,{sale:'Cash sale (galla)',saleS:'Sale',limitL:'Credit limit (Rs, optional)',overL:'Over limit'});
+Object.assign(T.roman,{sale:'Naqad sale (galla)',saleS:'Sale',limitL:'Udhaar ki had (Rs, optional)',overL:'Had se aage'});
+Object.assign(J.roman,{savedSale:'Likh diya, Seth ji. Aaj ki sale ab {a} hai.',saleLine:'Seth ji, aaj ki sale {a}. Is mahine ab tak {m}.',hSale:'Pichhle 7 din: sale {s}, kharcha {e}.',overLimit:'Dhyan dein: {n} ki had {l} hai. Ye likhne se baqaya {b} ho jayega.',limitSet:'Theek hai Seth ji, {n} ki udhaar ki had {a} rakh di. Had se aage jane par main bataunga.',hLimit:'{c} gaahak apni had se aage: {l}.',
+  bkNudge:'Seth ji, hisaab sirf isi phone par hai. Hafte ka backup apne WhatsApp par bhej dein, taake phone kho jaye to bhi hisaab mehfooz rahe.',bkBtn:'Backup bhejein',bkDone:'Backup tayyar. Apne WhatsApp ya email par save kar lein.'});
+Object.assign(J.ur,{savedSale:'لکھ دیا، سیٹھ جی۔ آج کی سیل اب {a} ہے۔',saleLine:'سیٹھ جی، آج کی سیل {a}۔ اس مہینے اب تک {m}۔',hSale:'پچھلے 7 دن: سیل {s}، خرچہ {e}۔',overLimit:'دھیان دیں: {n} کی حد {l} ہے۔ یہ لکھنے سے بقایا {b} ہو جائے گا۔',limitSet:'ٹھیک ہے سیٹھ جی، {n} کی ادھار کی حد {a} رکھ دی۔ حد سے آگے جانے پر میں بتاؤں گا۔',hLimit:'{c} گاہک اپنی حد سے آگے: {l}۔',
+  bkNudge:'سیٹھ جی، حساب صرف اسی فون پر ہے۔ ہفتے کا بیک اپ اپنے واٹس ایپ پر بھیج دیں، تاکہ فون کھو جائے تو بھی حساب محفوظ رہے۔',bkBtn:'بیک اپ بھیجیں',bkDone:'بیک اپ تیار۔ اپنے واٹس ایپ یا ای میل پر محفوظ کر لیں۔'});
+Object.assign(J.ps,{savedSale:'ومې لیکل، مالک صاحب. د نن خرڅلاو اوس {a} دی.',saleLine:'مالک صاحب، د نن خرڅلاو {a}. په دې میاشت کې تر اوسه {m}.',hSale:'تېرې 7 ورځې: خرڅلاو {s}، لګښت {e}.',overLimit:'پام: د {n} حد {l} دی. په دې لیکلو سره به پور {b} شي.',limitSet:'سمه ده مالک صاحب، د {n} د پور حد مې {a} کېښود. له حد تېرېدو به درته ووایم.',hLimit:'{c} پېرودونکي له خپل حد تېر: {l}.',
+  bkNudge:'مالک صاحب، حساب یوازې په همدې تلیفون کې دی. د اونۍ بیک اپ خپل واټس اپ ته ولېږئ، چې که تلیفون ورک شي هم حساب خوندي پاتې شي.',bkBtn:'بیک اپ ولېږئ',bkDone:'بیک اپ تیار دی. په خپل واټس اپ یا ایمیل کې یې خوندي کړئ.'});
+Object.assign(J.en,{savedSale:"Written, sir. Today's sales are now {a}.",saleLine:"Sir, today's sales: {a}. This month so far: {m}.",hSale:'Last 7 days: sales {s}, expenses {e}.',overLimit:"Careful: {n}'s limit is {l}. This entry makes the balance {b}.",limitSet:"Done, sir. {n}'s credit limit is now {a}. I'll warn you when it's crossed.",hLimit:'{c} customers over their limit: {l}.',
+  bkNudge:'Sir, your accounts live only on this phone. Send a weekly backup to your WhatsApp so nothing is lost if the phone is lost.',bkBtn:'Send backup',bkDone:'Backup ready. Save it to your WhatsApp or email.'});
+/* ---- committee (BC / kameti) ---- */
+const CS={
+ roman:{t:'Committee (BC)',nw:'+ Nayi committee',nm:'Committee ka naam',am:'Mahana qist (Rs)',mb:'Members (har naam nayi line par, baari ki tarteeb mein)',st:'Shuru ka mahina',sv:'Save karein',mo:'Mahina {m}/{n}',turn:'Is mahine ki baari: {n}',pot:'Har mahine kul: {a}',paid:'{p}/{n} ne qist de di',rem:'WhatsApp group par yaad dihaani',del:'Committee hatayein',delQ:'Ye committee hata dein?',none:'Abhi koi committee nahi. Mohallay ya khandan ki committee yahan likhein, Jugnu hisaab rakhega.',done:'Committee mukammal ho gayi. Mubarak ho!',
+  sum:'{c}: is mahine {p}/{n} ne qist di. Baari: {t}.{l}',left:' Baqi: {l}.',remText:'Assalam o alaikum! {c} committee ki is mahine ki qist {a} hai. Is mahine baari: {t}.{l} Shukriya!',remLeft:' Jinhon ne abhi nahi di: {l}.',open:'Committee kholo',tap:'Naam dabayein: qist mili / nahi mili.'},
+ ur:{t:'کمیٹی',nw:'+ نئی کمیٹی',nm:'کمیٹی کا نام',am:'ماہانہ قسط (روپے)',mb:'ممبر (ہر نام نئی لائن پر، باری کی ترتیب میں)',st:'شروع کا مہینہ',sv:'محفوظ کریں',mo:'مہینہ {m}/{n}',turn:'اس مہینے کی باری: {n}',pot:'ہر مہینے کل: {a}',paid:'{p}/{n} نے قسط دے دی',rem:'واٹس ایپ گروپ پر یاد دہانی',del:'کمیٹی ہٹائیں',delQ:'یہ کمیٹی ہٹا دیں؟',none:'ابھی کوئی کمیٹی نہیں۔ محلے یا خاندان کی کمیٹی یہاں لکھیں، جگنو حساب رکھے گا۔',done:'کمیٹی مکمل ہو گئی۔ مبارک ہو!',
+  sum:'{c}: اس مہینے {p}/{n} نے قسط دی۔ باری: {t}۔{l}',left:' باقی: {l}۔',remText:'السلام علیکم! {c} کمیٹی کی اس مہینے کی قسط {a} ہے۔ اس مہینے باری: {t}۔{l} شکریہ!',remLeft:' جنہوں نے ابھی نہیں دی: {l}۔',open:'کمیٹی کھولو',tap:'نام دبائیں: قسط ملی / نہیں ملی۔'},
+ ps:{t:'کمېټي',nw:'+ نوې کمېټي',nm:'د کمېټۍ نوم',am:'میاشتنی قسط (روپۍ)',mb:'غړي (هر نوم په نوې کرښه، د وار په ترتیب)',st:'د پیل میاشت',sv:'خوندي کړئ',mo:'میاشت {m}/{n}',turn:'د دې میاشتې وار: {n}',pot:'هره میاشت ټول: {a}',paid:'{p}/{n} قسط ورکړ',rem:'په واټس اپ ګروپ یادونه',del:'کمېټي لرې کړئ',delQ:'دا کمېټي لرې کړئ؟',none:'تراوسه هېڅ کمېټي نشته. د کلي یا کورنۍ کمېټي دلته ولیکئ، جګنو به یې حساب ساتي.',done:'کمېټي بشپړه شوه. مبارک شه!',
+  sum:'{c}: په دې میاشت {p}/{n} قسط ورکړ. وار: {t}.{l}',left:' پاتې: {l}.',remText:'السلام علیکم! د {c} کمېټۍ د دې میاشتې قسط {a} دی. د دې میاشتې وار: {t}.{l} مننه!',remLeft:' چا چې لا نه دی ورکړی: {l}.',open:'کمېټي پرانیزه',tap:'نوم کېکاږئ: قسط راغی / نه دی راغلی.'},
+ en:{t:'Committee (BC)',nw:'+ New committee',nm:'Committee name',am:'Monthly instalment (Rs)',mb:'Members (one name per line, in payout order)',st:'Start month',sv:'Save',mo:'Month {m}/{n}',turn:"This month's payout: {n}",pot:'Pot each month: {a}',paid:'{p}/{n} have paid',rem:'Remind the WhatsApp group',del:'Delete committee',delQ:'Delete this committee?',none:'No committees yet. Add your family or neighbourhood committee here and Jugnu keeps the hisaab.',done:'Committee complete. Mubarak!',
+  sum:'{c}: {p}/{n} paid this month. Payout: {t}.{l}',left:' Pending: {l}.',remText:"Assalam o alaikum! This month's {c} committee instalment is {a}. This month's payout: {t}.{l} Thank you!",remLeft:' Still to pay: {l}.',open:'Open committee',tap:'Tap a name: paid / not paid.'}};
+const ct=(k,l)=>((CS[l||D.lang]||CS.ur)[k])??CS.en[k];
+function monthKey(d){d=d||new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');}
+function monthsSince(start){const [y,m]=start.split('-').map(Number);const n=new Date();return (n.getFullYear()-y)*12+(n.getMonth()+1-m);}
+function comState(c){const i=monthsSince(c.start);const n=c.members.length;const mk=monthKey();const paid=(c.paid&&c.paid[mk])||[];
+  return{i,n,mk,paid,done:i>=n,before:i<0,turn:i>=0&&i<n?c.members[i]:'',left:c.members.filter((m,j)=>!paid.includes(j))};}
+function comSummary(c,l){const s=comState(c);if(s.done)return c.name+': '+ct('done',l);
+  return fill(ct('sum',l),{c:c.name,p:s.paid.length,n:s.n,t:s.turn||'-'}).replace('{l}',s.left.length?fill(ct('left',l),{l:joinL(s.left.slice(0,6),l)}):'');}
+function committeeView(){D.committees=D.committees||[];const l=D.lang;
+  const card=c=>{const s=comState(c);
+    return `<div class="page stack"><div class="shopname"><div><h1 dir="auto">${esc(c.name)}</h1><p class="soft small">${esc(fill(ct('pot'),{a:rs(c.amount*s.n)}))} · <span class="num">${rs(c.amount)}</span> × <span class="num">${s.n}</span></p></div><span class="tag">${esc(s.done?ct('done'):fill(ct('mo'),{m:Math.max(1,s.i+1),n:s.n}))}</span></div>
+     ${s.done?`<p class="w" style="font-weight:700">${esc(ct('done'))}</p>`:`<p style="font-weight:700">${esc(fill(ct('turn'),{n:s.turn||'-'}))}</p><p class="soft small">${esc(fill(ct('paid'),{p:s.paid.length,n:s.n}))} · ${esc(ct('tap'))}</p>
+     <div class="cmem">${c.members.map((m,j)=>`<button class="cm ${s.paid.includes(j)?'ok':''} ${j===s.i?'turn':''}" data-act="comToggle" data-id="${c.id}:${j}" dir="auto">${s.paid.includes(j)?'✓ ':''}${esc(m)}${j<s.i?' ·':''}</button>`).join('')}</div>
+     <a class="btn wa full" href="https://wa.me/?text=${encodeURIComponent(fill(ct('remText'),{c:c.name,a:rs(c.amount),t:s.turn||'-'}).replace('{l}',s.left.length?fill(ct('remLeft'),{l:joinL(s.left,l)}):''))}" target="_blank" rel="noopener">${esc(ct('rem'))}</a>`}
+     <button class="btn danger sm" data-act="comDel" data-id="${c.id}" style="align-self:flex-start">${esc(ct('del'))}</button></div>`;};
+  return `<div class="stack"><button class="btn ghost sm" data-act="tab" data-t="pilot" style="align-self:flex-start">${esc(t('back'))}</button>
+   <div class="page"><h1>${esc(ct('t'))}</h1></div>
+   ${D.committees.length?D.committees.map(card).join(''):`<div class="page"><p class="soft">${esc(ct('none'))}</p></div>`}
+   <button class="btn full" data-act="comNew">${esc(ct('nw'))}</button></div>`;}
+function comNewModal(){
+  modal(`<h1>${esc(ct('nw').replace('+ ',''))}</h1><form id="comForm" class="stack">
+   <div><label for="cmName">${esc(ct('nm'))}</label><input id="cmName" dir="auto" required maxlength="40"></div>
+   <div><label for="cmAmt">${esc(ct('am'))}</label><input id="cmAmt" inputmode="numeric" dir="ltr" required></div>
+   <div><label for="cmMem">${esc(ct('mb'))}</label><textarea id="cmMem" dir="auto" required style="min-height:140px"></textarea></div>
+   <div><label for="cmStart">${esc(ct('st'))}</label><input id="cmStart" type="month" required value="${monthKey()}"></div>
+   <div class="row"><button class="btn" type="submit" style="flex:1">${esc(ct('sv'))}</button><button class="btn ghost" type="button" data-act="closeModal">${esc(t('cancel'))}</button></div></form>`);
+  $('comForm').onsubmit=e=>{e.preventDefault();const amt=Math.round(parseFloat(toAsciiDigits($('cmAmt').value).replace(/[^\d.]/g,'')));
+    const mem=$('cmMem').value.split(/\n|,|،/).map(x=>x.trim()).filter(Boolean).slice(0,40);
+    if(!amt||amt<=0||mem.length<2){toast(t('nameAmt'));return;}
+    D.committees=D.committees||[];D.committees.push({id:uid(),name:cap($('cmName').value)||'Committee',amount:amt,members:mem.map(cap),start:$('cmStart').value||monthKey(),paid:{},created:Date.now()});save();closeModal();render();};}
+async function shareBackup(l){const json=JSON.stringify(D);const name=`jugnu-backup-${todayISO()}.json`;
+  try{const f=new File([json],name,{type:'application/json'});if(!inViewer()&&navigator.canShare&&navigator.canShare({files:[f]})){await navigator.share({files:[f],title:'Jugnu backup'});D.lastBackup=Date.now();save();toast(jt('bkDone',l));return;}}catch(e){if(e&&e.name==='AbortError')return;}
+  await saveBlob(name,new Blob([json],{type:'application/json'}));D.lastBackup=Date.now();save();toast(jt('bkDone',l));}
+
 /* ================= modal ================= */
 function modal(html){$('modalHost').innerHTML=`<div class="modal" role="dialog" aria-modal="true"><div class="page stack">${html}</div></div>`;}
 function closeModal(){$('modalHost').innerHTML='';}
@@ -1424,8 +1500,8 @@ function bindAfter(){
 function restoreFrom(txt){try{const d=JSON.parse(txt);if(!d||!Array.isArray(d.customers)||!Array.isArray(d.entries))throw 0;window.__restore=d;
   modal(`<h1>${esc(t('backup'))}</h1><p class="soft"><span class="num">${d.customers.length}</span> · <span class="num">${d.entries.length}</span> ${esc(t('entries'))}</p><div class="row"><button class="btn" data-act="doRestore" style="flex:1">OK</button><button class="btn ghost" data-act="closeModal">${esc(t('cancel'))}</button></div>`);}catch(e){toast('Invalid backup');}}
 function editCustModal(){const c=cust(S.cid);if(!c)return;
-  modal(`<h1>${esc(c.name)}</h1><form id="custForm" class="stack"><div><label for="cName">${esc(t('name'))}</label><input id="cName" dir="auto" required value="${esc(c.name)}"></div><div><label for="cPhone">${esc(t('phone'))}</label><input id="cPhone" inputmode="tel" dir="ltr" value="${esc(c.phone||'')}" placeholder="0300 1234567"></div><div><label for="cType">${esc(t('kind'))}</label><select id="cType"><option value="customer" ${c.type==='customer'?'selected':''}>${esc(t('customer'))}</option><option value="supplier" ${c.type==='supplier'?'selected':''}>${esc(t('supplier'))}</option></select></div><div class="row"><button class="btn" type="submit" style="flex:1">${esc(t('saveCust'))}</button><button class="btn ghost" type="button" data-act="closeModal">${esc(t('cancel'))}</button></div></form>`);
-  $('custForm').onsubmit=e=>{e.preventDefault();c.name=cap($('cName').value)||c.name;c.phone=$('cPhone').value.trim();c.type=$('cType').value;save();closeModal();render();};}
+  modal(`<h1>${esc(c.name)}</h1><form id="custForm" class="stack"><div><label for="cName">${esc(t('name'))}</label><input id="cName" dir="auto" required value="${esc(c.name)}"></div><div><label for="cPhone">${esc(t('phone'))}</label><input id="cPhone" inputmode="tel" dir="ltr" value="${esc(c.phone||'')}" placeholder="0300 1234567"></div><div><label for="cLimit">${esc(t('limitL'))}</label><input id="cLimit" inputmode="numeric" dir="ltr" value="${esc(c.limit||'')}"></div><div ${['expense','sales'].includes(c.type)?'hidden':''}><label for="cType">${esc(t('kind'))}</label><select id="cType"><option value="customer" ${c.type==='customer'?'selected':''}>${esc(t('customer'))}</option><option value="supplier" ${c.type==='supplier'?'selected':''}>${esc(t('supplier'))}</option></select></div><div class="row"><button class="btn" type="submit" style="flex:1">${esc(t('saveCust'))}</button><button class="btn ghost" type="button" data-act="closeModal">${esc(t('cancel'))}</button></div></form>`);
+  $('custForm').onsubmit=e=>{e.preventDefault();c.name=cap($('cName').value)||c.name;c.phone=$('cPhone').value.trim();if(!['expense','sales'].includes(c.type))c.type=$('cType').value;{const lv=Math.round(parseFloat(toAsciiDigits($('cLimit').value).replace(/[^\d.]/g,'')));c.limit=lv>0?lv:0;}save();closeModal();render();};}
 function download(name,text,type){saveBlob(name,new Blob([text],{type}));}
 async function copyText(txt,ok){try{await navigator.clipboard.writeText(txt);toast(ok||'Copied');}catch(e){modal(`<textarea id="cpy" readonly style="min-height:180px" dir="auto">${esc(txt)}</textarea><button class="btn ghost full" data-act="closeModal">OK</button>`);const ta=$('cpy');ta.focus();ta.select();}}
 function loadDemo(){
@@ -1462,6 +1538,12 @@ document.addEventListener('click',async e=>{
     case 'jStmt':{if(!cust(id))break;S.cid=id;toast(t('making'));const cs=await statementCanvases(id);docModal(t('statement'),cs,'statement',210,297,cust(id));break;}
     case 'jYes':{const d=S.drafts[id];if(!d||d.status)break;const r=commitEntry(d);d.status='yes';jSaved(r.c,r.saved,d.l);break;}
     case 'jEdit':{const d=S.drafts[id];if(!d||d.status)break;S.cid=null;go('entry',{draft:Object.assign({},d,{fromQuick:true,fromJugnu:id})});break;}
+    case 'comOpen':closeModal();go('committee');break;
+    case 'comNew':comNewModal();break;
+    case 'comToggle':{const [cid,j]=String(id).split(':');const c=(D.committees||[]).find(x=>x.id===cid);if(!c)break;const mk=monthKey();c.paid=c.paid||{};const arr=c.paid[mk]=c.paid[mk]||[];const k=Number(j);const pos=arr.indexOf(k);if(pos>=0)arr.splice(pos,1);else arr.push(k);save();render();break;}
+    case 'comDel':modal(`<h1>${esc(ct('delQ'))}</h1><div class="row"><button class="btn danger" data-act="comDelYes" data-id="${esc(id)}" style="flex:1">${esc(t('del'))}</button><button class="btn ghost" data-act="closeModal">${esc(t('cancel'))}</button></div>`);break;
+    case 'comDelYes':D.committees=(D.committees||[]).filter(c=>c.id!==id);save();closeModal();render();break;
+    case 'bkShare':shareBackup(D.lang);break;
     case 'profiles':profilesModal();break;
     case 'pickProf':switchTo(id);break;
     case 'addStu':addStuModal();break;
@@ -1496,8 +1578,8 @@ document.addEventListener('click',async e=>{
     case 'closeModal':closeModal();break;
     case 'exportCSV':{const rows=[['date','name','type','amount_pkr','signed','note','receipt_no']].concat(D.entries.slice().sort((a,b)=>a.date<b.date?-1:a.date>b.date?1:a.created-b.created).map(e=>[e.date,cust(e.cid)?.name||'',e.type,e.amount,SIGN[e.type]*e.amount,e.note||'',e.rno||'']));
       download(`jugnu-khata-${todayISO()}.csv`,'﻿'+rows.map(r=>r.map(v=>`"${String(v).replace(/"/g,'""')}"`).join(',')).join('\n'),'text/csv');break;}
-    case 'exportJSON':download(`jugnu-backup-${todayISO()}.json`,JSON.stringify(D),'application/json');break;
-    case 'copyBackup':copyText(JSON.stringify(D),t('bkCopy'));break;
+    case 'exportJSON':D.lastBackup=Date.now();save();download(`jugnu-backup-${todayISO()}.json`,JSON.stringify(D),'application/json');break;
+    case 'copyBackup':D.lastBackup=Date.now();save();copyText(JSON.stringify(D),t('bkCopy'));break;
     case 'pasteRestore':modal(`<h1>${esc(t('bkRestoreP'))}</h1><textarea id="pasteBox" dir="ltr"></textarea><div class="row"><button class="btn" data-act="doPaste" style="flex:1">${esc(t('go'))}</button><button class="btn ghost" data-act="closeModal">${esc(t('cancel'))}</button></div>`);break;
     case 'doPaste':{const v=$('pasteBox').value;closeModal();restoreFrom(v);break;}
     case 'doRestore':{const d=window.__restore;if(d){D=Object.assign(blank(),d);if(!D.seq)D.seq=1;save();closeModal();go('home');}break;}
