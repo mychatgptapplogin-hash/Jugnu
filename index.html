@@ -557,7 +557,8 @@ function jugnuAnswer(text,l){
   const s=' '+toAsciiDigits(text).toLowerCase()+' ';
   const custs=D.customers.map(c=>({c,b:balance(c.id),d:oldestUnpaidDays(c.id)}));
   const hit=nameInText(text);if(hit)learnAlias(hit.c,hit.tok);const named=hit?custs.find(x=>x.c.id===hit.c.id):null;
-  if(/\d/.test(s)){const p=parseEntry(text);if(p)return{entry:p};}
+  const isQ=/[?؟]/.test(text)||/(kaise|kaisay|kese|kyun|kyon|kya |kia |kitn|kab |kahan|how |what|why|which|when|batao|bataein|samjhao|کیسے|کیوں|کیا |کتن|بتاؤ|څنګه|ولې|څومره|راته ووایه)/.test(s)||RX.idea.test(s)||RX.health.test(s);
+  if(/\d/.test(s)&&!isQ){const p=parseEntry(text);if(p&&p.amount>=10)return{entry:p};}
   if(/(shukriya|thank|شکریہ|مننه|jazak|meherbani)/.test(s))return{text:jt('thanks',l)};
   if(/(yaad|remind|یاد|یادونه|reminder)/.test(s)&&named)return{text:custLine(named,l),cid:named.c.id,action:'remind'};
   if(/(goshwara|statement|گوشوارہ|pdf)/.test(s)&&named)return{text:custLine(named,l),cid:named.c.id,action:'statement'};
