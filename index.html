@@ -364,6 +364,11 @@ body.jlight .usyl{background:#EAF2FB;border-color:#9DBCE0;color:#123E72}
 .urow{display:flex;gap:8px;flex-wrap:wrap}
 .uexam{border:1px solid #F2A516;background:#2A1E05;color:#FFD873;border-radius:999px;padding:6px 12px;font:inherit;font-size:13px;font-weight:700;cursor:pointer;min-height:36px}
 body.jlight .uexam{background:#FFF3D6;color:#6B4400}
+.acc-lang{display:flex;gap:6px;flex-wrap:wrap}
+.acc-lang button{flex:1;min-width:70px;border:1px solid var(--line);background:#FFFFFF;color:var(--ink);border-radius:999px;padding:6px 10px;font:inherit;font-size:14px;cursor:pointer;min-height:38px}
+.acc-lang button.ur{font-family:var(--urdu);font-size:15px}
+.acc-lang button.ps{font-family:var(--pashto)}
+.acc-lang button[aria-pressed="true"]{background:var(--cover2);border-color:var(--cover2);color:#FFFFFF;font-weight:700}
 </style>
 
 <div class="wrap">
@@ -971,7 +976,7 @@ function settingsView(){
     <label for="importFile" class="btn ghost full" style="margin:0;color:var(--ink)">${esc(t('bkRestoreF'))}</label><input id="importFile" type="file" accept=".json,application/json,text/plain" hidden>
     <button class="btn ghost full" data-act="pasteRestore">${esc(t('bkRestoreP'))}</button></div>
    ${fbCardHTML()}
-   <div class="page stack"><h2 style="margin-top:0">${esc(t('danger'))}</h2><button class="btn danger full" data-act="wipe">${esc(t('wipe'))}</button><p class="note">Jugnu Munshi · ConceptAI · v0.14</p></div></div>`;
+   <div class="page stack"><h2 style="margin-top:0">${esc(t('danger'))}</h2><button class="btn danger full" data-act="wipe">${esc(t('wipe'))}</button><p class="note">Jugnu Munshi · ConceptAI · v0.14.1</p></div></div>`;
 }
 function pilotView(){
   const now=Date.now(),wk=7*86400000;
@@ -991,7 +996,8 @@ function pilotView(){
 let jBusy=false,SAMPLE=null;
 const sleep=ms=>new Promise(r=>setTimeout(r,ms));
 const RTL=l=>l==='ur'||l==='ps';
-function jState(s){const w=$('jFF');if(w)w.className='ffw '+s;const st=$('jStat');if(st)st.textContent=jt(s==='happy'?'done':s==='idle'?'ready':s);}
+const USTAT={roman:{thinking:'Soch raha hoon…'},ur:{thinking:'سوچ رہا ہوں…'},ps:{thinking:'فکر کوم…'},en:{thinking:'Thinking…'}};
+function jState(s){const w=$('jFF');if(w)w.className='ffw '+s;const st=$('jStat');if(st){const l=D.lang||'roman';st.textContent=(isStudent()&&s==='thinking')?((USTAT[l]||USTAT.roman).thinking):jt(s==='happy'?'done':s==='idle'?'ready':s);}}
 function updMode(){const m=$('jMode');if(m){const st=aiOn()?'on':(navigator.onLine===false?'off':'basic');
     m.textContent=isStudent()?({on:'AI ustad',off:'Offline ustad',basic:'Ustad (basic)'}[st]):jt({on:'aiOn',off:'aiOff',basic:'aiBasic'}[st]);m.className='jmode'+(aiOn()?' on':'');}}
 window.addEventListener('online',updMode);window.addEventListener('offline',updMode);
@@ -2198,6 +2204,7 @@ function acctModal(mode){
   if(!online()){toast(at('noNet'));return;}
   const m=mode||'new';const typ=['shop','student','family','other'];
   modal(`<div class="acc-top"><div class="acc-badge">${ffSVG()}</div><div><h1>${esc(m==='new'?at('accT'):at('login'))}</h1><p class="soft small">${esc(at('accWhy'))}</p></div></div>
+   <div class="acc-lang" role="group" aria-label="Language">${[['ur','اردو'],['ps','پښتو'],['roman','Roman Urdu'],['en','English']].map(([k,n])=>`<button type="button" data-act="accLang" data-id="${k}|${m}" aria-pressed="${D.lang===k}" class="${k==='ur'?'ur':k==='ps'?'ps':''}">${n}</button>`).join('')}</div>
    <div class="seg acc-tabs" role="group"><button data-act="accTab" data-id="new" aria-pressed="${m==='new'}">${esc(at('newA'))}</button><button data-act="accTab" data-id="login" aria-pressed="${m==='login'}">${esc(at('login'))}</button></div>
    <form id="accForm" class="stack" novalidate>
     <div><label for="aPh">${esc(at('mob'))}</label><input id="aPh" inputmode="tel" autocomplete="tel" dir="ltr" placeholder="03001234567" required></div>
@@ -2237,6 +2244,7 @@ function acctAct(act,id){
     case 'accOpen':acctModal('new');return true;
     case 'accLogin':acctModal('login');return true;
     case 'accTab':acctModal(id);return true;
+    case 'accLang':{const [lg,md]=String(id).split('|');const keep={ph:($('aPh')||{}).value||'',nm:($('aNm')||{}).value,ct:($('aCt')||{}).value,sh:($('aSh')||{}).value};D.lang=lg;save();render();acctModal(md);if(keep.ph)$('aPh').value=keep.ph;if(keep.nm!=null&&$('aNm'))$('aNm').value=keep.nm;if(keep.ct!=null&&$('aCt'))$('aCt').value=keep.ct;if(keep.sh!=null&&$('aSh'))$('aSh').value=keep.sh;return true;}
     case 'accLater':try{localStorage.setItem('jugnu_acc_later',String(Date.now()));}catch(e){}closeModal();return true;
     case 'accSync':syncPush(true).then(ok=>{toast(ok?'✓':at('fail'));render();});return true;
     case 'accOut':if(confirmSafe(at('outQ'))){accSet(null);render();}return true;
