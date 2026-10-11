@@ -225,6 +225,8 @@ body.night.stu .tabs button[aria-current="page"]{color:#9BE7FF}
 .modal .page{color:var(--ink)}
 .vbtn{display:grid;place-items:center;min-width:48px;border-radius:10px;border:1px solid #2B2836;background:#16141F;color:#FFD25E;cursor:pointer}
 .ustadT .vbtn{color:#9BE7FF}
+.vbtn.rec{background:#C62828;color:#fff;border-color:#C62828;font:700 14px/1 system-ui;animation:recp 1.2s infinite}@keyframes recp{50%{opacity:.75}}
+
 .jcard .jover{font-size:13px;font-weight:700;color:#7A1A12;background:#FBE3DF;border-radius:6px;padding:4px 8px;margin-top:6px;line-height:1.6}
 .cmem{display:flex;flex-wrap:wrap;gap:6px}
 .cm{border:1px solid var(--line);background:#FFFFFF;color:var(--ink);font:inherit;font-size:14px;border-radius:999px;padding:6px 12px;min-height:40px;cursor:pointer}
@@ -855,7 +857,7 @@ function settingsView(){
     <button class="btn ghost full" data-act="copyBackup">${esc(t('bkCopy'))}</button>
     <label for="importFile" class="btn ghost full" style="margin:0;color:var(--ink)">${esc(t('bkRestoreF'))}</label><input id="importFile" type="file" accept=".json,application/json,text/plain" hidden>
     <button class="btn ghost full" data-act="pasteRestore">${esc(t('bkRestoreP'))}</button></div>
-   <div class="page stack"><h2 style="margin-top:0">${esc(t('danger'))}</h2><button class="btn danger full" data-act="wipe">${esc(t('wipe'))}</button><p class="note">Jugnu Munshi · ConceptAI · v0.9</p></div></div>`;
+   <div class="page stack"><h2 style="margin-top:0">${esc(t('danger'))}</h2><button class="btn danger full" data-act="wipe">${esc(t('wipe'))}</button><p class="note">Jugnu Munshi · ConceptAI · v0.9.1</p></div></div>`;
 }
 function pilotView(){
   const now=Date.now(),wk=7*86400000;
@@ -894,7 +896,7 @@ function jugnuView(){
    <div class="jhero"><span class="ffw listening" id="jFF">${ffSVG()}</span><div><div class="jname">Jugnu<small>munshi</small></div><div class="jstat" id="jStat" aria-live="polite">${esc(jt('listening'))}</div><span class="jmode" id="jMode"></span></div>${profChip()}</div>
    <div class="jchat" id="jChat" aria-live="polite"></div>
    <div class="jchips">${jt('chips').map(q=>`<button class="jchip" data-act="jAsk" data-q="${esc(q)}" dir="auto">${esc(q)}</button>`).join('')}</div>
-   <form class="jform" id="jForm"><label for="jIn" class="sr">${esc(jt('ask'))}</label><input id="jIn" dir="auto" autocomplete="off" enterkeyhint="send" placeholder="${esc(jt('ph'))}"><label class="vbtn" title="${esc(jt('vBtn'))}" aria-label="${esc(jt('vBtn'))}"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg><input type="file" accept="audio/*" capture hidden data-voice="1"></label><button class="btn" type="submit">${esc(t('go'))}</button></form>
+   <form class="jform" id="jForm"><label for="jIn" class="sr">${esc(jt('ask'))}</label><input id="jIn" dir="auto" autocomplete="off" enterkeyhint="send" placeholder="${esc(jt('ph'))}"><button type="button" class="vbtn" data-rec="1" title="${esc(jt('vBtn'))}" aria-label="${esc(jt('vBtn'))}"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg></button><input type="file" accept="audio/*" hidden data-voice="1"><button class="btn" type="submit">${esc(t('go'))}</button></form>
    <p class="jhint">${esc(t('hint'))}</p></div>`;
 }
 function jGreet(){
@@ -1199,7 +1201,7 @@ function ustadView(){const p=activeP();
    <div class="jhero"><span class="ffw listening" id="jFF">${ffSVG()}</span><div><div class="jname">Ustad<small>jugnu</small></div><div class="jstat" id="jStat" aria-live="polite">${esc(jt('listening'))}</div><span class="jmode" id="jMode"></span></div>${profChip()}</div>
    <div class="jchat" id="jChat" aria-live="polite"></div>
    <div class="jchips">${ft('uChips').map(q=>`<button class="jchip" data-act="uAsk" data-q="${esc(q)}" dir="auto">${esc(q)}</button>`).join('')}</div>
-   <form class="jform" id="jForm"><label for="jIn" class="sr">Ustad</label><input id="jIn" dir="auto" autocomplete="off" enterkeyhint="send" placeholder="${esc(ft('uPh'))}"><label class="vbtn" title="${esc(jt('vBtn'))}" aria-label="${esc(jt('vBtn'))}"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg><input type="file" accept="audio/*" capture hidden data-voice="1"></label><button class="btn" type="submit">${esc(t('go'))}</button></form>
+   <form class="jform" id="jForm"><label for="jIn" class="sr">Ustad</label><input id="jIn" dir="auto" autocomplete="off" enterkeyhint="send" placeholder="${esc(ft('uPh'))}"><button type="button" class="vbtn" data-rec="1" title="${esc(jt('vBtn'))}" aria-label="${esc(jt('vBtn'))}"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg></button><input type="file" accept="audio/*" hidden data-voice="1"><button class="btn" type="submit">${esc(t('go'))}</button></form>
    <p class="jhint" id="uCap">${esc(D.plan==='family'?ft('famNote'):fill(ft('aiLeft'),{u:aiQuota().n,c:STU_CAP}))}</p></div>`;}
 function uMsgHTML(m,i){const l=m.l||D.lang;
   let h=`<div class="jmsg ${m.who==='me'?'jme':'jai'} l-${l}" dir="${RTL(l)?'rtl':'ltr'}">${esc(m.text||'')}`;
@@ -1334,6 +1336,32 @@ Object.assign(J.en,{vHear:'Listening to the voice note…',vGot:'The voice note 
 function draftFromAmount(text){const am=pAmounts(pTokens(text)).filter(a=>!a.qty).sort((a,b)=>b.v-a.v)[0];if(!am||am.v<10)return null;
   const s=' '+pTokens(text).join(' ')+' ';const gave=/(diye|diya|bhej|jama|ada|mil|wapis|wasool|paid|sent|received|دیے|دیا|بھیج|جمع|ادا|ملے|واپس|وصول|راکړ|راولېږ)/.test(s);
   return{name:'',amount:am.v,type:gave?'payment':'credit',date:todayISO(),note:''};}
+
+/* v0.9.1 in-app voice recorder (works on iPhone and Android) */
+let REC=null;
+function recMime(){const c=['audio/webm;codecs=opus','audio/webm','audio/mp4','audio/aac','audio/ogg'];if(!window.MediaRecorder||!MediaRecorder.isTypeSupported)return '';for(const m of c){try{if(MediaRecorder.isTypeSupported(m))return m;}catch(e){}}return '';}
+function recPick(btn){const f=btn.parentNode.querySelector('input[data-voice]');if(f)f.click();}
+async function recToggle(btn){
+  if(REC){REC.stop();return;}
+  if(!AI_URL||navigator.onLine===false){(isStudent()?uPush:jPush)({who:'ai',text:jt('vNet',D.lang),l:D.lang});return;}
+  if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia||!window.MediaRecorder){recPick(btn);return;}
+  let stream;try{stream=await navigator.mediaDevices.getUserMedia({audio:true});}catch(e){(isStudent()?uPush:jPush)({who:'ai',text:jt('vPerm',D.lang),l:D.lang});return;}
+  const mime=recMime();let mr;try{mr=mime?new MediaRecorder(stream,{mimeType:mime}):new MediaRecorder(stream);}catch(e){stream.getTracks().forEach(t=>t.stop());recPick(btn);return;}
+  const chunks=[];const t0=Date.now();const svg=btn.innerHTML;
+  const tick=()=>{const s=Math.floor((Date.now()-t0)/1000);btn.textContent='■ '+Math.floor(s/60)+':'+String(s%60).padStart(2,'0');if(s>=90)mr.stop();};
+  REC=mr;btn.classList.add('rec');btn.setAttribute('aria-label',jt('vStop',D.lang));tick();const iv=setInterval(tick,500);
+  mr.ondataavailable=e=>{if(e.data&&e.data.size)chunks.push(e.data);};
+  mr.onstop=()=>{clearInterval(iv);stream.getTracks().forEach(t=>t.stop());REC=null;
+    document.querySelectorAll('.vbtn.rec').forEach(b=>{b.classList.remove('rec');b.innerHTML=svg;b.setAttribute('aria-label',jt('vBtn',D.lang));});
+    const type=(mr.mimeType||mime||'audio/mp4').split(';')[0];const blob=new Blob(chunks,{type});
+    if(Date.now()-t0<800||blob.size<1500)return;handleVoice(blob);};
+  mr.start(1000);
+}
+document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('button[data-rec]');if(b){e.preventDefault();recToggle(b);}});
+Object.assign(J.roman,{vStop:'Rokne ke liye dabayein',vPerm:'Mic ki ijazat nahi mili. Settings mein Jugnu/Safari ko microphone ki ijazat dein, ya likh kar bata dein.'});
+Object.assign(J.ur,{vStop:'روکنے کے لیے دبائیں',vPerm:'مائیک کی اجازت نہیں ملی۔ سیٹنگز میں مائیکروفون کی اجازت دیں، یا لکھ کر بتا دیں۔'});
+Object.assign(J.ps,{vStop:'د درولو لپاره کېکاږئ',vPerm:'د مایک اجازه ونه موندل شوه. په سیټنګ کې د مایکروفون اجازه ورکړئ، یا یې ولیکئ.'});
+Object.assign(J.en,{vStop:'Tap to stop',vPerm:'Microphone permission was denied. Allow the microphone in Settings, or type it instead.'});
 async function transcribe(blob,l){
   const lang=l==='ps'?'ps':l==='en'?'en':'ur';const ctl=new AbortController();const tm=setTimeout(()=>ctl.abort(),45000);
   try{const r=await fetch(AI_URL+'transcribe',{method:'POST',headers:{'content-type':blob.type||'audio/ogg','x-lang':lang},body:blob,signal:ctl.signal});
@@ -1342,8 +1370,9 @@ async function handleVoice(blob){
   const l=D.lang;const stu=isStudent();const push=stu?uPush:jPush;
   if(!AI_URL||navigator.onLine===false){push({who:'ai',text:jt('vNet',l),l});return;}
   push({who:'ai',text:jt('vHear',l),l});jState('listening');
-  const tx=await transcribe(blob,l);
+  let tx=await transcribe(blob,l);
   if(!tx){push({who:'ai',text:jt('vFail',l),l});jState('idle');return;}
+  tx=tx.replace(/(\d),(?=\d{3}\b)/g,'$1').replace(/₹\s?/g,'Rs ');
   push({who:'ai',text:jt('vGot',l)+'\n"'+tx+'"',l});
   if(stu)uSend(tx);else jSendShared(tx);
 }
