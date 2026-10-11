@@ -1,0 +1,1442 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Jugnu Munshi</title>
+<meta name="theme-color" content="#0C0B12">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Nastaliq+Urdu:wght@400;600;700&family=Noto+Naskh+Arabic:wght@400;600;700&family=Sora:wght@400;600;700&display=swap">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+/* Layout: a shop register. Maroon cloth cover bar on top, cream ruled "pages" below, one column on phones.
+   Deliberately one light "paper" look, so every colour is set explicitly. */
+:root{
+  --desk:#EFE6D2; --paper:#FFFBF0; --rule:#E6D9BC; --margin:#C0392B; --ink:#1F1A17; --ink2:#4A3F36;
+  --cover:#5E1A1A; --cover2:#7A2424; --gold:#E2B04A; --goldsoft:#F6DFA6;
+  --udhaar:#A61E14; --wasooli:#17643A; --amber:#C46A0C; --line:#D8C9A6;
+  --latin:'Sora', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --urdu:'Noto Nastaliq Urdu', 'Jameel Noori Nastaleeq', serif;
+  --pashto:'Noto Naskh Arabic', 'Segoe UI', serif;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{background:var(--desk);color:var(--ink);font-family:var(--latin);font-size:16px;line-height:1.45;padding-inline:16px}
+html[lang="ur"] body{font-family:var(--urdu),var(--latin);font-size:17px;line-height:2.05}
+html[lang="ps"] body{font-family:var(--pashto),var(--latin);font-size:17px;line-height:1.75}
+.num,.amt,input[inputmode="numeric"],input[type="date"]{font-family:var(--latin);font-variant-numeric:tabular-nums;direction:ltr;unicode-bidi:isolate}
+.wrap{max-width:560px;margin:0 auto;padding-block:0 120px}
+header{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;margin-inline:-16px;padding:10px 16px;background:linear-gradient(180deg,var(--cover2),var(--cover));color:#FFF6E3;display:flex;align-items:center;justify-content:space-between;gap:10px;box-shadow:0 2px 0 var(--gold)}
+.logo{display:flex;align-items:flex-start;gap:2px;font-family:var(--latin);font-weight:700;font-size:23px;letter-spacing:-.04em;background:none;border:none;color:#FFF6E3;cursor:pointer;padding:0}
+.logo i{width:9px;height:9px;border-radius:50%;background:var(--gold);box-shadow:0 0 12px 4px rgba(226,176,74,.6);margin-top:4px;animation:glow 2.4s ease-in-out infinite}
+@keyframes glow{0%,100%{opacity:.6}20%{opacity:1}35%{opacity:.7}50%{opacity:1}}
+.logo small{font-size:12px;font-weight:600;color:var(--goldsoft);letter-spacing:.08em;text-transform:uppercase;margin:9px 8px 0}
+.hbtns{display:flex;gap:8px}
+.icon{width:44px;height:44px;border-radius:12px;border:1px solid rgba(255,230,180,.35);background:rgba(0,0,0,.18);color:#FFF6E3;display:grid;place-items:center;cursor:pointer}
+main{padding-top:14px}
+.page{background:var(--paper);border:1px solid var(--line);border-radius:6px;box-shadow:0 1px 0 #fff inset,0 6px 18px rgba(80,50,10,.10);padding:16px;position:relative}
+.page.ruled{background-image:linear-gradient(var(--paper),var(--paper)),repeating-linear-gradient(transparent 0 39px,var(--rule) 39px 40px)}
+h1{font-size:22px;margin:0;line-height:1.5}
+html[lang="ur"] h1{font-size:24px;line-height:2}
+h2{font-size:16px;margin:18px 0 8px;color:var(--cover);letter-spacing:.02em}
+html[lang="ur"] h2,html[lang="ps"] h2{font-size:18px}
+p{margin:0}
+.soft{color:var(--ink2)}
+.small{font-size:14px}
+.stack{display:flex;flex-direction:column;gap:12px}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.shopname{display:flex;justify-content:space-between;align-items:flex-end;gap:10px;border-bottom:2px solid var(--cover);padding-bottom:8px;margin-bottom:12px}
+.tiles{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:0;border:1px solid var(--line);border-radius:6px;overflow:hidden;background:var(--paper)}
+.tile{padding:10px 10px;border-inline-start:1px solid var(--line)}
+.tile:first-child{border-inline-start:none}
+.tile small{display:block;font-size:13px;color:var(--ink2);line-height:1.6}
+.tile b{font-size:19px;letter-spacing:-.02em;display:block}
+.u{color:var(--udhaar)} .w{color:var(--wasooli)}
+.btn{border:none;border-radius:10px;background:var(--cover);color:#FFF6E3;font:inherit;font-weight:700;font-size:16px;padding:10px 16px;min-height:48px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:8px;text-decoration:none;line-height:1.4}
+.btn.gold{background:var(--gold);color:#2A1A04}
+.btn.ghost{background:var(--paper);color:var(--ink);border:1px solid var(--line);font-weight:600}
+.btn.danger{background:#FBE3DF;color:#7A1A12;border:1px solid #E7A79E}
+.btn.wa{background:#167A47;color:#FFFFFF}
+.btn.full{width:100%}
+.btn.sm{min-height:42px;padding:6px 12px;font-size:14px}
+label{font-size:14px;color:var(--ink2);display:block;margin-bottom:2px}
+input,select,textarea{width:100%;min-height:48px;border-radius:8px;border:1px solid var(--line);background:#FFFFFF;color:var(--ink);font:inherit;font-size:16px;padding:8px 12px}
+html[lang="ur"] input,html[lang="ur"] select,html[lang="ur"] textarea{font-size:17px;line-height:2}
+textarea{min-height:90px;resize:vertical}
+.quick{display:flex;gap:8px}
+.quick input{flex:1;min-width:0}
+.list{display:flex;flex-direction:column}
+.cust{display:flex;justify-content:space-between;align-items:center;gap:10px;background:none;border:none;border-bottom:1px solid var(--rule);padding:10px 2px;color:var(--ink);font:inherit;text-align:start;width:100%;cursor:pointer;min-height:58px}
+.cust:last-child{border-bottom:none}
+.cust b{font-size:16px;font-weight:700}
+.cust small{display:block;color:var(--ink2);font-size:13px;line-height:1.6}
+.amt{text-align:end;font-weight:700;flex-shrink:0}
+.amt small{font-weight:400;color:var(--ink2);font-family:inherit}
+.tag{display:inline-block;font-size:12px;font-weight:700;border-radius:4px;padding:0 6px;background:#F3E3BF;color:#5A3A06;margin-inline-start:6px;line-height:1.8}
+.late{background:#FBE3DF;color:#7A1A12}
+.confirm{border:2px solid var(--gold)}
+/* register table */
+.regwrap{overflow-x:auto;margin-inline:-16px;padding-inline:16px}
+table.reg{width:100%;border-collapse:collapse;background:var(--paper)}
+table.reg tr.tap{cursor:pointer}
+table.reg tr.tap:hover td,table.reg tr.tap:focus td{background:#FBF0D3}
+table.reg td.dt{white-space:nowrap}
+table.reg td.det svg{vertical-align:middle;color:var(--wasooli)}
+table.reg th{background:#F4E8CC;color:var(--cover);font-size:13px;font-weight:700;padding:6px 4px;border-bottom:2px solid var(--margin);border-top:1px solid var(--line);text-align:center;white-space:nowrap}
+table.reg td{padding:8px 4px;border-bottom:1px solid var(--rule);font-size:14px;vertical-align:middle;text-align:center}
+table.reg td.det{text-align:start;min-width:64px}
+table.reg td.no{width:26px}
+table.reg td.det small{display:block;color:var(--ink2);font-size:12px;line-height:1.5}
+table.reg td.no{color:var(--ink2);border-inline-end:2px solid var(--margin);width:34px}
+table.reg tr.tot td{border-top:2px solid var(--ink);border-bottom:3px double var(--ink);font-weight:700;background:#FBF3DE}
+table.reg .acts{white-space:nowrap}
+.mini{width:36px;height:36px;border-radius:8px;border:1px solid var(--line);background:#FFFFFF;color:var(--ink);display:inline-grid;place-items:center;cursor:pointer;vertical-align:middle}
+.fab{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(76px + env(safe-area-inset-bottom,0px));z-index:6;box-shadow:0 8px 24px rgba(94,26,26,.35);min-height:56px;padding:12px 26px;border-radius:999px;font-size:17px}
+.note{font-size:13px;color:var(--ink2);line-height:1.6}
+html[lang="ur"] .note{font-size:14px;line-height:2}
+.warnbox{background:#FFF0D6;border:1px solid #E9C27A;color:#5A3A06;border-radius:8px;padding:10px 12px;font-size:14px}
+.seg{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}
+.seg button{border:1px solid var(--line);background:#FFFFFF;color:var(--ink);font-size:16px;border-radius:10px;min-height:52px;cursor:pointer}
+.seg button.ur{font-family:var(--urdu);font-size:18px}
+.seg button.ps{font-family:var(--pashto);font-size:18px}
+.seg button.lat{font-family:var(--latin)}
+.seg button[aria-pressed="true"]{background:var(--cover);color:#FFF6E3;border-color:var(--cover);font-weight:700}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(150px + env(safe-area-inset-bottom,0px));background:var(--ink);color:#FFF6E3;font-weight:700;font-size:14px;border-radius:999px;padding:8px 18px;z-index:9;max-width:90vw;text-align:center}
+.empty{text-align:center;padding:20px 8px;color:var(--ink2)}
+.grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.modal{position:fixed;inset:0;background:rgba(30,15,5,.55);z-index:9;display:flex;align-items:flex-end;justify-content:center;padding:16px;overflow-y:auto}
+.modal .page{width:100%;max-width:560px;margin-bottom:env(safe-area-inset-bottom,0px);max-height:92vh;overflow-y:auto}
+.preview{width:100%;height:auto;border:1px solid var(--line);border-radius:6px;background:#fff}
+.today{display:flex;justify-content:space-between;gap:10px;border-bottom:1px dashed var(--rule);padding:6px 0;font-size:14px}
+.today:last-child{border-bottom:none}
+/* ===== Jugnu firefly (original bot style) ===== */
+.ff{overflow:visible;display:block}
+.ff .float{animation:ffFloat 3.2s ease-in-out infinite}
+@keyframes ffFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
+.ff .wL{transform-origin:96px 90px;animation:ffL 1.6s ease-in-out infinite}
+.ff .wR{transform-origin:104px 90px;animation:ffR 1.6s ease-in-out infinite}
+@keyframes ffL{0%,100%{transform:rotate(0)}50%{transform:rotate(-12deg)}}
+@keyframes ffR{0%,100%{transform:rotate(0)}50%{transform:rotate(12deg)}}
+.ff .px{fill:#8FE3FF;animation:ffPx 1.8s ease-in-out infinite}
+@keyframes ffPx{0%,100%{opacity:.25}50%{opacity:1}}
+.ff .halo{transform-origin:100px 118px;animation:ffBr 3.2s ease-in-out infinite}
+@keyframes ffBr{0%,100%{transform:scale(1);opacity:.75}50%{transform:scale(1.06);opacity:.95}}
+.ff .flash{transform-origin:100px 118px;opacity:.12}
+.ff .core{transform-origin:100px 118px}
+.ff .eyes{transition:transform .35s ease}
+.ff .eo{transform-origin:100px 117px;animation:ffBl 4.2s infinite}
+@keyframes ffBl{0%,93%,100%{transform:scaleY(1)}96%{transform:scaleY(.1)}}
+.ff .eh{opacity:0;transition:opacity .25s}
+.ffw.thinking .flash,.ffw.listening .flash{animation:ffFire 1.6s ease-in-out infinite}
+.ffw.thinking .core{animation:ffFlick 1.6s ease-in-out infinite}
+@keyframes ffFire{0%,100%{opacity:.08;transform:scale(.9)}12%{opacity:1;transform:scale(1.28)}28%{opacity:.3;transform:scale(1)}42%{opacity:.85;transform:scale(1.16)}62%{opacity:.12;transform:scale(.95)}}
+@keyframes ffFlick{0%,100%{filter:brightness(.8)}12%{filter:brightness(1.4)}42%{filter:brightness(1.3)}62%{filter:brightness(.85)}}
+.ffw.thinking .eyes{transform:translate(4px,-7px)}
+.ffw.thinking .eo{animation:none;transform:scaleY(.65)}
+.ffw.thinking .wL,.ffw.thinking .wR,.ffw.listening .wL,.ffw.listening .wR{animation-duration:.25s}
+.ffw.thinking .px,.ffw.listening .px{animation-duration:.6s}
+.ffw.happy .eo{opacity:0}
+.ffw.happy .eh{opacity:1}
+.ffw.happy .float{animation:ffHop .5s ease-out 2}
+@keyframes ffHop{0%,100%{transform:translateY(0)}40%{transform:translateY(-14px)}}
+.logo .ffw{width:34px;height:34px;margin-inline-end:2px}
+.logo{align-items:center}
+.ffbtn{position:fixed;inset-inline-start:16px;bottom:calc(18px + env(safe-area-inset-bottom,0px));z-index:6;width:64px;height:64px;border-radius:50%;border:2px solid var(--gold);background:radial-gradient(circle at 50% 45%,#2A2140,#0C0B12 70%);box-shadow:0 0 22px rgba(255,190,80,.45),0 8px 20px rgba(0,0,0,.35);cursor:pointer;display:grid;place-items:center;padding:0}
+.ffbtn .ffw{width:58px;height:58px}
+.jsheet{background:#0C0B12;color:#F7F3EA;border:1px solid #2B2836;border-radius:18px;padding:16px;display:flex;flex-direction:column;gap:10px;width:100%;max-width:560px;max-height:92vh;overflow-y:auto;margin-bottom:env(safe-area-inset-bottom,0px)}
+.jsheet .jtop{display:flex;align-items:center;gap:12px}
+.jsheet .jtop .ffw{width:96px;height:96px;flex-shrink:0}
+.jsheet .jname{font-family:var(--latin);font-weight:700;font-size:22px;letter-spacing:-.03em}
+.jsheet .jstat{font-size:14px;color:#FFD25E;min-height:20px}
+.jsheet .jclose{margin-inline-start:auto;align-self:flex-start;width:44px;height:44px;border-radius:22px;border:1px solid #2B2836;background:#16141F;color:#F7F3EA;cursor:pointer;font-size:20px}
+.jchat{display:flex;flex-direction:column;gap:8px;max-height:38vh;overflow-y:auto;padding:2px}
+.jmsg{max-width:88%;padding:9px 13px;border-radius:16px;font-size:15px;line-height:1.6;white-space:pre-line}
+html[lang="ur"] .jmsg{font-size:16px;line-height:2}
+.jai{background:#16141F;border:1px solid #2B2836;align-self:flex-start;border-end-start-radius:5px}
+.jme{background:#FF9F3A;color:#1A0E04;align-self:flex-end;border-end-end-radius:5px}
+.jchips{display:flex;gap:8px;overflow-x:auto;padding-bottom:2px}
+.jchip{flex-shrink:0;border:1px solid #2B2836;background:#16141F;color:#F7F3EA;font:inherit;font-size:14px;border-radius:999px;padding:8px 12px;cursor:pointer;min-height:42px}
+.jform{display:flex;gap:8px}
+.jform input{flex:1;min-width:0;background:#16141F;border-color:#2B2836;color:#F7F3EA}
+.jform input::placeholder{color:#BDB5CC}
+.jform .btn{background:#FF9F3A;color:#1A0E04}
+.jhint{font-size:13px;color:#D3CDDD}
+.toast .ffw{width:26px;height:26px;display:inline-block;vertical-align:middle;margin-inline-end:6px}
+
+/* ===== Jugnu home (AI munshi is the main screen) ===== */
+body.night{background:#08070D;color:#F7F3EA}
+body.night header{display:none}
+body.night .wrap{padding-bottom:0}
+.jhome{display:flex;flex-direction:column;gap:10px;height:calc(100dvh - 96px - env(safe-area-inset-bottom,0px));min-height:440px}
+.jhero{display:flex;align-items:center;gap:12px}
+.jhero .ffw{width:88px;height:88px;flex-shrink:0}
+.jname{font-family:var(--latin);font-weight:700;font-size:24px;letter-spacing:-.03em;color:#FFF6E3;line-height:1.2}
+.jname small{font-size:12px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:#FFD25E;margin-inline-start:6px}
+.jstat{font-size:14px;color:#FFD25E;min-height:22px}
+.jmode{display:inline-block;font-family:var(--latin);font-size:12px;font-weight:700;border-radius:999px;padding:2px 10px;border:1px solid #3A3648;color:#D3CDDD;margin-top:2px;line-height:1.7}
+.jmode.on{border-color:#FFB547;color:#FFD25E}
+.jhome .jchat{flex:1;min-height:0;max-height:none;overflow-y:auto;background:#0F0D17;border:1px solid #221F2C;border-radius:16px;padding:10px}
+.jmsg.l-ur{font-family:var(--urdu),var(--latin);font-size:16px;line-height:2.1}
+.jmsg.l-ps{font-family:var(--pashto),var(--latin);font-size:16px;line-height:1.8}
+.jmsg.l-en,.jmsg.l-roman{font-family:var(--latin);font-size:15px;line-height:1.55}
+.jai{color:#F7F3EA}
+.jbtns{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;white-space:normal}
+.jbtns .jchip{min-height:38px;padding:6px 12px;font-size:14px;background:#221E2E;border-color:#3A3648}
+.jbtns .jyes{background:#FF9F3A;color:#1A0E04;border-color:#FF9F3A;font-weight:700}
+.jcard{margin-top:8px;background:#FFFBF0;color:#1F1A17;border:2px solid #E2B04A;border-radius:10px;padding:8px 10px;white-space:normal}
+.jcard .jr{display:flex;justify-content:space-between;gap:10px;border-bottom:1px dashed #E6D9BC;padding:2px 0;font-size:14px}
+.jcard .jr:last-of-type{border-bottom:none}
+.jcard .jr span{color:#4A3F36}
+.jcard .jnew{font-size:12px;color:#7A4A06;margin-top:4px;line-height:1.7}
+.jcard .jdone{font-weight:700;color:#17643A;margin-top:4px}
+.jcard .jdone.no{color:#7A1A12}
+.jcard .jbtns .jchip{background:#FFFFFF;color:#1F1A17;border-color:#D8C9A6}
+.jcard .jbtns .jyes{background:#5E1A1A;color:#FFF6E3;border-color:#5E1A1A}
+.jhome .jform input{min-height:52px}
+.jhome .jform .btn{min-width:64px}
+/* bottom tabs */
+.tabs{position:fixed;left:0;right:0;bottom:0;z-index:7;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));background:#FFFBF0;border-top:2px solid var(--gold);padding-bottom:env(safe-area-inset-bottom,0px)}
+.tabs.stuTabs{grid-template-columns:repeat(3,minmax(0,1fr))}
+.tabs button{min-height:62px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;background:none;border:none;color:var(--ink2);font:inherit;font-size:13px;line-height:1.3;cursor:pointer;padding:4px 2px}
+html[lang="ur"] .tabs button{font-size:14px;line-height:1.7}
+.tabs button[aria-current="page"]{color:var(--cover);font-weight:700}
+.tabs .tdot{width:20px;height:20px;border-radius:50%;background:radial-gradient(circle at 40% 35%,#FFF6D6,#FFD25E 45%,#FF8A2B);box-shadow:0 0 10px 3px rgba(255,190,80,.55)}
+body.night .tabs{background:#0C0B12;border-top-color:#2B2836}
+body.night .tabs button{color:#CFC8DA}
+body.night .tabs button[aria-current="page"]{color:#FFD25E}
+
+/* family profiles + Ustad */
+.pchip{margin-inline-start:auto;align-self:flex-start;display:flex;align-items:center;gap:6px;border:1px solid #3A3648;background:#16141F;color:#F7F3EA;border-radius:999px;padding:4px 10px 4px 4px;font:inherit;font-size:13px;cursor:pointer;max-width:46%;min-height:40px}
+.pchip span[dir]{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pav{width:30px;height:30px;border-radius:50%;display:inline-grid;place-items:center;font-family:var(--latin);font-weight:700;font-size:14px;flex-shrink:0;background:#FFB547;color:#2A1404}
+.pav.student{background:#5FB8FF;color:#06223A}
+.plist{display:flex;flex-direction:column;gap:8px}
+.prow{display:flex;align-items:center;gap:8px;border:1px solid var(--line);border-radius:12px;padding:6px;background:#FFFFFF}
+.prow.on{border:2px solid var(--gold)}
+.pbtn{flex:1;display:flex;align-items:center;gap:10px;background:none;border:none;font:inherit;color:var(--ink);text-align:start;cursor:pointer;min-height:48px}
+.pbtn .pav{width:40px;height:40px;font-size:17px}
+.pbtn small{display:block;color:var(--ink2);font-size:13px;line-height:1.5}
+.linkcode{font-size:40px;font-weight:700;text-align:center;letter-spacing:.12em;color:var(--cover);padding:8px 0}
+.ustadT .jname small{color:#9BE7FF}
+.ustadT .jstat{color:#9BE7FF}
+.ustadT .jme{background:#5FB8FF;color:#06223A}
+.ustadT .jform .btn{background:#5FB8FF;color:#06223A}
+body.night.stu .tabs button[aria-current="page"]{color:#9BE7FF}
+.modal .page{color:var(--ink)}
+.jmsg:has(.qcard){width:88%}
+.qcard{margin-top:8px;background:#FFFFFF;color:#1F1A17;border:2px solid #5FB8FF;border-radius:12px;padding:10px;white-space:normal;font-family:var(--latin)}
+.qcard .qq{font-weight:700;font-size:15px;line-height:1.5;margin-bottom:8px}
+.qopt{display:block;width:100%;text-align:start;margin-top:6px;border:1px solid #C9D6E3;background:#F4F8FC;color:#10202E;border-radius:10px;padding:10px 12px;font:inherit;font-size:15px;cursor:pointer;min-height:44px}
+.qopt.ok{background:#DDF3E5;border-color:#17643A;color:#0E3D23;font-weight:700}
+.qopt.bad{background:#FBE3DF;border-color:#A61E14;color:#7A1A12}
+.qopt:disabled{cursor:default}
+.sbar{display:grid;grid-template-columns:90px 1fr 48px;align-items:center;gap:8px;padding:6px 0}
+.sbar .sb{height:12px;background:#EFE6D2;border-radius:6px;overflow:hidden}
+.sbar .sb i{display:block;height:100%}
+pre.rep{white-space:pre-wrap;font:inherit;font-size:14px;line-height:1.8;margin:0;background:#FBF3DE;border:1px solid var(--line);border-radius:8px;padding:10px}
+.tog{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.tog .btn{flex-shrink:0}
+#printArea{display:none}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);clip-path:inset(50%);white-space:nowrap}
+body{overflow-x:hidden}
+@media print{
+  body{background:#fff;padding:0}
+  .wrap,#fabHost,#modalHost,#tabHost,.toast{display:none!important}
+  #printArea{display:block}
+  #printArea img{width:100%;page-break-after:always;display:block}
+}
+button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,a:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+@media (prefers-reduced-motion:reduce){*{animation:none!important}}
+</style>
+
+<div class="wrap">
+  <header>
+    <button class="logo" data-act="jhome" aria-label="Jugnu"><span class="ffw" id="logoFF"></span>jugnu<small>munshi</small></button>
+    <div class="hbtns" id="hbtns"></div>
+  </header>
+  <main id="app" aria-live="polite"></main>
+</div>
+<div id="fabHost"></div>
+<div id="tabHost"></div>
+<div id="modalHost"></div>
+<div id="printArea"></div>
+
+<script>
+/* ================= storage ================= */
+const KEY='jugnu_khata_v1';
+let storageOK=true;
+function blank(){return{v:2,shop:null,customers:[],entries:[],reminders:[],lang:null,seq:1};}
+function load(){try{const s=localStorage.getItem(KEY);if(!s)return blank();const d=JSON.parse(s);const b=Object.assign(blank(),d);if(!b.seq)b.seq=1;b.entries.forEach(e=>{if(e.type==='payment'&&!e.rno)e.rno=b.seq++;});return b;}catch(e){storageOK=false;return blank();}}
+let D=load();
+function save(){try{localStorage.setItem(KEY,JSON.stringify(D));storageOK=true;}catch(e){storageOK=false;}}
+
+/* ================= helpers ================= */
+const $=id=>document.getElementById(id);
+const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,7);
+const num=n=>Math.round(Math.abs(n)).toLocaleString('en-US');
+const rs=n=>'Rs '+num(n);
+function todayISO(d){d=d||new Date();const z=new Date(d.getTime()-d.getTimezoneOffset()*60000);return z.toISOString().slice(0,10);}
+function daysBetween(a,b){return Math.round((new Date(b+'T00:00:00')-new Date(a+'T00:00:00'))/86400000);}
+function dmy(iso){const [y,m,d]=iso.split('-');return `${d}-${m}-${y}`;}
+function toast(t,happy){const el=document.createElement('div');el.className='toast';if(happy){el.innerHTML=`<span class="ffw happy">${ffSVG()}</span>`;}el.append(t);document.body.appendChild(el);setTimeout(()=>el.remove(),2300);}
+/* ---- firefly drawing ---- */
+const FF_POLY=[[96,88],[66,62],[54,68],[57,84],[88,100]];
+function ffInside(x,y,p){let c=false;for(let i=0,j=p.length-1;i<p.length;j=i++){const[xi,yi]=p[i],[xj,yj]=p[j];if(((yi>y)!==(yj>y))&&(x<(xj-xi)*(y-yi)/(yj-yi)+xi))c=!c;}return c;}
+let FF_PX='';for(let y=62;y<=98;y+=6)for(let x=52;x<=94;x+=6){if(ffInside(x+2.25,y+2.25,FF_POLY)){const d=Math.hypot(96-x,90-y);FF_PX+=`<rect class="px" x="${x}" y="${y}" width="4.5" height="4.5" rx="1" style="animation-delay:${(d*.025).toFixed(2)}s"/>`;}}
+let ffN=0;
+function ffSVG(){const n=++ffN;return `<svg class="ff" viewBox="20 30 160 160" width="100%" height="100%" aria-hidden="true"><defs><radialGradient id="fh${n}" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="#FFD25E" stop-opacity=".75"/><stop offset="45%" stop-color="#FF9F3A" stop-opacity=".25"/><stop offset="100%" stop-color="#FF9F3A" stop-opacity="0"/></radialGradient><radialGradient id="fc${n}" cx="38%" cy="35%" r="65%"><stop offset="0%" stop-color="#FFF6D6"/><stop offset="40%" stop-color="#FFD25E"/><stop offset="100%" stop-color="#FF8A2B"/></radialGradient></defs><circle class="flash" cx="100" cy="118" r="92" fill="url(#fh${n})"/><g class="float"><g class="wL">${FF_PX}</g><g class="wR"><g transform="translate(200 0) scale(-1 1)">${FF_PX}</g></g><circle class="halo" cx="100" cy="118" r="62" fill="url(#fh${n})"/><circle class="core" cx="100" cy="118" r="34" fill="url(#fc${n})"/><g class="eyes"><g class="eo"><rect x="85" y="107" width="10" height="20" rx="5" fill="#2A1404"/><rect x="105" y="107" width="10" height="20" rx="5" fill="#2A1404"/></g><path class="eh" d="M82 120 Q 89.5 109, 97 120 M103 120 Q 110.5 109, 118 120" fill="none" stroke="#2A1404" stroke-width="5" stroke-linecap="round"/></g></g></svg>`;}
+function phone92(p){let d=String(p||'').replace(/[^\d]/g,'');if(!d)return'';if(d.startsWith('0092'))d=d.slice(2);if(d.startsWith('92'))return d;if(d.startsWith('0'))return'92'+d.slice(1);if(d.length===10&&d.startsWith('3'))return'92'+d;return d;}
+const inViewer=()=>!!(window.claude&&window.claude.use);
+const isRTL=()=>D.lang==='ur'||D.lang==='ps';
+
+/* ================= language ================= */
+const T={
+ ur:{lene:'لینے ہیں',dene:'دینے ہیں',aaj:'آج کی وصولی',search:'نام سے تلاش کریں',entry:'+ نیا اندراج',quickL:'جلدی اندراج',quickPh:'لکھیں: احمد نے 2000 کا سامان لیا',go:'آگے',overdue:'پرانا ادھار (7 دن سے زیادہ)',all:'تمام کھاتے',todayL:'آج کے اندراج',
+   none:'ابھی کوئی کھاتہ نہیں۔ "+ نیا اندراج" دبائیں یا نمونے کی دکان دیکھیں۔',confirm:'ٹھیک لکھا؟',name:'نام',amount:'رقم (روپے)',type:'قسم',date:'تاریخ',noteL:'تفصیل (اختیاری)',saveB:'جی ہاں، محفوظ کریں',cancel:'نہیں',newName:'نیا نام: محفوظ کرتے ہی نیا کھاتہ بن جائے گا',
+   credit:'ادھار دیا (گاہک نے سامان لیا)',payment:'وصولی (رقم ملی)',goods:'مال آیا (سپلائر سے)',paid:'ادائیگی کی (سپلائر کو)',
+   creditS:'ادھار',paymentS:'وصولی',goodsS:'مال آیا',paidS:'ادائیگی',
+   owesMe:'لینے ہیں',iOwe:'دینے ہیں',settled:'حساب برابر',days:'دن',remind:'واٹس ایپ پر یاد دہانی',addEntry:'اندراج کریں',ledger:'کھاتہ رجسٹر',back:'واپس',
+   delQ:'یہ اندراج حذف کریں؟',del:'حذف',edit:'درستی',phone:'فون نمبر',kind:'قسم',customer:'گاہک',supplier:'سپلائر',saveCust:'محفوظ کریں',
+   settings:'ترتیبات',shop:'دکان',pilot:'پائلٹ رپورٹ',backup:'بیک اپ',lang:'زبان',hint:'بول کر لکھنے کے لیے کی بورڈ کا مائیک دبائیں۔',
+   parseFail:'سمجھ نہیں آیا۔ نام اور رقم لکھیں، جیسے: "بلال نے 1500 دیے"',manual:'فارم سے اندراج',noPhone:'اس گاہک کا فون نمبر نہیں۔ پہلے نمبر درج کریں۔',sentLog:'یاد دہانی بھیج دی گئی',lastRem:'آخری یاد دہانی',
+   colNo:'نمبر',colDate:'تاریخ',colDet:'تفصیل',colCr:'ادھار',colRv:'وصولی',colBal:'بقایا',total:'میزان',
+   receipt:'رسید',receiptNo:'رسید نمبر',from:'وصول از',amtRecv:'وصول شدہ رقم',method:'ذریعہ',remain:'باقی بقایا',sign:'دستخط',thanks:'شکریہ! دوبارہ تشریف لائیں',
+   statement:'کھاتے کا گوشوارہ',totCr:'کل ادھار',totRv:'کل وصولی',made:'جگنو کھاتہ سے تیار کردہ',page:'صفحہ',
+   pdfR:'رسید PDF',pdfS:'کھاتہ PDF',img:'تصویر',print:'پرنٹ',share:'واٹس ایپ پر بھیجیں',making:'تیار ہو رہا ہے…',cash:'نقد',
+   start:'شروع کریں',demo:'نمونے کی دکان دیکھیں',welcome:'خوش آمدید',intro:'جگنو کھاتہ آپ کا ادھار کا حساب رجسٹر کی طرح رکھتا ہے، رسید بناتا ہے اور گاہکوں کو عزت سے یاد دلاتا ہے۔ سارا حساب اسی فون پر محفوظ رہتا ہے۔',
+   shopName:'دکان کا نام',owner:'مالک کا نام',city:'شہر',iban:'بینک / راست IBAN (اختیاری)',payNote:'یہ نمبر یاد دہانی اور رسید پر چھپتے ہیں تاکہ گاہک سیدھا آپ کو رقم بھیج سکے۔ جگنو خود کبھی رقم نہیں پکڑتا۔',
+   saved:'محفوظ ہو گیا',savedShop:'دکان محفوظ ہو گئی',bkNote:'حساب صرف اسی فون پر ہے۔ ہفتے میں ایک بار بیک اپ لیں اور خود کو واٹس ایپ کر دیں۔',csv:'کھاتہ CSV',bkFile:'بیک اپ فائل',bkCopy:'بیک اپ کاپی کریں',bkRestoreF:'بیک اپ فائل سے واپس لائیں',bkRestoreP:'کاپی کیا ہوا بیک اپ لگائیں',wipe:'سارا حساب حذف کریں',danger:'احتیاط',
+   pilotNote:'فیلڈ ٹیم کے لیے: صرف گنتی، کوئی نام یا رقم نہیں۔',copyRep:'رپورٹ کاپی کریں',entries:'اندراج',tapRow:'کسی بھی سطر کو دبائیں: رسید، درستی یا حذف۔',nameAmt:'نام اور درست رقم لکھیں'},
+ ps:{lene:'اخیستل دي',dene:'ورکول دي',aaj:'د نن وصولي',search:'په نوم ولټوئ',entry:'+ نوې لیکنه',quickL:'چټکه لیکنه',quickPh:'ولیکئ: احمد 2000 روپۍ پور واخیست',go:'مخکې',overdue:'زوړ پور (له 7 ورځو زیات)',all:'ټولې کهاتې',todayL:'د نن لیکنې',
+   none:'تراوسه هېڅ کهاته نشته. "+ نوې لیکنه" کېکاږئ یا د نمونې دوکان وګورئ.',confirm:'سم مو ولیکل؟',name:'نوم',amount:'رقم (روپۍ)',type:'ډول',date:'نېټه',noteL:'تفصیل (اختیاري)',saveB:'هو، خوندي یې کړئ',cancel:'نه',newName:'نوی نوم: د خوندي کولو سره به نوې کهاته جوړه شي',
+   credit:'پور ورکړ (پېرودونکي سودا واخیسته)',payment:'وصولي (پیسې راغلې)',goods:'مال راغی (له سپلایر)',paid:'ادایګي وشوه (سپلایر ته)',
+   creditS:'پور',paymentS:'وصولي',goodsS:'مال راغی',paidS:'ادایګي',
+   owesMe:'اخیستل دي',iOwe:'ورکول دي',settled:'حساب برابر',days:'ورځې',remind:'په واټس اپ یادونه',addEntry:'لیکنه وکړئ',ledger:'د کهاتې راجستر',back:'شاته',
+   delQ:'دا لیکنه ړنګه کړئ؟',del:'ړنګول',edit:'سمول',phone:'د تلیفون شمېره',kind:'ډول',customer:'پېرودونکی',supplier:'سپلایر',saveCust:'خوندي کول',
+   settings:'تنظیمات',shop:'دوکان',pilot:'د پیلوټ راپور',backup:'بیک اپ',lang:'ژبه',hint:'د خبرو لپاره د خپل کیبورډ مایک کېکاږئ.',
+   parseFail:'پوه نشوم. نوم او رقم ولیکئ، لکه: "بلال 1500 راکړل"',manual:'د فورم له لارې لیکنه',noPhone:'د دې پېرودونکي شمېره نشته. لومړی شمېره ولیکئ.',sentLog:'یادونه ولېږل شوه',lastRem:'وروستۍ یادونه',
+   colNo:'شمېره',colDate:'نېټه',colDet:'تفصیل',colCr:'پور',colRv:'وصولي',colBal:'پاتې',total:'ټولټال',
+   receipt:'رسید',receiptNo:'د رسید شمېره',from:'له',amtRecv:'ترلاسه شوې پیسې',method:'لاره',remain:'پاتې پور',sign:'لاسلیک',thanks:'مننه! بیا راشئ',
+   statement:'د کهاتې حساب',totCr:'ټول پور',totRv:'ټوله وصولي',made:'له جګنو کهاتې جوړ شوی',page:'مخ',
+   pdfR:'رسید PDF',pdfS:'کهاته PDF',img:'انځور',print:'چاپ',share:'په واټس اپ یې ولېږئ',making:'جوړېږي…',cash:'نغدې',
+   start:'پیل کړئ',demo:'د نمونې دوکان وګورئ',welcome:'ښه راغلاست',intro:'جګنو کهاته ستاسو د پور حساب د راجستر په څېر ساتي، رسید جوړوي او پېرودونکو ته په درناوي یادونه کوي. ټول حساب په همدې تلیفون کې خوندي پاتې کېږي.',
+   shopName:'د دوکان نوم',owner:'د مالک نوم',city:'ښار',iban:'بانک / راست IBAN (اختیاري)',payNote:'دا شمېرې په یادونه او رسید کې چاپېږي چې پېرودونکی مستقیم تاسو ته پیسې ولېږي. جګنو پخپله هېڅکله پیسې نه اخلي.',
+   saved:'خوندي شو',savedShop:'دوکان خوندي شو',bkNote:'حساب یوازې په همدې تلیفون کې دی. په اونۍ کې یو ځل بیک اپ واخلئ او ځان ته یې په واټس اپ ولېږئ.',csv:'کهاته CSV',bkFile:'بیک اپ فایل',bkCopy:'بیک اپ کاپي کړئ',bkRestoreF:'له بیک اپ فایل څخه بېرته راوړئ',bkRestoreP:'کاپي شوی بیک اپ ولګوئ',wipe:'ټول حساب ړنګ کړئ',danger:'پام',
+   pilotNote:'د ساحوي ټیم لپاره: یوازې شمېر، هېڅ نوم یا رقم نه.',copyRep:'راپور کاپي کړئ',entries:'لیکنې',tapRow:'هره کرښه کېکاږئ: رسید، سمول یا ړنګول.',nameAmt:'نوم او سم رقم ولیکئ'},
+ en:{lene:'To receive',dene:'To pay',aaj:'Collected today',search:'Search by name',entry:'+ New entry',quickL:'Quick entry',quickPh:'Type: Ahmed took goods for 2000',go:'Next',overdue:'Overdue (older than 7 days)',all:'All accounts',todayL:"Today's entries",
+   none:'No accounts yet. Tap "+ New entry" or view the demo shop.',confirm:'Is this right?',name:'Name',amount:'Amount (Rs)',type:'Type',date:'Date',noteL:'Details (optional)',saveB:'Yes, save',cancel:'No',newName:'New name: a new account is created when you save',
+   credit:'Credit given (customer took goods)',payment:'Payment received',goods:'Goods received (from supplier)',paid:'Payment made (to supplier)',
+   creditS:'Credit',paymentS:'Received',goodsS:'Goods in',paidS:'Paid out',
+   owesMe:'to receive',iOwe:'to pay',settled:'settled',days:'days',remind:'Remind on WhatsApp',addEntry:'Add entry',ledger:'Ledger',back:'Back',
+   delQ:'Delete this entry?',del:'Delete',edit:'Edit',phone:'Phone number',kind:'Type',customer:'Customer',supplier:'Supplier',saveCust:'Save',
+   settings:'Settings',shop:'Shop',pilot:'Pilot report',backup:'Backup',lang:'Language',hint:'To speak, tap the mic on your phone keyboard.',
+   parseFail:'Could not understand. Write a name and amount, like: "Bilal paid 1500"',manual:'Entry by form',noPhone:'This customer has no phone number. Add one first.',sentLog:'Reminder sent',lastRem:'Last reminder',
+   colNo:'No.',colDate:'Date',colDet:'Details',colCr:'Credit',colRv:'Received',colBal:'Balance',total:'Total',
+   receipt:'Receipt',receiptNo:'Receipt no.',from:'Received from',amtRecv:'Amount received',method:'Method',remain:'Balance remaining',sign:'Signature',thanks:'Thank you! Please visit again',
+   statement:'Account statement',totCr:'Total credit',totRv:'Total received',made:'Made with Jugnu Khata',page:'Page',
+   pdfR:'Receipt PDF',pdfS:'Statement PDF',img:'Image',print:'Print',share:'Send on WhatsApp',making:'Preparing…',cash:'Cash',
+   start:'Start',demo:'View the demo shop',welcome:'Welcome',intro:'Jugnu Khata keeps your credit accounts like a register, makes receipts and reminds customers politely. Everything stays saved on this phone.',
+   shopName:'Shop name',owner:'Owner name',city:'City',iban:'Bank / Raast IBAN (optional)',payNote:'These numbers print on reminders and receipts so customers can pay you directly. Jugnu never holds money.',
+   saved:'Saved',savedShop:'Shop saved',bkNote:'Your accounts live only on this phone. Back up once a week and send it to yourself on WhatsApp.',csv:'Ledger CSV',bkFile:'Backup file',bkCopy:'Copy backup',bkRestoreF:'Restore from backup file',bkRestoreP:'Paste a copied backup',wipe:'Delete all accounts',danger:'Careful',
+   pilotNote:'For the field team: counts only, no names or amounts.',copyRep:'Copy report',entries:'entries',tapRow:'Tap any row for receipt, edit or delete.',nameAmt:'Write a name and a valid amount'},
+ roman:{lene:'Lene hain',dene:'Dene hain',aaj:'Aaj ki wasooli',search:'Naam se dhoondein',entry:'+ Naya indraaj',quickL:'Jaldi indraaj',quickPh:'Likhein: Ahmed ne 2000 ka saman liya',go:'Aage',overdue:'Purana udhaar (7 din se zyada)',all:'Tamam khaate',todayL:'Aaj ke indraaj',
+   none:'Abhi koi khata nahi. "+ Naya indraaj" dabayein ya demo dukaan dekhein.',confirm:'Theek likha?',name:'Naam',amount:'Raqam (Rs)',type:'Qism',date:'Tareekh',noteL:'Tafseel (optional)',saveB:'Ji haan, save karein',cancel:'Nahi',newName:'Naya naam: save karte hi naya khata ban jayega',
+   credit:'Udhaar diya (gaahak ne saman liya)',payment:'Wasooli (raqam mili)',goods:'Maal aaya (supplier se)',paid:'Adaigi ki (supplier ko)',
+   creditS:'Udhaar',paymentS:'Wasooli',goodsS:'Maal aaya',paidS:'Adaigi',
+   owesMe:'lene hain',iOwe:'dene hain',settled:'hisaab barabar',days:'din',remind:'WhatsApp pe yaad dihaani',addEntry:'Indraaj karein',ledger:'Khata register',back:'Wapis',
+   delQ:'Ye indraaj delete karein?',del:'Delete',edit:'Durusti',phone:'Phone number',kind:'Qism',customer:'Gaahak',supplier:'Supplier',saveCust:'Save karein',
+   settings:'Settings',shop:'Dukaan',pilot:'Pilot report',backup:'Backup',lang:'Zubaan',hint:'Bol kar likhne ke liye keyboard ka mic dabayein.',
+   parseFail:'Samajh nahi aaya. Naam aur raqam likhein, jaise: "Bilal ne 1500 diye"',manual:'Form se indraaj',noPhone:'Is gaahak ka phone number nahi. Pehle number daalein.',sentLog:'Yaad dihaani bhej di',lastRem:'Aakhri yaad dihaani',
+   colNo:'No.',colDate:'Tareekh',colDet:'Tafseel',colCr:'Udhaar',colRv:'Wasooli',colBal:'Baqaya',total:'Meezan',
+   receipt:'Raseed',receiptNo:'Raseed no.',from:'Wasool az',amtRecv:'Wasool shuda raqam',method:'Zariya',remain:'Baqi baqaya',sign:'Dastakhat',thanks:'Shukriya! Dobara tashreef laayein',
+   statement:'Khate ka goshwara',totCr:'Kul udhaar',totRv:'Kul wasooli',made:'Jugnu Khata se tayyar',page:'Safha',
+   pdfR:'Raseed PDF',pdfS:'Khata PDF',img:'Tasveer',print:'Print',share:'WhatsApp pe bhejein',making:'Tayyar ho raha hai…',cash:'Naqad',
+   start:'Shuru karein',demo:'Demo dukaan dekhein',welcome:'Khush aamdeed',intro:'Jugnu Khata aap ka udhaar register ki tarah rakhta hai, raseed banata hai aur gaahakon ko izzat se yaad dilata hai. Sara hisaab isi phone par mehfooz rehta hai.',
+   shopName:'Dukaan ka naam',owner:'Maalik ka naam',city:'Shehar',iban:'Bank / Raast IBAN (optional)',payNote:'Ye number yaad dihaani aur raseed par chhapte hain taake gaahak seedha aap ko paisay bhej sake. Jugnu khud kabhi paisay nahi pakarta.',
+   saved:'Save ho gaya',savedShop:'Dukaan save ho gayi',bkNote:'Hisaab sirf isi phone par hai. Hafte mein aik dafa backup lein aur khud ko WhatsApp kar dein.',csv:'Khata CSV',bkFile:'Backup file',bkCopy:'Backup copy karein',bkRestoreF:'Backup file se wapis laayein',bkRestoreP:'Copy kiya hua backup lagayein',wipe:'Sara hisaab delete karein',danger:'Ehtiyaat',
+   pilotNote:'Field team ke liye: sirf ginti, koi naam ya raqam nahi.',copyRep:'Report copy karein',entries:'indraaj',tapRow:'Kisi bhi line ko dabayein: raseed, durusti ya delete.',nameAmt:'Naam aur sahi raqam likhein'}
+};
+Object.assign(T.ur,{tabJ:'جگنو',tabK:'کھاتہ',tabR:'رپورٹ',tabS:'ترتیبات'});Object.assign(T.ps,{tabJ:'جګنو',tabK:'کهاته',tabR:'راپور',tabS:'تنظیمات'});
+Object.assign(T.en,{tabJ:'Jugnu',tabK:'Khata',tabR:'Report',tabS:'Settings'});Object.assign(T.roman,{tabJ:'Jugnu',tabK:'Khata',tabR:'Report',tabS:'Settings'});
+const t=k=>((T[D.lang]||T.ur)[k])||T.en[k]||k;
+const J={
+ roman:{ask:'Jugnu',ph:'Likhein ya bolein: Ahmed ne 2000 ka saman liya',ready:'Haazir',listening:'Sun raha hoon…',thinking:'Hisaab dekh raha hoon…',done:'Ho gaya!',
+   chips:['Aaj ki wasooli?','Sab se zyada kis ne dena hai?','Purana udhaar kis ka hai?','Kul udhaar kitna hai?'],
+   greet:'Assalam o alaikum Seth ji! Main aap ka munshi Jugnu. Hisaab likhwaiye ya poochiye, main haazir hoon.',
+   sum:'Aaj ab tak {a} wasool hue. Bazaar mein {b} ka udhaar baqi hai.',
+   most:'Seth ji, sab se zyada baqaya {n} ki taraf hai: {a}. Yaad dihaani bhej doon?',noneOwe:'Seth ji, is waqt kisi ki taraf koi baqaya nahi.',
+   today:'Seth ji, aaj ab tak {a} wasool hue hain.',total:'Seth ji, bazaar mein kul {a} ka udhaar hai, {c} gaahakon ki taraf. Aap ne suppliers ko {d} dene hain.',
+   over:'Seth ji, in ka udhaar 7 din se purana ho gaya hai: {l}. Yaad dihaani bhej doon?',noOver:'Shabash Seth ji, koi purana udhaar nahi.',
+   cust:'{n} ki taraf {a} baqaya hai, {d} din se.',custS:'{n} ki taraf {a} baqaya hai.',custOwe:'Aap ne {n} ko {a} dene hain.',custZero:'{n} ka hisaab barabar hai.',
+   confirmQ:'Ye likh doon, Seth ji?',saved:'Likh diya, Seth ji. {n} ka ab baqaya {a} hai.',savedSup:'Likh diya. {n} ko ab {a} dene hain.',savedZero:'Likh diya. {n} ka hisaab barabar ho gaya.',
+   cancelled:'Theek hai, nahi likha.',thanks:'Shukriya Seth ji! Aur koi hisaab?',
+   dont:'Seth ji, samajh nahi aaya. Aise likhwaiye: "Ahmed ne 2000 ka saman liya", ya poochiye: "Bilal ka hisaab".',
+   yes:'Haan, likh do',editB:'Durust karo',noB:'Nahi',openB:'Khata kholo',remindB:'Yaad dihaani',stmtB:'Goshwara PDF',
+   aiOn:'AI munshi',aiOff:'Offline munshi',viewer:'Print aur share website link se kholne par chalte hain. Abhi PDF save karein aur phone ki files se print ya share karein.',noShare:'Ye phone yahan se file share nahi kar raha. PDF save karke WhatsApp mein laga dein.',share:'PDF share karein',print:'Print karein'},
+ ur:{ask:'جگنو',ph:'لکھیں یا بولیں: احمد نے 2000 کا سامان لیا',ready:'حاضر',listening:'سن رہا ہوں…',thinking:'حساب دیکھ رہا ہوں…',done:'ہو گیا!',
+   chips:['آج کی وصولی؟','سب سے زیادہ کس نے دینا ہے؟','پرانا ادھار کس کا ہے؟','کل ادھار کتنا ہے؟'],
+   greet:'السلام علیکم سیٹھ جی! میں آپ کا منشی جگنو ہوں۔ حساب لکھوائیے یا پوچھیے، حاضر ہوں۔',
+   sum:'آج اب تک {a} وصول ہوئے۔ بازار میں {b} کا ادھار باقی ہے۔',
+   most:'سیٹھ جی، سب سے زیادہ بقایا {n} کی طرف ہے: {a}۔ یاد دہانی بھیج دوں؟',noneOwe:'سیٹھ جی، اس وقت کسی کی طرف کوئی بقایا نہیں۔',
+   today:'سیٹھ جی، آج اب تک {a} وصول ہوئے ہیں۔',total:'سیٹھ جی، بازار میں کل {a} کا ادھار ہے، {c} گاہکوں کی طرف۔ آپ نے سپلائرز کو {d} دینے ہیں۔',
+   over:'سیٹھ جی، ان کا ادھار 7 دن سے پرانا ہو گیا ہے: {l}۔ یاد دہانی بھیج دوں؟',noOver:'شاباش سیٹھ جی، کوئی پرانا ادھار نہیں۔',
+   cust:'{n} کی طرف {a} بقایا ہے، {d} دن سے۔',custS:'{n} کی طرف {a} بقایا ہے۔',custOwe:'آپ نے {n} کو {a} دینے ہیں۔',custZero:'{n} کا حساب برابر ہے۔',
+   confirmQ:'یہ لکھ دوں، سیٹھ جی؟',saved:'لکھ دیا، سیٹھ جی۔ {n} کا اب بقایا {a} ہے۔',savedSup:'لکھ دیا۔ {n} کو اب {a} دینے ہیں۔',savedZero:'لکھ دیا۔ {n} کا حساب برابر ہو گیا۔',
+   cancelled:'ٹھیک ہے، نہیں لکھا۔',thanks:'شکریہ سیٹھ جی! اور کوئی حساب؟',
+   dont:'سیٹھ جی، سمجھ نہیں آیا۔ ایسے لکھوائیے: "احمد نے 2000 کا سامان لیا"، یا پوچھیے: "بلال کا حساب"۔',
+   yes:'جی ہاں، لکھ دو',editB:'درست کرو',noB:'نہیں',openB:'کھاتہ کھولو',remindB:'یاد دہانی',stmtB:'گوشوارہ PDF',
+   aiOn:'اے آئی منشی',aiOff:'آف لائن منشی',viewer:'پرنٹ اور شیئر ویب سائٹ لنک سے کھولنے پر چلتے ہیں۔ ابھی PDF محفوظ کریں اور فون کی فائلوں سے پرنٹ یا شیئر کریں۔',noShare:'یہ فون فائل شیئر نہیں کر رہا۔ PDF محفوظ کر کے واٹس ایپ میں لگا دیں۔',share:'PDF شیئر کریں',print:'پرنٹ کریں'},
+ ps:{ask:'جګنو',ph:'ولیکئ یا خبرې وکړئ: احمد 2000 پور واخیست',ready:'حاضر',listening:'اورم…',thinking:'حساب ګورم…',done:'وشو!',
+   chips:['د نن وصولي؟','تر ټولو زیات پور د چا دی؟','زوړ پور د چا دی؟','ټول پور څومره دی؟'],
+   greet:'السلام علیکم مالک صاحب! زه ستاسو منشي جګنو یم. حساب راته ولیکئ یا یې وپوښتئ، حاضر یم.',
+   sum:'نن تر اوسه {a} وصول شوي. په بازار کې {b} پور پاتې دی.',
+   most:'مالک صاحب، تر ټولو زیات پور د {n} دی: {a}. یادونه ورته ولېږم؟',noneOwe:'مالک صاحب، اوس د هېچا پور نشته.',
+   today:'مالک صاحب، نن تر اوسه {a} وصول شوي.',total:'مالک صاحب، په بازار کې ټول {a} پور دی، د {c} پېرودونکو. تاسو سپلایرانو ته {d} ورکول دي.',
+   over:'مالک صاحب، د دوی پور له 7 ورځو زوړ شوی: {l}. یادونه ولېږم؟',noOver:'شاباس مالک صاحب، هېڅ زوړ پور نشته.',
+   cust:'د {n} پور {a} دی، له {d} ورځو.',custS:'د {n} پور {a} دی.',custOwe:'تاسو {n} ته {a} ورکول دي.',custZero:'د {n} حساب برابر دی.',
+   confirmQ:'دا ولیکم، مالک صاحب؟',saved:'ومې لیکل، مالک صاحب. د {n} پور اوس {a} دی.',savedSup:'ومې لیکل. تاسو {n} ته اوس {a} ورکول دي.',savedZero:'ومې لیکل. د {n} حساب برابر شو.',
+   cancelled:'سمه ده، ونه مې لیکل.',thanks:'مننه مالک صاحب! بل کوم حساب؟',
+   dont:'مالک صاحب، پوه نشوم. داسې یې ولیکئ: "احمد 2000 پور واخیست"، یا وپوښتئ: "د بلال حساب".',
+   yes:'هو، ویې لیکه',editB:'سم یې کړه',noB:'نه',openB:'کهاته پرانیزه',remindB:'یادونه',stmtB:'حساب PDF',
+   aiOn:'AI منشي',aiOff:'آفلاین منشي',viewer:'چاپ او شریکول هغه وخت کار کوي چې اپ د ویب پاڼې له لینک خلاص شي. اوس PDF خوندي کړئ او د تلیفون له فایلونو یې چاپ یا شریک کړئ.',noShare:'دا تلیفون فایل نه شریکوي. PDF خوندي کړئ او په واټس اپ کې یې ولګوئ.',share:'PDF شریک کړئ',print:'چاپ کړئ'},
+ en:{ask:'Jugnu',ph:'Type or speak: Ahmed took goods for 2000',ready:'Ready',listening:'Listening…',thinking:'Checking the accounts…',done:'Done!',
+   chips:['Collected today?','Who owes the most?','Who has old dues?','Total outstanding?'],
+   greet:"Assalam o alaikum, sir! I'm Jugnu, your munshi. Tell me an entry or ask about any account.",
+   sum:'Collected so far today: {a}. Credit outstanding in the market: {b}.',
+   most:'Sir, the biggest balance is with {n}: {a}. Shall I send a reminder?',noneOwe:'Sir, nobody owes you anything right now.',
+   today:'Sir, {a} collected so far today.',total:'Sir, {a} is outstanding with {c} customers. You owe suppliers {d}.',
+   over:'Sir, these dues are older than 7 days: {l}. Shall I send reminders?',noOver:'Well done, sir. No old dues.',
+   cust:'{n} owes {a}, for {d} days.',custS:'{n} owes {a}.',custOwe:'You owe {n} {a}.',custZero:"{n}'s account is settled.",
+   confirmQ:'Shall I write this down, sir?',saved:'Written, sir. {n} now owes {a}.',savedSup:'Written. You now owe {n} {a}.',savedZero:"Written. {n}'s account is settled.",
+   cancelled:'Alright, not written.',thanks:'Thank you, sir! Anything else?',
+   dont:'Sorry sir, I did not get that. Try: "Ahmed took goods for 2000", or ask: "Bilal account".',
+   yes:'Yes, write it',editB:'Edit',noB:'No',openB:'Open account',remindB:'Reminder',stmtB:'Statement PDF',
+   aiOn:'AI munshi',aiOff:'Offline munshi',viewer:"Print and share work when the app is opened from its website link. For now, save the PDF and print or share it from your phone's files.",noShare:'This phone cannot share files from here. Save the PDF and attach it in WhatsApp.',share:'Share PDF',print:'Print'}
+};
+const jt=(k,l)=>((J[l||D.lang]||J.ur)[k])||J.en[k];
+const tL=(k,l)=>((T[l||D.lang]||T.ur)[k])||T.en[k]||k;
+const fill=(s,o)=>s.replace(/\{(\w)\}/g,(m,k)=>o[k]!=null?o[k]:m);
+/* ---- Jugnu v0.4: small talk, shop health, business ideas (all offline) ---- */
+const JX={
+ roman:{chips:['Aaj ki wasooli?','Dukaan ka haal batao','Sale barhane ka idea do','Sab se zyada kis ne dena hai?'],
+  how:'Allah ka shukar hai, Seth ji! Aap sunaiye, dukaan kaisi chal rahi hai? Hisaab ka koi kaam ho to bataiye.',
+  sup:'Bas Seth ji, aap ka khata sambhaal raha hoon. Kya likhoon ya kya bataoon?',
+  who:'Main Jugnu hoon, Seth ji, aap ka munshi. Udhaar aur wasooli likhta hoon, baqaya batata hoon, raseed banata hoon aur gaahakon ko izzat se yaad dilata hoon.',
+  can:'Main ye sab kar sakta hoon, Seth ji:\n1. Bol kar ya likh kar indraaj: "Ahmed ne 2000 ka saman liya"\n2. Kisi ka hisaab: "Bilal ka hisaab"\n3. Dukaan ka haal aur mashwara\n4. Raseed aur goshwara PDF\n5. WhatsApp par yaad dihaani\nHisaab ka kaam bina internet ke bhi hota hai.',
+  morning:'Subah bakhair, Seth ji! Allah aaj ki dukaandari mein barkat de. Aaj ka pehla indraaj likhwaiye.',
+  night:'Shab bakhair, Seth ji! Aaj ka hisaab mehfooz hai. Kal milte hain.',
+  eid:'Khair Mubarak, Seth ji! Aap ko aur ghar walon ko Eid bohat mubarak ho.',
+  ok:'Ji Seth ji, haazir hoon.',bye:'Allah Hafiz, Seth ji! Hisaab mehfooz hai.',
+  needNet:'Ye sawal internet wale Jugnu se poochiye. Hisaab ka har kaam main bina internet ke kar leta hoon.',
+  ideaLead:'Seth ji, aaj ka mashwara:',
+  tips:['Tez bikne wali cheezein (cheeni, ghee, chai, doodh) kabhi khatam na hon. Khaali shelf se gaahak doosri dukaan chala jata hai.','JazzCash, Easypaisa ya Raast QR dukaan par laga dein. Is se udhaar kam aur naqad sale zyada hoti hai.','Choti packing rakhein (pao, aadha kilo, 50 rupay ka pack). Dihaari wale gaahak roz aate hain.','Har gaahak ki udhaar ki had muqarrar karein aur khate mein likh lein. Had poori ho to pehle wasooli, phir naya saman.','Roz WhatsApp status par aaj ka offer lagayein. Pakke gaahak dekh kar aate hain.','Mahine ke shuru aur tankhwa ke dinon se pehle stock poora kar lein. Inhi dinon sab se zyada sale hoti hai.','Qareeb ke gharon ke liye WhatsApp order aur ghar tak delivery shuru karein. Ye gaahak pakka ho jata hai.','Dukaan saaf aur roshan rakhein aur cheezon par qeemat likhein. Gaahak ka bharosa barhta hai.'],
+  hNo:'Seth ji, abhi khata khaali hai. Pehla indraaj likhwaiye, phir main dukaan ka haal bataunga.',
+  hHead:'Seth ji, dukaan ka haal:',hLene:'Bazaar mein {a} udhaar hai, {c} gaahakon ki taraf.',hTrend:'Pichhle 7 din: {r} wasooli, {g} naya udhaar.',
+  hConc:'Kul udhaar ka {p}% sirf {n} ki taraf hai.',hOver:'{c} gaahakon ka udhaar 7 din se purana hai ({a}).',
+  sRemind:'Mashwara: aaj {n} ko yaad dihaani bhejein.',sConc:'Mashwara: jab tak {n} baqaya kam na karein, naya udhaar rok lein.',sLimit:'Mashwara: udhaar wasooli se zyada ja raha hai. Har gaahak ki had muqarrar karein.',
+  sPhone:'{c} gaahakon ka phone number nahi. Number daal dein taake yaad dihaani bhej sakoon.',sGood:'MashaAllah, hisaab sehatmand hai. Isi tarah chalaiye.',more:'Aur mashwara (AI)',offline:'Bina internet ke'},
+ ur:{chips:['آج کی وصولی؟','دکان کا حال بتاؤ','سیل بڑھانے کا مشورہ دو','سب سے زیادہ کس نے دینا ہے؟'],
+  how:'اللہ کا شکر ہے، سیٹھ جی! آپ سنائیے، دکان کیسی چل رہی ہے؟ حساب کا کوئی کام ہو تو بتائیے۔',
+  sup:'بس سیٹھ جی، آپ کا کھاتہ سنبھال رہا ہوں۔ کیا لکھوں یا کیا بتاؤں؟',
+  who:'میں جگنو ہوں، سیٹھ جی، آپ کا منشی۔ ادھار اور وصولی لکھتا ہوں، بقایا بتاتا ہوں، رسید بناتا ہوں اور گاہکوں کو عزت سے یاد دلاتا ہوں۔',
+  can:'سیٹھ جی، میں یہ سب کر سکتا ہوں:\n1. بول کر یا لکھ کر اندراج: "احمد نے 2000 کا سامان لیا"\n2. کسی کا حساب: "بلال کا حساب"\n3. دکان کا حال اور مشورہ\n4. رسید اور گوشوارہ PDF\n5. واٹس ایپ پر یاد دہانی\nحساب کا کام انٹرنیٹ کے بغیر بھی ہوتا ہے۔',
+  morning:'صبح بخیر، سیٹھ جی! اللہ آج کی دکانداری میں برکت دے۔ آج کا پہلا اندراج لکھوائیے۔',
+  night:'شب بخیر، سیٹھ جی! آج کا حساب محفوظ ہے۔ کل ملتے ہیں۔',
+  eid:'خیر مبارک، سیٹھ جی! آپ کو اور گھر والوں کو عید بہت مبارک ہو۔',
+  ok:'جی سیٹھ جی، حاضر ہوں۔',bye:'اللہ حافظ، سیٹھ جی! حساب محفوظ ہے۔',
+  needNet:'یہ سوال انٹرنیٹ والے جگنو سے پوچھیے۔ حساب کا ہر کام میں انٹرنیٹ کے بغیر کر لیتا ہوں۔',
+  ideaLead:'سیٹھ جی، آج کا مشورہ:',
+  tips:['تیز بکنے والی چیزیں (چینی، گھی، چائے، دودھ) کبھی ختم نہ ہوں۔ خالی شیلف سے گاہک دوسری دکان چلا جاتا ہے۔','جاز کیش، ایزی پیسہ یا راست QR دکان پر لگا دیں۔ اس سے ادھار کم اور نقد سیل زیادہ ہوتی ہے۔','چھوٹی پیکنگ رکھیں (پاؤ، آدھا کلو، 50 روپے کا پیک)۔ دیہاڑی والے گاہک روز آتے ہیں۔','ہر گاہک کی ادھار کی حد مقرر کریں اور کھاتے میں لکھ لیں۔ حد پوری ہو تو پہلے وصولی، پھر نیا سامان۔','روز واٹس ایپ اسٹیٹس پر آج کی آفر لگائیں۔ پکے گاہک دیکھ کر آتے ہیں۔','مہینے کے شروع اور تنخواہ کے دنوں سے پہلے سٹاک پورا کر لیں۔ انہی دنوں سب سے زیادہ سیل ہوتی ہے۔','قریب کے گھروں کے لیے واٹس ایپ آرڈر اور گھر تک ڈیلیوری شروع کریں۔ یہ گاہک پکا ہو جاتا ہے۔','دکان صاف اور روشن رکھیں اور چیزوں پر قیمت لکھیں۔ گاہک کا بھروسہ بڑھتا ہے۔'],
+  hNo:'سیٹھ جی، ابھی کھاتہ خالی ہے۔ پہلا اندراج لکھوائیے، پھر میں دکان کا حال بتاؤں گا۔',
+  hHead:'سیٹھ جی، دکان کا حال:',hLene:'بازار میں {a} ادھار ہے، {c} گاہکوں کی طرف۔',hTrend:'پچھلے 7 دن: {r} وصولی، {g} نیا ادھار۔',
+  hConc:'کل ادھار کا {p}% صرف {n} کی طرف ہے۔',hOver:'{c} گاہکوں کا ادھار 7 دن سے پرانا ہے ({a})۔',
+  sRemind:'مشورہ: آج {n} کو یاد دہانی بھیجیں۔',sConc:'مشورہ: جب تک {n} بقایا کم نہ کریں، نیا ادھار روک لیں۔',sLimit:'مشورہ: ادھار وصولی سے زیادہ جا رہا ہے۔ ہر گاہک کی حد مقرر کریں۔',
+  sPhone:'{c} گاہکوں کا فون نمبر نہیں۔ نمبر ڈال دیں تاکہ یاد دہانی بھیج سکوں۔',sGood:'ماشاءاللہ، حساب صحت مند ہے۔ اسی طرح چلائیے۔',more:'مزید مشورہ (AI)',offline:'انٹرنیٹ کے بغیر'},
+ ps:{chips:['د نن وصولي؟','د دوکان حال راته ووایه','د خرڅلاو د زیاتولو مشوره راکړه','تر ټولو زیات پور د چا دی؟'],
+  how:'الحمدلله، مالک صاحب! تاسو ووایئ، دوکان څنګه روان دی؟ د حساب کوم کار وي نو ووایئ.',
+  sup:'هېڅ مالک صاحب، ستاسو کهاته ساتم. څه ولیکم یا څه درته ووایم؟',
+  who:'زه جګنو یم، مالک صاحب، ستاسو منشي. پور او وصولي لیکم، پاتې حساب درته وایم، رسید جوړوم او پېرودونکو ته په درناوي یادونه کوم.',
+  can:'مالک صاحب، زه دا ټول کولی شم:\n1. په خبرو یا لیکلو لیکنه: "احمد 2000 پور واخیست"\n2. د چا حساب: "د بلال حساب"\n3. د دوکان حال او مشوره\n4. رسید او حساب PDF\n5. په واټس اپ یادونه\nد حساب کار بې انټرنېټه هم کېږي.',
+  morning:'سهار مو پخیر، مالک صاحب! الله دې د نن سودا کې برکت واچوي. د نن لومړۍ لیکنه راته ووایئ.',
+  night:'شپه مو پخیر، مالک صاحب! د نن حساب خوندي دی. سبا به سره ګورو.',
+  eid:'اختر مو مبارک شه، مالک صاحب! تاسو او کورنۍ ته مو اختر مبارک.',
+  ok:'هو مالک صاحب، حاضر یم.',bye:'د خدای په امان، مالک صاحب! حساب خوندي دی.',
+  needNet:'دا پوښتنه د انټرنېټ والا جګنو نه وکړئ. د حساب هر کار زه بې انټرنېټه کولی شم.',
+  ideaLead:'مالک صاحب، د نن مشوره:',
+  tips:['ژر خرڅېدونکي شیان (بوره، غوړي، چای، شیدې) هېڅکله مه ختموئ. له خالي المارۍ پېرودونکی بل دوکان ته ځي.','جاز کیش، ایزي پیسه یا راست QR په دوکان کې ولګوئ. پور کمېږي او نغدې خرڅلاو زیاتېږي.','وړه بسته بندي وساتئ (پاو، نیم کیلو، د 50 روپیو بسته). د ورځې مزدور پېرودونکي هره ورځ راځي.','د هر پېرودونکي لپاره د پور حد وټاکئ او په کهاته کې یې ولیکئ. حد پوره شي نو لومړی وصولي، بیا نوې سودا.','هره ورځ په واټس اپ سټیټس د نن آفر ولګوئ. پاخه پېرودونکي یې ګوري او راځي.','د میاشتې له پیل او د تنخوا له ورځو مخکې سټاک پوره کړئ. په همدې ورځو تر ټولو زیات خرڅلاو کېږي.','نږدې کورونو ته د واټس اپ آرډر او کور ته رسولو خدمت پیل کړئ. دا پېرودونکی پاخه کېږي.','دوکان پاک او روښانه وساتئ او په شیانو بیه ولیکئ. د پېرودونکي باور زیاتېږي.'],
+  hNo:'مالک صاحب، کهاته لا خالي ده. لومړۍ لیکنه راته ووایئ، بیا به د دوکان حال درته ووایم.',
+  hHead:'مالک صاحب، د دوکان حال:',hLene:'په بازار کې {a} پور دی، د {c} پېرودونکو.',hTrend:'تېرې 7 ورځې: {r} وصولي، {g} نوی پور.',
+  hConc:'د ټول پور {p}% یوازې د {n} دی.',hOver:'د {c} پېرودونکو پور له 7 ورځو زوړ دی ({a}).',
+  sRemind:'مشوره: نن {n} ته یادونه ولېږئ.',sConc:'مشوره: تر هغه چې {n} پور کم نه کړي، نوی پور ودروئ.',sLimit:'مشوره: پور له وصولۍ زیات ځي. د هر پېرودونکي حد وټاکئ.',
+  sPhone:'د {c} پېرودونکو تلیفون شمېره نشته. شمېره ولیکئ چې یادونه ولېږم.',sGood:'ماشاءالله، حساب روغ دی. همداسې یې روان ساتئ.',more:'نوره مشوره (AI)',offline:'بې انټرنېټه'},
+ en:{chips:['Collected today?','How is my shop doing?','Give me an idea to grow sales','Who owes the most?'],
+  how:"Alhamdulillah, all good, sir! How is the shop doing? Tell me if there's any hisaab to write.",
+  sup:'Just looking after your khata, sir. What shall I write or check?',
+  who:"I'm Jugnu, sir, your munshi. I write credit and payments, tell balances, make receipts and politely remind customers.",
+  can:'Here is what I can do, sir:\n1. Entries by voice or text: "Ahmed took goods for 2000"\n2. Anyone\'s account: "Bilal account"\n3. Shop health and advice\n4. Receipt and statement PDFs\n5. WhatsApp reminders\nAll the hisaab works without internet.',
+  morning:"Good morning, sir! May today's business be blessed. Tell me the first entry.",
+  night:"Good night, sir! Today's accounts are safe. See you tomorrow.",
+  eid:'Khair Mubarak, sir! Eid Mubarak to you and your family.',
+  ok:'Yes sir, at your service.',bye:'Allah Hafiz, sir! Your accounts are safe.',
+  needNet:'Ask this when Jugnu is online. Every hisaab job works without internet.',
+  ideaLead:"Sir, today's advice:",
+  tips:['Never run out of fast sellers (sugar, ghee, tea, milk). An empty shelf sends the customer to another shop.','Put up a JazzCash, Easypaisa or Raast QR. Less credit, more cash sales.','Keep small packs (pao, half kilo, Rs 50 packs). Daily-wage customers come every day.','Set a credit limit for each customer and note it in the khata. Limit reached: collect first, then new goods.',"Post today's offer on your WhatsApp status daily. Regulars see it and come.",'Fill stock before the start of the month and salary days. That is when sales peak.','Start WhatsApp orders and home delivery for nearby houses. Those customers become loyal.','Keep the shop clean and bright, and show prices. It builds trust.'],
+  hNo:"Sir, the khata is empty. Tell me the first entry, then I'll tell you how the shop is doing.",
+  hHead:'Sir, your shop health:',hLene:'{a} outstanding with {c} customers.',hTrend:'Last 7 days: {r} collected, {g} new credit.',
+  hConc:'{p}% of all credit is with just {n}.',hOver:'{c} customers have dues older than 7 days ({a}).',
+  sRemind:'Advice: send {n} a reminder today.',sConc:'Advice: pause new credit for {n} until they pay down.',sLimit:'Advice: credit is going out faster than collection. Set a limit per customer.',
+  sPhone:'{c} customers have no phone number. Add numbers so I can send reminders.',sGood:'MashaAllah, the accounts are healthy. Keep it up.',more:'More advice (AI)',offline:'No internet'}
+};
+['roman','ur','ps','en'].forEach(k=>Object.assign(J[k],JX[k]));
+const aiOn=()=>!!SAMPLE&&navigator.onLine!==false;
+function joinL(arr,l){return arr.join(l==='ur'||l==='ps'?'، ':', ');}
+function shopHealth(l){
+  if(!D.entries.length)return jt('hNo',l);
+  const custs=D.customers.map(c=>({c,b:balance(c.id),d:oldestUnpaidDays(c.id)}));
+  const owe=custs.filter(x=>x.b>0&&x.c.type==='customer').sort((a,b)=>b.b-a.b);
+  const lene=owe.reduce((s,x)=>s+x.b,0);
+  const wk=todayISO(new Date(Date.now()-7*86400000));
+  const rec=D.entries.filter(e=>e.type==='payment'&&e.date>wk).reduce((s,e)=>s+e.amount,0);
+  const giv=D.entries.filter(e=>e.type==='credit'&&e.date>wk).reduce((s,e)=>s+e.amount,0);
+  const od=owe.filter(x=>x.d>7).sort((a,b)=>b.d-a.d);
+  const L=[jt('hHead',l),'• '+fill(jt('hLene',l),{a:rs(lene),c:owe.length}),'• '+fill(jt('hTrend',l),{r:rs(rec),g:rs(giv)})];
+  const top=owe.slice(0,2),topSum=top.reduce((s,x)=>s+x.b,0),p=lene?Math.round(topSum/lene*100):0;
+  if(owe.length>=3&&p>=50)L.push('• '+fill(jt('hConc',l),{p,n:joinL(top.map(x=>nameFor(x.c,l)),l)}));
+  if(od.length)L.push('• '+fill(jt('hOver',l),{c:od.length,a:rs(od.reduce((s,x)=>s+x.b,0))}));
+  const S2=[];
+  if(od.length)S2.push(fill(jt('sRemind',l),{n:joinL(od.slice(0,3).map(x=>nameFor(x.c,l)),l)}));
+  if(owe.length>=3&&p>=50)S2.push(fill(jt('sConc',l),{n:nameFor(top[0].c,l)}));
+  if(giv>rec&&giv>0)S2.push(jt('sLimit',l));
+  const noPh=owe.filter(x=>!x.c.phone).length;if(noPh)S2.push(fill(jt('sPhone',l),{c:noPh}));
+  if(!S2.length)S2.push(jt('sGood',l));
+  return L.join('\n')+'\n\n'+S2.slice(0,3).join('\n');
+}
+function nextTip(l){const tips=jt('tips',l);const i=(D.tipI||0)%tips.length;D.tipI=i+1;save();return jt('ideaLead',l)+'\n'+tips[i];}
+const RX={
+  health:/(dukaa?n ka haal|dukan ka hal|haal batao|mera haal|shop (is )?doing|shop health|how is my shop|business kaisa|kaam kaisa|کا حال بتاؤ|دکان کا حال|کاروبار کیسا|د دوکان حال|کاروبار څنګه)/,
+  idea:/(idea|mashwa?ra|mashvara|advice|suggest|\btips?\b|grow|increase sales|sale barh|sales barh|barhaun|badhaun|barhane|مشورہ|مشورا|آئیڈیا|ترکیب|بڑھاؤں|بڑھانے|مشوره|لارښوونه|زیاتولو|زیاته کړم)/,
+  how:/(kya haa?l|kia haa?l|haa?l hai|haal chaal|kaise ho|kaisay ho|kese ho|kaisa hai jugnu|how are you|how r u|how ru|\bhru\b|کیا حال|حال ہے|کیسے ہو|څنګه یې|څه حال|ستړی مه|stray ma)/,
+  sup:/(what'?s up|wh?atsup|wassup|\bsup\b|kya ho raha|kya chal raha|کیا ہو رہا|کیا چل رہا|څه کوې|څه خبره)/,
+  who:/(kaun ho|kon ho|who are you|your name|tumhara naam|aap ka naam|آپ کون|تم کون|تمہارا نام|ته څوک|تاسو څوک|ستا نوم)/,
+  can:/(kya kar sakt|what can you|\bhelp\b|madad|مدد|کیا کر سکت|څه کولی|مرسته|features)/,
+  morning:/(good morning|subh?a bakhair|subah bakhair|صبح بخیر|سهار مو پخیر)/,
+  night:/(good night|shab bakhair|شب بخیر|شپه مو پخیر)/,
+  eid:/(eid mubarak|عید مبارک|اختر مبارک|akhtar mubarak)/,
+  bye:/(allah hafiz|khuda hafiz|\bbye\b|اللہ حافظ|خدا حافظ|د خدای په امان|خدای پامان)/,
+  ok:/^\s*(ok|okay|theek|thik|theek hai|acha|achha|accha|ٹھیک|ٹھیک ہے|اچھا|ښه|سمه ده)\s*$/
+};
+/* reply in the same language and script the shopkeeper used */
+function detectLang(text){
+  if(/[ټډړښږځڅېۍګ]/.test(text))return 'ps';
+  {const PSW=['د','راته','ووایه','ووایئ','زما','ستا','کړه','راکړه','یم','نن','پور','واخیست','راکړل','څنګه','څومره','دوکان','مالک','مننه'];const ws=String(text).split(/[\s،؟?!.]+/);if(ws.some(w=>PSW.includes(w)))return 'ps';}
+  if(/[؀-ۿ]/.test(text))return 'ur';
+  if(/[a-z]/i.test(text)){
+    if(/\b(ne|ka|ki|ke|ko|se|hai|hain|hoon|diye|diya|liya|liye|udhaar|udhar|kitna|kitni|kis|aaj|kal|baqaya|sab|zyada|wasooli|hisaab|hisab|bhai|ji|kya|karo|kar|dena|lena|purana|kul|shukriya|salam|bhejo|yaad|aap|ap|tum|kaun|kon|ho|haal|hal|kaise|kaisa|kese|chal|raha|rahi|theek|thik|batao|bataein|mashwara|dukaan|dukan|acha|achha|nahi|mera|meri|mujhe|dein)\b/i.test(text))return 'roman';
+    return 'en';
+  }
+  return D.lang||'roman';
+}
+/* ---- Munshi rule engine (works offline) ---- */
+function custLine(x,l){const b=x.b,n=nameFor(x.c,l);if(b>0)return fill(jt(x.d>0?'cust':'custS',l),{n,a:rs(b),d:x.d});if(b<0)return fill(jt('custOwe',l),{n,a:rs(b)});return fill(jt('custZero',l),{n});}
+function jugnuAnswer(text,l){
+  l=l||detectLang(text);
+  const s=' '+toAsciiDigits(text).toLowerCase()+' ';
+  const custs=D.customers.map(c=>({c,b:balance(c.id),d:oldestUnpaidDays(c.id)}));
+  const hit=nameInText(text);if(hit)learnAlias(hit.c,hit.tok);const named=hit?custs.find(x=>x.c.id===hit.c.id):null;
+  if(/\d/.test(s)){const p=parseEntry(text);if(p)return{entry:p};}
+  if(/(shukriya|thank|شکریہ|مننه|jazak|meherbani)/.test(s))return{text:jt('thanks',l)};
+  if(/(yaad|remind|یاد|یادونه|reminder)/.test(s)&&named)return{text:custLine(named,l),cid:named.c.id,action:'remind'};
+  if(/(goshwara|statement|گوشوارہ|pdf)/.test(s)&&named)return{text:custLine(named,l),cid:named.c.id,action:'statement'};
+  if(students().length&&/(padhai|parhai|study|studies|report|school|پڑھائی|رپورٹ|سکول|زده کړ|راپور|ښوونځ)/.test(s)){const ns=students().filter(p=>{const k=skel(words(p.name)[0]);return s.includes(norm(p.name).split(' ')[0])||words(text).some(w=>skel(w)===k&&k.length>=2);});
+    const list=ns.length?ns:(/(bach|bachon|bachay|بچ|ماشوم|children|kids|sab)/.test(s)?students():[]);if(list.length)return{text:list.map(p=>famReport(p,l)).join('\n\n'),kind:'fam'};}
+  if(RX.health.test(s))return{text:shopHealth(l),kind:'health'};
+  if(RX.idea.test(s))return{text:nextTip(l),kind:'idea'};
+  if(/(most|zyada|ziada|زیادہ|زیات|تر ټولو|kis ne|کس نے|څوک|د چا|sab se)/.test(s)&&!/(purana|old|پرانا|زوړ|overdue)/.test(s)){
+    const top=custs.filter(x=>x.b>0&&x.c.type==='customer').sort((a,b)=>b.b-a.b)[0];
+    return top?{text:fill(jt('most',l),{n:nameFor(top.c,l),a:rs(top.b)}),cid:top.c.id,action:'remind'}:{text:jt('noneOwe',l)};}
+  if(/(purana|old|overdue|پرانا|زوړ|late|der)/.test(s)){
+    const od=custs.filter(x=>x.b>0&&x.d>7&&x.c.type==='customer').sort((a,b)=>b.d-a.d);
+    return od.length?{text:fill(jt('over',l),{l:od.slice(0,4).map(x=>`${nameFor(x.c,x.l||l)} (${rs(x.b)})`).join(l==='ur'||l==='ps'?'، ':', ')}),cid:od[0].c.id,action:'remind'}:{text:jt('noOver',l)};}
+  if(/(aaj|today|آج| نن |wasooli|collect|وصولی|وصولي)/.test(s)&&!named){
+    const td=todayISO();const a=D.entries.filter(e=>e.type==='payment'&&e.date===td).reduce((t,e)=>t+e.amount,0);return{text:fill(jt('today',l),{a:rs(a)})};}
+  if(/(kul|total|کل|ټول|outstanding|bazaar|بازار)/.test(s)){
+    const r=custs.filter(x=>x.b>0);const d=custs.filter(x=>x.b<0).reduce((t,x)=>t-x.b,0);
+    return{text:fill(jt('total',l),{a:rs(r.reduce((t,x)=>t+x.b,0)),c:r.length,d:rs(d)})};}
+  if(named)return{text:custLine(named,l),cid:named.c.id};
+  for(const k of ['how','sup','who','can','morning','night','eid','bye'])if(RX[k].test(s))return{text:jt(k,l),kind:'talk'};
+  if(RX.ok.test(s.replace(/[!.?،؟۔]/g,' ')))return{text:jt('ok',l),kind:'talk'};
+  if(/(salam|سلام|hello|\bhi\b|assalam|aoa|سلام علیکم)/.test(s))return{text:jt('greet',l)};
+  return{text:jt('dont',l)};
+}
+const SIGN={credit:1,payment:-1,goods:-1,paid:1};
+function applyLang(){const l=D.lang||'ur';document.documentElement.lang=l==='roman'?'ur-Latn':l;document.documentElement.dir=(l==='ur'||l==='ps')?'rtl':'ltr';}
+
+/* ================= ledger maths ================= */
+function entriesOf(cid){return D.entries.filter(e=>e.cid===cid).sort((a,b)=>a.date===b.date?a.created-b.created:(a.date<b.date?-1:1));}
+function balance(cid){return D.entries.reduce((s,e)=>e.cid===cid?s+SIGN[e.type]*e.amount:s,0);}
+function balanceAfter(entry){let b=0;for(const e of entriesOf(entry.cid)){b+=SIGN[e.type]*e.amount;if(e.id===entry.id)break;}return b;}
+function oldestUnpaidDays(cid){const es=entriesOf(cid);let pay=es.filter(e=>SIGN[e.type]<0).reduce((s,e)=>s+e.amount,0);for(const e of es){if(SIGN[e.type]>0){if(pay>=e.amount)pay-=e.amount;else return daysBetween(e.date,todayISO());}}return 0;}
+function cust(id){return D.customers.find(c=>c.id===id);}
+const norm=s=>s.trim().replace(/\s+/g,' ').toLowerCase();
+function findByName(n){const raw=n;n=norm(n);if(!n)return null;
+  const hit=D.customers.find(c=>norm(c.name)===n)||(n.split(' ').length===1?D.customers.find(c=>norm(c.name).split(' ')[0]===n):null);if(hit)return hit;
+  const k=words(n).map(skel).join(' ');if(k.replace(/ /g,'').length<2)return null;
+  const full=D.customers.filter(c=>words(c.name).map(skel).join(' ')===k);if(full.length===1){learnAlias(full[0],raw.trim());return full[0];}
+  if(!k.includes(' ')){const fw=D.customers.filter(c=>skel(words(c.name)[0])===k);if(fw.length===1){learnAlias(fw[0],raw.trim());return fw[0];}}
+  return null;}
+/* Roman <-> Urdu/Pashto name matching: both scripts reduce to the same consonant skeleton (Bilal = بلال = "bll") */
+const AR2L={'ب':'b','پ':'p','ت':'t','ٹ':'t','ټ':'t','ث':'s','ج':'j','چ':'c','ح':'h','خ':'k','د':'d','ڈ':'d','ډ':'d','ذ':'z','ر':'r','ڑ':'r','ړ':'r','ز':'z','ژ':'z','ږ':'z','ځ':'z','س':'s','ش':'s','ښ':'s','ص':'s','ض':'z','ط':'t','ظ':'z','غ':'g','ف':'f','ق':'k','ک':'k','ك':'k','گ':'g','ګ':'g','ل':'l','م':'m','ن':'n','ں':'n','څ':'s'};
+const isAr=w=>/[\u0600-\u06FF]/.test(w);
+function skel(w){w=String(w||'').toLowerCase();let o='';
+  if(isAr(w)){[...w].forEach((ch,i)=>{if(ch==='ہ'||ch==='ه')o+=i===0?'h':'';else o+=AR2L[ch]||'';});}
+  else{o=w.replace(/[^a-z]/g,'').replace(/kh/g,'k').replace(/gh/g,'g').replace(/ch/g,'c').replace(/sh/g,'s').replace(/th/g,'t').replace(/ph/g,'f').replace(/q/g,'k').replace(/v/g,'w').replace(/x/g,'ks')
+     .replace(/([^aeiouh])h/g,'$1').replace(/h$/,'').replace(/[aeiouwy]/g,'');}
+  return o.replace(/(.)\1+/g,'$1');}
+const words=s=>String(s||'').toLowerCase().replace(/[^\p{L}\p{N}\s]/gu,' ').split(/\s+/).filter(Boolean);
+/* find a customer mentioned anywhere in a message, in either script */
+function nameInText(text){
+  const s=' '+norm(text)+' ';
+  for(const c of D.customers){const n=norm(c.name);const f=n.split(' ')[0];if(s.includes(' '+n+' ')||s.includes(n)&&n.length>3||(f.length>=3&&s.includes(' '+f+' ')))return{c,tok:null};}
+  const toks=words(text).filter(w=>!/^\d+$/.test(w));const ts=toks.map(skel);
+  for(const c of D.customers){const cs=words(c.name).map(skel).filter(Boolean);if(!cs.length)continue;
+    for(let i=0;i+cs.length<=ts.length;i++){if(cs.every((k,j)=>k===ts[i+j])&&cs.join('').length>=2)return{c,tok:toks.slice(i,i+cs.length).join(' ')};}}
+  for(const c of D.customers){const f=skel(words(c.name)[0]);if(f.length<2)continue;const i=ts.indexOf(f);if(i>=0)return{c,tok:toks[i]};}
+  return null;
+}
+/* remember how the shopkeeper writes a name in the other script, so replies use his spelling */
+function learnAlias(c,tok){if(!c||!tok)return;if(isAr(tok)!==isAr(c.name)){if(isAr(tok))c.ar=c.ar||tok;else c.lat=c.lat||cap(tok);save();}}
+function nameFor(c,l){if(!c)return'';const wantAr=l==='ur'||l==='ps';if(wantAr&&!isAr(c.name)&&c.ar)return c.ar;if(!wantAr&&isAr(c.name)&&c.lat)return c.lat;return c.name;}
+
+function cap(s){s=s.trim().replace(/\s+/g,' ');return /[a-z]/i.test(s)?s.split(' ').map(w=>w?w[0].toUpperCase()+w.slice(1):w).join(' '):s;}
+
+/* ================= parser: Roman Urdu, English, Urdu, Pashto ================= */
+function toAsciiDigits(s){return s.replace(/[۰-۹]/g,d=>String(d.charCodeAt(0)-0x06F0)).replace(/[٠-٩]/g,d=>String(d.charCodeAt(0)-0x0660));}
+function parseAmount(s){
+  const m=s.replace(/(\d),(\d)/g,'$1$2').match(/(\d+(?:\.\d+)?)\s*(k\b|hazar|hazaar|hzar|hajar|thousand|lakh|lac|ہزار|لاکھ|زره|زر|لک)?/i);
+  if(!m)return{a:0};let a=parseFloat(m[1]);const u=(m[2]||'').toLowerCase();
+  if(/lakh|lac|لاکھ|لک/.test(u))a*=100000;else if(u)a*=1000;return{a:Math.round(a),idx:m.index};
+}
+function parseEntry(raw){
+  let s=' '+toAsciiDigits(raw).toLowerCase().replace(/[!?،؟۔]/g,' ').replace(/\.(?!\d)/g,' ').replace(/\s+/g,' ')+' ';
+  const {a:amount,idx}=parseAmount(s);if(!amount)return null;
+  const via=/jazz ?cash|جاز ?کیش/.test(s)?'JazzCash':/easy ?paisa|ایزی ?پیسہ|ایزي ?پیسه/.test(s)?'Easypaisa':/bank|raast|بینک|بانک|راست/.test(s)?'Bank':'';
+  let name='',type='',m;
+  const isArabic=/[؀-ۿ]/.test(s);
+  if(isArabic){
+    // Urdu
+    if((m=s.match(/^\s*(.+?)\s+سے\s/))&&/(مال|سامان|سٹاک|آیا|ایا)/.test(s)){name=m[1];type='goods';}
+    else if((m=s.match(/^\s*(.+?)\s+کو\s/))){name=m[1];type=/(سامان|ادھار|مال).*(دیا|دے)/.test(s)?'credit':'paid';}
+    else if((m=s.match(/^\s*(.+?)\s+نے\s/))){name=m[1];type=/(دیے|دئیے|دیئے|دیا|دی |جمع|ادا|بھیجے|بھیج)/.test(s)&&!/(لیا|لیے|لے گیا|لے گئی|ادھار)/.test(s)?'payment':'credit';}
+    // Pashto
+    else if((m=s.match(/^\s*(?:له\s+)?(.+?)\s+(?:نه|څخه)\s/))&&/(مال|سودا|راغی|راغلل)/.test(s)){name=m[1];type='goods';}
+    else if((m=s.match(/^\s*(.+?)\s+ته\s/))){name=m[1];type=/(پور|سودا|سامان)/.test(s)?'credit':'paid';}
+    else{name=s.slice(0,idx).trim();
+      if(/(راکړ|راولېږ|راولیږ|جمع|ادا|راغلې|دیے|دیے|دیے)/.test(s))type='payment';
+      else type='credit';}
+    name=name.replace(/^(له)\s+/,'').replace(/\s+(نے|کو|سے|ته|نه)$/,'').trim();
+  }else{
+    const took=/(liya|liye|li |le gay|le gai|khareed|udhaar|udhar|took|bought|credit)/.test(s);
+    const paidWord=/(diye|diya|di |dia |de diye|bheje|bhej|jama|payment|ada|mile|mila|paid|sent|received)/.test(s);
+    if((m=s.match(/^\s*(.+?)\s+se\s/))&&/(maal|mal|saman|stock|aaya|aya)/.test(s)){name=m[1];type='goods';}
+    else if((m=s.match(/^\s*(.+?)\s+ko\s/))){name=m[1];type=/(saman|samaan|maal|udhaar|udhar)\s.*(diya|diye|de )/.test(s)?'credit':(paidWord?'paid':'credit');}
+    else if((m=s.match(/^\s*(.+?)\s+ne\s/))){name=m[1];type=took&&!/(diye|de diye|bheje|jama|ada)/.test(s)?'credit':(paidWord?'payment':'credit');}
+    else if((m=s.match(/^\s*([a-z][a-z ]*?)\s+(paid|sent|gave)\b/))){name=m[1];type='payment';}
+    else if((m=s.match(/^\s*([a-z][a-z ]*?)\s+(took|bought)\b/))){name=m[1];type='credit';}
+    else if((m=s.match(/^\s*(?:paid|payment to)\s+([a-z][a-z ]*?)\s+\d/))){name=m[1];type='paid';}
+    else if((m=s.match(/^\s*([a-z][a-z ]*?)\s+\d/))){name=m[1];type=paidWord?'payment':'credit';}
+    name=name.replace(/\b(ka|ki|ke)\s*$/,'').trim();
+  }
+  name=name.replace(/[0-9]/g,'').trim();
+  if(!name)return null;
+  const ex=findByName(name);
+  if(ex&&ex.type==='supplier'){if(type==='credit')type='goods';if(type==='payment')type='paid';}
+  return{name:ex?ex.name:cap(name),amount,type,date:todayISO(),note:via};
+}
+
+/* ================= navigation ================= */
+let S={screen:'jugnu',cid:null,draft:null,q:'',chat:[],drafts:{}};
+function go(screen,extra){if(screen==='home')screen='khata';S=Object.assign({},S,{screen},extra||{});render();window.scrollTo(0,0);}
+
+/* ================= views ================= */
+const ICON={
+ chart:'<svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>',
+ gear:'<svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1"/></svg>',
+ pen:'<svg aria-hidden="true" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4L19 9l-4-4L4 16z"/></svg>',
+ bin:'<svg aria-hidden="true" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/></svg>',
+ share:'<svg aria-hidden="true" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 10.5l6.8-4M8.6 13.5l6.8 4"/></svg>',
+ print:'<svg aria-hidden="true" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9V3h12v6M6 18H4v-7h16v7h-2M8 14h8v7H8z"/></svg>',
+ user:'<svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0M16 4.5a3.5 3.5 0 0 1 0 7M18 14a6 6 0 0 1 3.5 6"/></svg>',
+ book:'<svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h11a3 3 0 0 1 3 3v13H7a3 3 0 0 1-3-3zM4 17a3 3 0 0 1 3-3h11M8 8h6"/></svg>',
+ rcpt:'<svg aria-hidden="true" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2h12v20l-3-2-3 2-3-2-3 2zM9 7h6M9 11h6M9 15h4"/></svg>'
+};
+function header(){const lf=$('logoFF');if(lf&&!lf.firstChild)lf.innerHTML=ffSVG();const sm=document.querySelector('.logo small');if(sm)sm.textContent=(D.shop&&isStudent())?'ustad':'munshi';$('hbtns').innerHTML='';}
+function render(){
+  applyLang();header();const app=$('app');$('fabHost').innerHTML='';$('tabHost').innerHTML='';document.body.classList.remove('night');
+  if(!D.lang){app.innerHTML=langView();return;}
+  if(!D.shop){app.innerHTML=setupView();bindAfter();return;}
+  if(S.screen==='home')S.screen='khata';
+  ensureProfiles();const stu=isStudent();document.body.classList.toggle('stu',stu);
+  if(stu&&!['ustad','progress'].includes(S.screen))S.screen='ustad';
+  if(!stu&&['ustad','progress'].includes(S.screen))S.screen='jugnu';
+  const sc=S.screen;
+  if(sc==='jugnu'){document.body.classList.add('night');app.innerHTML=jugnuView();}
+  else if(sc==='ustad'){document.body.classList.add('night');app.innerHTML=ustadView();}
+  else if(sc==='progress'){app.innerHTML=progressView();}
+  else if(sc==='khata'){app.innerHTML=homeView();$('fabHost').innerHTML=`<button class="btn gold fab" data-act="newEntry">${esc(t('entry'))}</button>`;}
+  else if(sc==='entry')app.innerHTML=entryView();
+  else if(sc==='customer')app.innerHTML=customerView();
+  else if(sc==='settings')app.innerHTML=settingsView();
+  else if(sc==='pilot')app.innerHTML=pilotView();
+  $('tabHost').innerHTML=tabBar();
+  bindAfter();
+  if(sc==='jugnu')jugnuMount();
+  if(sc==='ustad')ustadMount();
+}
+const storageWarn=()=>storageOK?'':`<div class="warnbox">This browser is not letting the app save. Open it in Chrome normally (not private mode), or data will be lost.</div>`;
+function langButtons(){return `<div class="seg" role="group" aria-label="Language"><button class="ur" data-lang="ur" aria-pressed="${D.lang==='ur'}">اردو</button><button class="ps" data-lang="ps" aria-pressed="${D.lang==='ps'}">پښتو</button><button class="lat" data-lang="roman" aria-pressed="${D.lang==='roman'}">Roman Urdu</button><button class="lat" data-lang="en" aria-pressed="${D.lang==='en'}">English</button></div>`;}
+function langView(){return `<div class="page stack" style="text-align:center"><h1 style="font-family:var(--latin)">Jugnu Khata</h1><p style="font-family:var(--urdu);font-size:18px;line-height:2.2">زبان منتخب کریں · ژبه وټاکئ · Choose language</p>${langButtons()}</div>`;}
+function setupView(){
+  return `<div class="page ruled stack">${storageWarn()}
+   <h1>${esc(t('welcome'))}</h1><p class="soft">${esc(t('intro'))}</p>
+   ${langButtons()}
+   <form id="setupForm" class="stack">
+     <div><label for="sName">${esc(t('shopName'))}</label><input id="sName" required dir="auto"></div>
+     <div><label for="sOwner">${esc(t('owner'))}</label><input id="sOwner" dir="auto"></div>
+     <div><label for="sCity">${esc(t('city'))}</label><input id="sCity" dir="auto"></div>
+     <div class="grid2"><div><label for="sJc">JazzCash</label><input id="sJc" inputmode="tel" dir="ltr" placeholder="03xx xxxxxxx"></div><div><label for="sEp">Easypaisa</label><input id="sEp" inputmode="tel" dir="ltr" placeholder="03xx xxxxxxx"></div></div>
+     <div><label for="sIban">${esc(t('iban'))}</label><input id="sIban" dir="ltr" placeholder="PK.."></div>
+     <p class="note">${esc(t('payNote'))}</p>
+     <button class="btn full" type="submit">${esc(t('start'))}</button>
+   </form>
+   <button class="btn ghost full" data-act="demo">${esc(t('demo'))}</button></div>`;
+}
+function homeView(){
+  const custs=D.customers.map(c=>({c,b:balance(c.id),d:oldestUnpaidDays(c.id)}));
+  const lene=custs.filter(x=>x.b>0).reduce((s,x)=>s+x.b,0),dene=custs.filter(x=>x.b<0).reduce((s,x)=>s-x.b,0);
+  const td=todayISO(),todays=D.entries.filter(e=>e.date===td).sort((a,b)=>b.created-a.created);
+  const aaj=todays.filter(e=>e.type==='payment').reduce((s,e)=>s+e.amount,0);
+  const q=norm(S.q);const shown=custs.filter(x=>!q||norm(x.c.name).includes(q)).sort((a,b)=>b.b-a.b);
+  const overdue=custs.filter(x=>x.b>0&&x.d>7&&x.c.type==='customer').sort((a,b)=>b.d-a.d);
+  const row=x=>`<button class="cust" data-act="openCust" data-id="${x.c.id}"><span><b>${esc(x.c.name)}</b>${x.c.type==='supplier'?`<span class="tag">${esc(t('supplier'))}</span>`:''}${x.b>0&&x.d>7?`<span class="tag late"><span class="num">${x.d}</span> ${esc(t('days'))}</span>`:''}<small>${D.entries.filter(e=>e.cid===x.c.id).length} ${esc(t('entries'))}</small></span><span class="amt ${x.b>0?'w':x.b<0?'u':''}"><span class="num">${rs(x.b)}</span><small style="display:block">${x.b>0?esc(t('owesMe')):x.b<0?esc(t('iOwe')):esc(t('settled'))}</small></span></button>`;
+  return `<div class="stack">${storageWarn()}
+   <div class="page">
+     <div class="shopname"><div><h1>${esc(D.shop.name)}</h1><p class="soft small">${esc([D.shop.owner,D.shop.city].filter(Boolean).join(' · '))}</p></div><span class="num soft small">${dmy(td)}</span></div>
+     <div class="tiles"><div class="tile"><small>${esc(t('lene'))}</small><b class="num w">${num(lene)}</b></div><div class="tile"><small>${esc(t('dene'))}</small><b class="num u">${num(dene)}</b></div><div class="tile"><small>${esc(t('aaj'))}</small><b class="num w">${num(aaj)}</b></div></div>
+     <form id="quickForm" class="stack" style="margin-top:14px"><label for="quick">${esc(t('quickL'))}</label><div class="quick"><input id="quick" dir="auto" autocomplete="off" placeholder="${esc(t('quickPh'))}"><button class="btn" type="submit">${esc(t('go'))}</button></div><p class="note">${esc(t('hint'))}</p></form>
+   </div>
+   ${todays.length?`<div class="page"><h2 style="margin-top:0">${esc(t('todayL'))}</h2>${todays.slice(0,6).map(e=>`<div class="today"><span>${esc(cust(e.cid)?.name||'')} · ${esc(t(e.type+'S'))}</span><span class="num ${SIGN[e.type]>0?'u':'w'}">${rs(e.amount)}</span></div>`).join('')}</div>`:''}
+   ${overdue.length?`<div class="page"><h2 style="margin-top:0">${esc(t('overdue'))} (<span class="num">${overdue.length}</span>)</h2><div class="list">${overdue.slice(0,5).map(row).join('')}</div></div>`:''}
+   <div class="page ruled"><h2 style="margin-top:0">${esc(t('all'))}</h2>
+     ${D.customers.length>5?`<input id="search" dir="auto" placeholder="${esc(t('search'))}" value="${esc(S.q)}" aria-label="${esc(t('search'))}" style="margin-bottom:6px">`:''}
+     <div class="list">${shown.length?shown.map(row).join(''):`<div class="empty">${esc(t('none'))}</div>`}</div></div>
+  </div>`;
+}
+function typeOptions(sel){return['credit','payment','goods','paid'].map(k=>`<option value="${k}" ${k===sel?'selected':''}>${esc(t(k))}</option>`).join('');}
+function entryView(){
+  const d=S.draft||{name:'',amount:'',type:'credit',date:todayISO(),note:''};
+  const isNew=d.name&&!findByName(d.name);
+  const backAct=d.fromJugnu?'data-act="tab" data-t="jugnu"':S.cid?`data-act="openCust" data-id="${S.cid}"`:'data-act="home"';
+  return `<div class="stack"><button class="btn ghost sm" ${backAct} style="align-self:flex-start">${esc(t('back'))}</button>
+   <div class="page ruled confirm stack"><h1>${esc(d.fromQuick?t('confirm'):(d.id?t('edit'):t('manual')))}</h1>
+    ${d.fromQuick?`<p class="soft small" dir="auto">"${esc(d.raw)}"</p>`:''}
+    <form id="entryForm" class="stack">
+     <div><label for="eName">${esc(t('name'))}</label><input id="eName" dir="auto" list="custNames" required value="${esc(d.name)}" autocomplete="off"><datalist id="custNames">${D.customers.map(c=>`<option value="${esc(c.name)}"></option>`).join('')}</datalist>${isNew?`<p class="note">${esc(t('newName'))}</p>`:''}</div>
+     <div><label for="eAmt">${esc(t('amount'))}</label><input id="eAmt" inputmode="numeric" dir="ltr" required value="${esc(d.amount)}"></div>
+     <div><label for="eType">${esc(t('type'))}</label><select id="eType">${typeOptions(d.type)}</select></div>
+     <div class="grid2"><div><label for="eDate">${esc(t('date'))}</label><input id="eDate" type="date" required value="${esc(d.date)}"></div><div><label for="eNote">${esc(t('noteL'))}</label><input id="eNote" dir="auto" value="${esc(d.note||'')}"></div></div>
+     <div class="row"><button class="btn" type="submit" style="flex:1">${esc(t('saveB'))}</button><button class="btn ghost" type="button" ${backAct}>${esc(t('cancel'))}</button></div>
+    </form></div></div>`;
+}
+function customerView(){
+  const c=cust(S.cid);if(!c)return homeView();
+  const b=balance(c.id),es=entriesOf(c.id),od=oldestUnpaidDays(c.id);
+  const lastR=D.reminders.filter(r=>r.cid===c.id).sort((a,b)=>b.at-a.at)[0];
+  let run=0,tc=0,tr=0;
+  const rows=es.map((e,i)=>{const sg=SIGN[e.type];run+=sg*e.amount;if(sg>0)tc+=e.amount;else tr+=e.amount;
+    return `<tr class="tap" data-act="rowMenu" data-id="${e.id}" tabindex="0" role="button" aria-label="${esc(t(e.type+'S'))} ${num(e.amount)}"><td class="no num">${i+1}</td><td class="num dt">${dmy(e.date).slice(0,5)}</td><td class="det">${esc(t(e.type+'S'))}${e.type==='payment'?' '+ICON.rcpt:''}${e.note?`<small dir="auto">${esc(e.note)}</small>`:''}</td><td class="num u">${sg>0?num(e.amount):''}</td><td class="num w">${sg<0?num(e.amount):''}</td><td class="num" style="font-weight:700">${num(run)}${run<0?' ↓':''}</td></tr>`;}).join('');
+  return `<div class="stack"><button class="btn ghost sm" data-act="home" style="align-self:flex-start">${esc(t('back'))}</button>
+   <div class="page"><div class="shopname"><div><h1>${esc(c.name)}</h1><p class="soft small">${esc(c.type==='supplier'?t('supplier'):t('customer'))}${c.phone?` · <span class="num">${esc(c.phone)}</span>`:''}</p></div><button class="btn ghost sm" data-act="editCust">${esc(t('edit'))}</button></div>
+    <div class="row" style="justify-content:space-between;align-items:flex-end"><div><small class="soft">${b>0?esc(t('owesMe')):b<0?esc(t('iOwe')):esc(t('settled'))}</small><div class="num ${b>0?'w':b<0?'u':''}" style="font-size:30px;font-weight:700;line-height:1.3">${rs(b)}</div></div>${b>0&&od?`<span class="tag ${od>7?'late':''}"><span class="num">${od}</span> ${esc(t('days'))}</span>`:''}</div>
+    <div class="row" style="margin-top:12px">${b>0&&c.type==='customer'?`<button class="btn wa" data-act="remind" style="flex:1">${esc(t('remind'))}</button>`:''}<button class="btn" data-act="addFor" style="flex:1">${esc(t('addEntry'))}</button></div>
+    <div class="row" style="margin-top:8px"><button class="btn ghost sm" data-act="statement" style="flex:1">${ICON.rcpt} ${esc(t('pdfS'))}</button></div>
+    ${lastR?`<p class="note" style="margin-top:6px">${esc(t('lastRem'))}: <span class="num">${esc(dmy(todayISO(new Date(lastR.at))))}</span></p>`:''}
+   </div>
+   <div class="page"><h2 style="margin-top:0">${esc(t('ledger'))}</h2>
+    <div class="regwrap"><table class="reg"><thead><tr><th>${esc(t('colNo'))}</th><th>${esc(t('colDate'))}</th><th>${esc(t('colDet'))}</th><th>${esc(t('colCr'))}</th><th>${esc(t('colRv'))}</th><th>${esc(t('colBal'))}</th></tr></thead>
+    <tbody>${rows||`<tr><td colspan="6" class="empty">—</td></tr>`}${es.length?`<tr class="tot"><td></td><td></td><td class="det">${esc(t('total'))}</td><td class="num u">${num(tc)}</td><td class="num w">${num(tr)}</td><td class="num">${num(b)}</td></tr>`:''}</tbody></table></div>
+    <p class="note" style="margin-top:8px">${esc(t('tapRow'))}</p></div>
+  </div>`;
+}
+function settingsView(){
+  const s=D.shop;
+  return `<div class="stack"><button class="btn ghost sm" data-act="home" style="align-self:flex-start">${esc(t('back'))}</button>
+   <div class="page stack"><h1>${esc(t('settings'))}</h1><h2>${esc(t('lang'))}</h2>${langButtons()}</div>
+   <div class="page ruled stack"><h2 style="margin-top:0">${esc(t('shop'))}</h2>
+    <form id="shopForm" class="stack">
+     <div><label for="sName">${esc(t('shopName'))}</label><input id="sName" dir="auto" required value="${esc(s.name)}"></div>
+     <div><label for="sOwner">${esc(t('owner'))}</label><input id="sOwner" dir="auto" value="${esc(s.owner||'')}"></div>
+     <div><label for="sCity">${esc(t('city'))}</label><input id="sCity" dir="auto" value="${esc(s.city||'')}"></div>
+     <div class="grid2"><div><label for="sJc">JazzCash</label><input id="sJc" inputmode="tel" dir="ltr" value="${esc(s.jc||'')}"></div><div><label for="sEp">Easypaisa</label><input id="sEp" inputmode="tel" dir="ltr" value="${esc(s.ep||'')}"></div></div>
+     <div><label for="sIban">${esc(t('iban'))}</label><input id="sIban" dir="ltr" value="${esc(s.iban||'')}"></div>
+     <button class="btn full" type="submit">${esc(t('saveCust'))}</button></form></div>
+   <div class="page stack"><h2 style="margin-top:0">${esc(ft('prof'))}</h2>
+    <div class="tog"><span>${esc(ft('pinSet'))}: <b>${esc(D.pin?ft('pinOn'):ft('pinOff'))}</b></span><button class="btn ghost sm" data-act="setPin">${esc(ft('pinChange'))}</button></div>
+    <p class="note">${esc(ft('pinHint'))}</p>
+    <button class="btn ghost full" data-act="profiles">${esc(ft('who'))}</button>
+    <div class="tog"><span>${esc(ft('fam'))}<small class="note" style="display:block">${esc(ft('famNote'))}</small></span><button class="btn ${D.plan==='family'?'':'ghost'} sm" data-act="togPlan" aria-pressed="${D.plan==='family'}">${D.plan==='family'?'ON':'OFF'}</button></div>
+    <div class="tog"><span>${esc(ft('consent'))}<small class="note" style="display:block">${esc(ft('consentNote'))}</small></span><button class="btn ${D.consent?'':'ghost'} sm" data-act="togConsent" aria-pressed="${!!D.consent}">${D.consent?'ON':'OFF'}</button></div></div>
+   <div class="page stack"><h2 style="margin-top:0">${esc(t('backup'))}</h2><p class="note">${esc(t('bkNote'))}</p>
+    <button class="btn ghost full" data-act="exportCSV">${esc(t('csv'))}</button>
+    <button class="btn ghost full" data-act="exportJSON">${esc(t('bkFile'))}</button>
+    <button class="btn ghost full" data-act="copyBackup">${esc(t('bkCopy'))}</button>
+    <label for="importFile" class="btn ghost full" style="margin:0;color:var(--ink)">${esc(t('bkRestoreF'))}</label><input id="importFile" type="file" accept=".json,application/json,text/plain" hidden>
+    <button class="btn ghost full" data-act="pasteRestore">${esc(t('bkRestoreP'))}</button></div>
+   <div class="page stack"><h2 style="margin-top:0">${esc(t('danger'))}</h2><button class="btn danger full" data-act="wipe">${esc(t('wipe'))}</button><p class="note">Jugnu Munshi · ConceptAI · v0.5</p></div></div>`;
+}
+function pilotView(){
+  const now=Date.now(),wk=7*86400000;
+  const eWeek=D.entries.filter(e=>e.created>now-wk).length,remWeek=D.reminders.filter(r=>r.at>now-wk).length;
+  const paidAfter=D.reminders.filter(r=>D.entries.some(e=>e.cid===r.cid&&e.type==='payment'&&e.created>r.at&&e.created<r.at+wk)).length,totalRem=D.reminders.length;
+  const activeDays=new Set(D.entries.filter(e=>e.created>now-wk).map(e=>todayISO(new Date(e.created)))).size;
+  const first=D.entries.length?todayISO(new Date(Math.min(...D.entries.map(e=>e.created)))):todayISO();
+  const code=String(D.shop.created||'0000').slice(-5);
+  window.__pilotRows=[['Shop code',code],['Using since',first],['Customers',D.customers.filter(c=>c.type==='customer').length],['Entries this week',eWeek],['Days used this week',activeDays+' / 7'],['Reminders this week',remWeek],['Receipts made',D.receiptsMade||0],['Reminders followed by payment within 7 days',totalRem?`${paidAfter} of ${totalRem} (${Math.round(paidAfter/totalRem*100)}%)`:'0']];
+  return `<div class="stack">${famSection()}
+   <div class="page stack"><h1>${esc(t('pilot'))}</h1><p class="note">${esc(t('pilotNote'))}</p>
+   <div dir="ltr" style="font-family:var(--latin)">${window.__pilotRows.map(r=>`<div class="today"><span>${esc(r[0])}</span><b class="num">${esc(r[1])}</b></div>`).join('')}</div>
+   <button class="btn full" data-act="copyPilot">${esc(t('copyRep'))}</button></div></div>`;
+}
+
+/* ================= Jugnu munshi: main screen ================= */
+let jBusy=false,SAMPLE=null;
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+const RTL=l=>l==='ur'||l==='ps';
+function jState(s){const w=$('jFF');if(w)w.className='ffw '+s;const st=$('jStat');if(st)st.textContent=jt(s==='happy'?'done':s==='idle'?'ready':s);}
+function updMode(){const m=$('jMode');if(m){m.textContent=isStudent()?(aiOn()?'AI ustad':'Offline ustad'):jt(aiOn()?'aiOn':'aiOff');m.className='jmode'+(aiOn()?' on':'');}}
+window.addEventListener('online',updMode);window.addEventListener('offline',updMode);
+async function jMore(l){if(jBusy||!aiOn())return;jBusy=true;jState('thinking');
+  const ask={roman:'Mere khate ko dekh kar 3 practical mashware do.',ur:'میرے کھاتے کو دیکھ کر 3 عملی مشورے دو۔',ps:'زما کهاته وګوره او 3 عملي مشورې راکړه.',en:'Look at my khata and give me 3 practical suggestions.'}[l]||'';
+  const r=await askAI(ask,l,'advice');jPush({who:'ai',text:r?r.text:jt('needNet',l),l});jState(r?'happy':'idle');setTimeout(()=>{if(!jBusy)jState('idle');},1400);jBusy=false;}
+(async()=>{try{if(window.claude&&window.claude.use){SAMPLE=await window.claude.use('sample');updMode();}}catch(e){SAMPLE=null;}})();
+function tabBar(){
+  const cur=S.screen==='customer'||S.screen==='entry'?(S.draft&&S.draft.fromJugnu?'jugnu':'khata'):S.screen;
+  const b=(k,lab,ic)=>`<button data-act="tab" data-t="${k}" ${cur===k?'aria-current="page"':''}>${ic}<span>${esc(lab)}</span></button>`;
+  if(isStudent())return `<nav class="tabs stuTabs" aria-label="Ustad">${b('ustad',ft('ustad'),'<span class="tdot" aria-hidden="true"></span>')}${b('progress',ft('progress'),ICON.chart)}<button data-act="profiles">${ICON.user}<span>${esc(ft('switchB'))}</span></button></nav>`;
+  return `<nav class="tabs" aria-label="Jugnu">${b('jugnu',t('tabJ'),'<span class="tdot" aria-hidden="true"></span>')}${b('khata',t('tabK'),ICON.book)}${b('pilot',t('tabR'),ICON.chart)}${b('settings',t('tabS'),ICON.gear)}</nav>`;
+}
+function jugnuView(){
+  return `<div class="jhome">
+   <div class="jhero"><span class="ffw listening" id="jFF">${ffSVG()}</span><div><div class="jname">Jugnu<small>munshi</small></div><div class="jstat" id="jStat" aria-live="polite">${esc(jt('listening'))}</div><span class="jmode" id="jMode"></span></div>${profChip()}</div>
+   <div class="jchat" id="jChat" aria-live="polite"></div>
+   <div class="jchips">${jt('chips').map(q=>`<button class="jchip" data-act="jAsk" data-q="${esc(q)}" dir="auto">${esc(q)}</button>`).join('')}</div>
+   <form class="jform" id="jForm"><label for="jIn" class="sr">${esc(jt('ask'))}</label><input id="jIn" dir="auto" autocomplete="off" enterkeyhint="send" placeholder="${esc(jt('ph'))}"><button class="btn" type="submit">${esc(t('go'))}</button></form>
+   <p class="jhint">${esc(t('hint'))}</p></div>`;
+}
+function jGreet(){
+  const l=D.lang;let tx=jt('greet',l);
+  if(D.customers.length){const td=todayISO();const aaj=D.entries.filter(e=>e.type==='payment'&&e.date===td).reduce((s,e)=>s+e.amount,0);
+    const lene=D.customers.map(c=>balance(c.id)).filter(b=>b>0).reduce((s,b)=>s+b,0);tx+='\n'+fill(jt('sum',l),{a:rs(aaj),b:rs(lene)});}
+  S.chat.push({who:'ai',text:tx,l});
+}
+function jugnuMount(){
+  if(!S.chat.length)jGreet();
+  renderChat();updMode();
+  $('jForm').onsubmit=e=>{e.preventDefault();const v=$('jIn').value;$('jIn').value='';jSend(v);};
+  setTimeout(()=>{if($('jFF')&&!jBusy)jState('idle');},1500);
+}
+function cardHTML(d,id,l){
+  const r=(k,v,n)=>`<div class="jr"><span>${esc(tL(k,l))}</span><b class="${n?'num':''}" dir="auto">${esc(v)}</b></div>`;
+  const ex=findByName(d.name);
+  return `<div class="jcard">${r('name',ex?nameFor(ex,l):d.name)}${r('type',tL(d.type+'S',l))}${r('amount',rs(d.amount),1)}${r('date',dmy(d.date),1)}${d.note?r('noteL',d.note):''}
+   ${!d.status&&!findByName(d.name)?`<p class="jnew">${esc(tL('newName',l))}</p>`:''}
+   ${d.status?`<p class="jdone ${d.status==='no'?'no':''}">${d.status==='yes'?'✓':'✕'}</p>`:`<div class="jbtns"><button class="jchip jyes" data-act="jYes" data-id="${id}">${esc(jt('yes',l))}</button><button class="jchip" data-act="jEdit" data-id="${id}">${esc(jt('editB',l))}</button><button class="jchip" data-act="jNo" data-id="${id}">${esc(jt('noB',l))}</button></div>`}</div>`;
+}
+function msgHTML(m){
+  const l=m.l||D.lang;
+  let h=`<div class="jmsg ${m.who==='me'?'jme':'jai'} l-${l}" dir="${RTL(l)?'rtl':'ltr'}">${esc(m.text).replace(/Rs [\d,]+/g,x=>`<bdi dir="ltr">${x}</bdi>`)}`;
+  if(m.card&&S.drafts[m.card])h+=cardHTML(S.drafts[m.card],m.card,l);
+  if(m.btns&&m.btns.length)h+=`<div class="jbtns">${m.btns.map(b=>`<button class="jchip" data-act="${b.act}" data-id="${esc(b.id||'')}">${esc(b.label)}</button>`).join('')}</div>`;
+  return h+'</div>';
+}
+function renderChat(){const c=$('jChat');if(!c)return;c.innerHTML=S.chat.map(msgHTML).join('');c.scrollTop=c.scrollHeight;}
+function jPush(m){S.chat.push(m);if(S.chat.length>80)S.chat.splice(0,S.chat.length-80);renderChat();}
+async function jSend(q){
+  q=String(q||'').trim();if(!q||jBusy)return;jBusy=true;
+  const l=detectLang(q);
+  jPush({who:'me',text:q,l});jState('thinking');
+  await sleep(450);
+  let a=jugnuAnswer(q,l);
+  if(!a.entry&&aiOn()&&(a.text===jt('dont',l)||a.kind==='idea')){const r=await askAI(q,l,a.kind==='idea'?'advice':'chat');if(r)a=r;}
+  else if(!a.entry&&!aiOn()&&a.text===jt('dont',l))a={text:jt('dont',l)+'\n'+jt('needNet',l)};
+  jHandle(a,q,l);jBusy=false;
+}
+function custBtns(cid,l){const c=cust(cid);if(!c)return[];const b=balance(cid);const out=[{act:'jOpen',id:cid,label:jt('openB',l)}];
+  if(c.type==='customer'&&b>0)out.push({act:'jRemind',id:cid,label:jt('remindB',l)});
+  out.push({act:'jStmt',id:cid,label:jt('stmtB',l)});return out;}
+function jHandle(a,q,l){
+  if(a.entry){const id=uid();S.drafts[id]=Object.assign({},a.entry,{type:a.entry.type||'credit',raw:q,l});
+    jPush({who:'ai',text:a.text||jt('confirmQ',l),card:id,l});jState('idle');return;}
+  const btns=a.cid?custBtns(a.cid,l):[];if(a.kind==='health'&&aiOn())btns.push({act:'jMore',id:l,label:jt('more',l)});
+  jPush({who:'ai',text:a.text,btns,l});
+  jState(a.text===jt('dont',l)?'idle':'happy');setTimeout(()=>{if(!jBusy)jState('idle');},1400);
+}
+function commitEntry(d){
+  let c=findByName(d.name);if(!c){c={id:uid(),name:cap(d.name),phone:'',type:(d.type==='goods'||d.type==='paid')?'supplier':'customer',created:Date.now()};D.customers.push(c);}
+  let saved;
+  if(d.id){saved=D.entries.find(x=>x.id===d.id);if(saved)Object.assign(saved,{cid:c.id,amount:d.amount,type:d.type,date:d.date,note:d.note||''});if(saved&&d.type==='payment'&&!saved.rno)saved.rno=D.seq++;}
+  else{saved={id:uid(),cid:c.id,amount:d.amount,type:d.type,date:d.date||todayISO(),note:d.note||'',created:Date.now()};if(d.type==='payment')saved.rno=D.seq++;D.entries.push(saved);}
+  save();return{c,saved};
+}
+function jSaved(c,saved,l){
+  const b=balance(c.id);const btns=[{act:'jOpen',id:c.id,label:jt('openB',l)}];
+  if(saved&&saved.type==='payment')btns.push({act:'receipt',id:saved.id,label:tL('pdfR',l)});
+  if(c.type==='customer'&&b>0)btns.push({act:'jRemind',id:c.id,label:jt('remindB',l)});
+  jPush({who:'ai',text:fill(jt(b>0?'saved':b<0?'savedSup':'savedZero',l),{n:nameFor(c,l),a:rs(b)}),btns,l});
+  jState('happy');setTimeout(()=>{if(!jBusy)jState('idle');},1400);
+}
+/* ---- AI munshi (Claude, on the viewer's account) with offline fallback ---- */
+const LNAME={ur:'Urdu in Urdu script (the Nastaliq / Arabic alphabet)',roman:'Roman Urdu (Urdu written in English letters, like a WhatsApp message)',ps:'Pashto in Pashto script',en:'simple English'};
+const ADDR={ur:'سیٹھ جی',roman:'Seth ji',ps:'مالک صاحب',en:'sir'};
+async function askAI(q,l,mode){
+  try{
+    const td=todayISO();const aaj=D.entries.filter(e=>e.type==='payment'&&e.date===td).reduce((s,e)=>s+e.amount,0);
+    const led=D.customers.map(c=>{const b=balance(c.id);return `- ${c.name} | ${c.type} | ${b>0?'owes the shop Rs '+num(b):b<0?'the shop owes Rs '+num(b):'settled'} | oldest unpaid: ${oldestUnpaidDays(c.id)} days`;}).join('\n')||'(no accounts yet)';
+    const hist=S.chat.slice(-7,-1).map(m=>(m.who==='me'?'Shopkeeper: ':'Jugnu: ')+m.text).join('\n');
+    const prompt=`You are Jugnu, a Pakistani AI assistant who works as the munshi (trusted bookkeeper and advisor) of a small shop. You understand Urdu in Urdu script, Roman Urdu, Pashto and English.
+You help with: the shop's khata, practical business advice for small Pakistani shops (personalise it with the ledger numbers below), everyday questions, and friendly chat.
+Rules:
+- Reply ONLY in ${LNAME[l]}, the same language and script the shopkeeper just used. Address him as "${ADDR[l]}".
+- Talk like a respectful, loyal old-school munshi: warm, practical, simple words. No emojis. No dashes.
+- Length: ${mode==='advice'?'up to 4 short numbered points, each one line, low cost and doable this week in a Pakistani market (JazzCash, Easypaisa, Raast QR, WhatsApp, local suppliers)':'at most 3 short sentences'}.
+- Use ONLY the numbers in the ledger below. Never invent a balance.
+- Medical, legal or religious ruling questions: give only a short, general, safe answer and advise him to ask a doctor, a lawyer or a mufti. Never give medicine doses. Money or investment questions: say it is general information, not financial advice.
+- If his message records a transaction, fill "entry" with name, amount (rupees, integer) and type: "credit" (customer took goods on udhaar), "payment" (customer paid the shop), "goods" (supplier delivered stock), "paid" (shop paid a supplier). Do NOT say it is saved: the app shows a confirm card.
+- If the message is about one person in the ledger, put their exact ledger name in "customer". Set "action" to "remind" if he wants a WhatsApp reminder, or "statement" if he wants their statement.
+Shop: ${D.shop.name}${D.shop.city?', '+D.shop.city:''}. Today: ${td}. Collected today: Rs ${num(aaj)}.
+Ledger:
+${led}
+Recent chat:
+${hist||'(none)'}
+Shopkeeper's new message: """${q}"""
+Reply with only JSON like {"reply":"...","entry":null,"customer":null,"action":null}`;
+    const r=await SAMPLE.json(prompt,{modelTier:'quick',cache:false});
+    if(!r||typeof r.reply!=='string'||!r.reply.trim())return null;
+    const out={text:r.reply.trim().slice(0,900)};const e=r.entry;
+    if(e&&typeof e==='object'){const amt=Math.round(Number(toAsciiDigits(String(e.amount||'')).replace(/[^\d.]/g,'')));const ty=['credit','payment','goods','paid'].includes(e.type)?e.type:null;const nm=String(e.name||'').trim().slice(0,60);
+      if(amt>0&&ty&&nm){const ex=findByName(nm);let t2=ty;if(ex&&ex.type==='supplier'){if(t2==='credit')t2='goods';if(t2==='payment')t2='paid';}out.entry={name:ex?ex.name:cap(nm),amount:amt,type:t2,date:td,note:''};}}
+    if(!out.entry&&r.customer){const c=findByName(String(r.customer));if(c){out.cid=c.id;if(r.action==='remind'||r.action==='statement')out.action=r.action;}}
+    return out;
+  }catch(err){if(err&&['not_granted','unavailable','capability_disabled','capability_removed'].includes(err.code)){SAMPLE=null;updMode();}return null;}
+}
+function doRemind(c){const p=phone92(c.phone);if(!p){toast(t('noPhone'));S.cid=c.id;editCustModal();return;}const tx=reminderText(c);
+  modal(`<h1>${esc(t('remind'))}</h1><textarea readonly dir="auto" style="min-height:220px">${esc(tx)}</textarea><a class="btn wa full" id="waGo" href="https://wa.me/${esc(p)}?text=${encodeURIComponent(tx)}" target="_blank" rel="noopener">WhatsApp</a><button class="btn ghost full" data-act="closeModal">${esc(t('cancel'))}</button>`);
+  $('waGo').addEventListener('click',()=>{D.reminders.push({cid:c.id,at:Date.now()});save();setTimeout(()=>{closeModal();render();toast(t('sentLog'));},300);});}
+
+/* ================= Family profiles + Ustad (student tutor) ================= */
+const FS={
+ roman:{prof:'Profiles',who:'Kaun istemal kar raha hai?',addStu:'+ Bacha (student) shamil karein',stuName:'Bache ka naam',cls:'Class',save:'Save karein',
+  pinSet:'Khata PIN',pinNew:'Naya 4 hindson ka PIN',pinAsk:'Khata kholne ke liye PIN daalein',pinWrong:'Ghalat PIN',pinOn:'PIN laga hua hai',pinOff:'PIN nahi laga',pinHint:'Bachon ko khata aur paisay nazar nahi aayenge.',pinChange:'PIN lagayein / badlein',pinRemove:'PIN hatayein',
+  removeStu:'Hatayein',maxStu:'Family plan mein 3 bache tak.',link:'Bache ke apne phone par',linkNote:'Bacha apne phone par Jugnu khol kar ye code daalega. Ye Jugnu cloud ke saath chalega (pilot ke baad). Abhi bacha isi phone par apni profile chala sakta hai.',
+  ustad:'Ustad',progress:'Progress',switchB:'Profile',owner:'Seth ji (Munshi)',
+  uGreet:'Assalam o alaikum {n}! Main Ustad Jugnu hoon. Aaj kya parhein? Quiz lo, formula poochho ya koi bhi padhai ka sawal.',
+  uChips:['Maths quiz','Physics quiz','Formula batao','Mera progress'],uPh:'Sawal likho ya bolo: Pythagoras kya hai?',
+  qStart:'Chalo {s} ka quiz! 5 sawal. Tayyar?',qRight:'Shabash! Sahi jawab.',qWrong:'Koi baat nahi. Sahi jawab: {a}',qDone:'Quiz khatam: {s}/{t}. {m}',qGood:'Zabardast!',qOk:'Achha hai, thodi mehnat aur.',qLow:'Isay dobara parhte hain. Fikar na karo.',
+  fLead:'Ye lo formula:',fList:'Ye formulas mere paas offline hain: {l}. Kis ka chahiye?',
+  offTopic:'{n}, ye padhai ka sawal nahi. Chalo kuch seekhte hain: Maths ya Science ka quiz karein?',
+  care:'{n}, agar tum pareshan ho to abhi ammi abbu ya kisi bharosemand teacher se baat karo. Tum akele nahi ho.',
+  uNeedNet:'Is sawal ke liye internet chahiye. Tab tak quiz karein ya formula poochho?',
+  cap:'Aaj ke {c} AI sawal poore ho gaye. Kal phir poochna, ya Family plan lein. Quiz aur formulas abhi bhi chalte hain.',aiLeft:'AI sawal aaj: {u}/{c}',
+  uHow:'Main theek hoon, {n}! Tum sunao, aaj school mein kya parha?',uThanks:'Shabash {n}! Aur kuch poochna hai?',
+  pTitle:'{n} ka progress',pWeek:'Is hafte padhai',pDays:'{d}/7 din',pAsked:'Sawal pooche',pQuiz:'Quiz diye',pBy:'Subject ke hisaab se',pNone:'Abhi koi quiz nahi diya. Ustad tab mein "Maths quiz" likho.',
+  rep:'{n} (Class {c}) ki is hafte ki report:\n• Padhai: {d}/7 din\n• Sawal pooche: {q}\n• Quiz diye: {z}{sub}{strong}{weak}\n\nJugnu Ustad',repSub:'\n• {s}: {p}%',repStrong:'\n• Mazboot: {s}',repWeak:'\n• Mehnat chahiye: {s}',
+  famTitle:'Bachon ki padhai',sendWa:'WhatsApp par bhejein',noStu:'Abhi koi bacha shamil nahi. Jugnu screen par apne naam wale button se shamil karein.',
+  consent:'Jugnu behtar banane ke liye gumnaam ginti bhejein',consentNote:'Bachon ka data kabhi istemal nahi hota. Sara hisaab isi phone par rehta hai.',fam:'Family plan (demo)',famNote:'Munshi + 3 bache, AI sawal la-mehdood.'},
+ ur:{prof:'پروفائل',who:'کون استعمال کر رہا ہے؟',addStu:'+ بچہ (طالب علم) شامل کریں',stuName:'بچے کا نام',cls:'جماعت',save:'محفوظ کریں',
+  pinSet:'کھاتہ PIN',pinNew:'نیا 4 ہندسوں کا PIN',pinAsk:'کھاتہ کھولنے کے لیے PIN ڈالیں',pinWrong:'غلط PIN',pinOn:'PIN لگا ہوا ہے',pinOff:'PIN نہیں لگا',pinHint:'بچوں کو کھاتہ اور پیسے نظر نہیں آئیں گے۔',pinChange:'PIN لگائیں / بدلیں',pinRemove:'PIN ہٹائیں',
+  removeStu:'ہٹائیں',maxStu:'فیملی پلان میں 3 بچے تک۔',link:'بچے کے اپنے فون پر',linkNote:'بچہ اپنے فون پر جگنو کھول کر یہ کوڈ ڈالے گا۔ یہ جگنو کلاؤڈ کے ساتھ چلے گا (پائلٹ کے بعد)۔ ابھی بچہ اسی فون پر اپنی پروفائل چلا سکتا ہے۔',
+  ustad:'استاد',progress:'کارکردگی',switchB:'پروفائل',owner:'سیٹھ جی (منشی)',
+  uGreet:'السلام علیکم {n}! میں استاد جگنو ہوں۔ آج کیا پڑھیں؟ کوئز لو، فارمولا پوچھو یا پڑھائی کا کوئی بھی سوال۔',
+  uChips:['ریاضی کوئز','فزکس کوئز','فارمولا بتاؤ','میری کارکردگی'],uPh:'سوال لکھو یا بولو: فیثاغورث کیا ہے؟',
+  qStart:'چلو {s} کا کوئز! 5 سوال۔ تیار؟',qRight:'شاباش! صحیح جواب۔',qWrong:'کوئی بات نہیں۔ صحیح جواب: {a}',qDone:'کوئز ختم: {s}/{t}۔ {m}',qGood:'زبردست!',qOk:'اچھا ہے، تھوڑی محنت اور۔',qLow:'اسے دوبارہ پڑھتے ہیں۔ فکر نہ کرو۔',
+  fLead:'یہ لو فارمولا:',fList:'یہ فارمولے میرے پاس آف لائن ہیں: {l}۔ کس کا چاہیے؟',
+  offTopic:'{n}، یہ پڑھائی کا سوال نہیں۔ چلو کچھ سیکھتے ہیں: ریاضی یا سائنس کا کوئز کریں؟',
+  care:'{n}، اگر تم پریشان ہو تو ابھی امی ابو یا کسی بھروسہ مند استاد سے بات کرو۔ تم اکیلے نہیں ہو۔',
+  uNeedNet:'اس سوال کے لیے انٹرنیٹ چاہیے۔ تب تک کوئز کریں یا فارمولا پوچھو؟',
+  cap:'آج کے {c} AI سوال پورے ہو گئے۔ کل پھر پوچھنا، یا فیملی پلان لیں۔ کوئز اور فارمولے ابھی بھی چلتے ہیں۔',aiLeft:'AI سوال آج: {u}/{c}',
+  uHow:'میں ٹھیک ہوں، {n}! تم سناؤ، آج سکول میں کیا پڑھا؟',uThanks:'شاباش {n}! اور کچھ پوچھنا ہے؟',
+  pTitle:'{n} کی کارکردگی',pWeek:'اس ہفتے پڑھائی',pDays:'{d}/7 دن',pAsked:'سوال پوچھے',pQuiz:'کوئز دیے',pBy:'مضمون کے لحاظ سے',pNone:'ابھی کوئی کوئز نہیں دیا۔ استاد ٹیب میں "ریاضی کوئز" لکھو۔',
+  rep:'{n} (جماعت {c}) کی اس ہفتے کی رپورٹ:\n• پڑھائی: {d}/7 دن\n• سوال پوچھے: {q}\n• کوئز دیے: {z}{sub}{strong}{weak}\n\nجگنو استاد',repSub:'\n• {s}: {p}%',repStrong:'\n• مضبوط: {s}',repWeak:'\n• محنت چاہیے: {s}',
+  famTitle:'بچوں کی پڑھائی',sendWa:'واٹس ایپ پر بھیجیں',noStu:'ابھی کوئی بچہ شامل نہیں۔ جگنو اسکرین پر اپنے نام والے بٹن سے شامل کریں۔',
+  consent:'جگنو بہتر بنانے کے لیے گمنام گنتی بھیجیں',consentNote:'بچوں کا ڈیٹا کبھی استعمال نہیں ہوتا۔ سارا حساب اسی فون پر رہتا ہے۔',fam:'فیملی پلان (ڈیمو)',famNote:'منشی + 3 بچے، AI سوال لامحدود۔'},
+ ps:{prof:'پروفایلونه',who:'څوک یې کاروي؟',addStu:'+ ماشوم (زده کوونکی) ور اضافه کړئ',stuName:'د ماشوم نوم',cls:'ټولګی',save:'خوندي کړئ',
+  pinSet:'د کهاتې PIN',pinNew:'نوی 4 عددي PIN',pinAsk:'د کهاتې د خلاصولو لپاره PIN ولیکئ',pinWrong:'غلط PIN',pinOn:'PIN لګېدلی',pinOff:'PIN نه دی لګېدلی',pinHint:'ماشومان به کهاته او پیسې ونه ګوري.',pinChange:'PIN ولګوئ / بدل کړئ',pinRemove:'PIN لرې کړئ',
+  removeStu:'لرې کړئ',maxStu:'په کورني پلان کې تر 3 ماشومانو.',link:'د ماشوم په خپل تلیفون',linkNote:'ماشوم به په خپل تلیفون جګنو خلاص کړي او دا کوډ به ولیکي. دا به له جګنو کلاوډ سره کار کوي (له پیلوټ وروسته). اوس ماشوم په همدې تلیفون خپل پروفایل کارولی شي.',
+  ustad:'استاد',progress:'پرمختګ',switchB:'پروفایل',owner:'مالک صاحب (منشي)',
+  uGreet:'السلام علیکم {n}! زه استاد جګنو یم. نن څه ولولو؟ کوئز واخله، فارمول وپوښته یا د زده کړې هره پوښتنه.',
+  uChips:['د ریاضي کوئز','د فزیک کوئز','فارمول راته ووایه','زما پرمختګ'],uPh:'پوښتنه ولیکه یا ووایه: فیثاغورث څه دی؟',
+  qStart:'راځه د {s} کوئز! 5 پوښتنې. تیار یې؟',qRight:'شاباس! سم ځواب.',qWrong:'خبره نشته. سم ځواب: {a}',qDone:'کوئز پای ته ورسېد: {s}/{t}. {m}',qGood:'ډېر ښه!',qOk:'ښه دی، لږ نور زیار.',qLow:'دا به بیا ولولو. فکر مه کوه.',
+  fLead:'دا دی فارمول:',fList:'دا فارمولونه زما سره بې انټرنېټه دي: {l}. کوم یو غواړې؟',
+  offTopic:'{n}، دا د زده کړې پوښتنه نه ده. راځه څه زده کړو: د ریاضي یا ساینس کوئز وکړو؟',
+  care:'{n}، که پرېشانه یې نو همدا اوس له مور پلار یا باوري استاد سره خبرې وکړه. ته یوازې نه یې.',
+  uNeedNet:'دې پوښتنې ته انټرنېټ پکار دی. تر هغه کوئز وکړو یا فارمول وپوښته؟',
+  cap:'د نن {c} AI پوښتنې پوره شوې. سبا بیا وپوښته، یا کورنی پلان واخلئ. کوئز او فارمولونه اوس هم چلېږي.',aiLeft:'نن AI پوښتنې: {u}/{c}',
+  uHow:'زه ښه یم، {n}! ته ووایه، نن په ښوونځي کې څه ولوستل؟',uThanks:'شاباس {n}! نوره پوښتنه لرې؟',
+  pTitle:'د {n} پرمختګ',pWeek:'په دې اونۍ کې زده کړه',pDays:'{d}/7 ورځې',pAsked:'پوښتنې',pQuiz:'کوئزونه',pBy:'د مضمون له مخې',pNone:'تراوسه هېڅ کوئز نه دی ورکړل شوی. د استاد ټب کې "د ریاضي کوئز" ولیکه.',
+  rep:'د {n} (ټولګی {c}) د دې اونۍ راپور:\n• زده کړه: {d}/7 ورځې\n• پوښتنې: {q}\n• کوئزونه: {z}{sub}{strong}{weak}\n\nجګنو استاد',repSub:'\n• {s}: {p}%',repStrong:'\n• پیاوړی: {s}',repWeak:'\n• زیار پکار دی: {s}',
+  famTitle:'د ماشومانو زده کړه',sendWa:'په واټس اپ یې ولېږئ',noStu:'تراوسه هېڅ ماشوم نه دی ور اضافه شوی. د جګنو په پرده کې د خپل نوم له تڼۍ یې ور اضافه کړئ.',
+  consent:'د جګنو د ښه کولو لپاره بې نومه شمېرې ولېږئ',consentNote:'د ماشومانو معلومات هېڅکله نه کارول کېږي. ټول حساب په همدې تلیفون کې دی.',fam:'کورنی پلان (ډیمو)',famNote:'منشي + 3 ماشومان، AI پوښتنې بې حده.'},
+ en:{prof:'Profiles',who:"Who's using Jugnu?",addStu:'+ Add a child (student)',stuName:"Child's name",cls:'Class',save:'Save',
+  pinSet:'Khata PIN',pinNew:'New 4-digit PIN',pinAsk:'Enter PIN to open the khata',pinWrong:'Wrong PIN',pinOn:'PIN is on',pinOff:'No PIN set',pinHint:'Children will not see the khata or money.',pinChange:'Set / change PIN',pinRemove:'Remove PIN',
+  removeStu:'Remove',maxStu:'Family plan: up to 3 children.',link:"On the child's own phone",linkNote:'The child opens Jugnu on their phone and enters this code. This works with Jugnu cloud (after the pilot). For now the child can use their profile on this phone.',
+  ustad:'Ustad',progress:'Progress',switchB:'Profile',owner:'Owner (Munshi)',
+  uGreet:"Assalam o alaikum {n}! I'm Ustad Jugnu. What shall we study today? Take a quiz, ask a formula or any study question.",
+  uChips:['Maths quiz','Physics quiz','Show a formula','My progress'],uPh:'Type or speak: What is Pythagoras?',
+  qStart:"Let's do a {s} quiz! 5 questions. Ready?",qRight:'Well done! Correct.',qWrong:'No problem. Correct answer: {a}',qDone:'Quiz done: {s}/{t}. {m}',qGood:'Excellent!',qOk:'Good, a little more practice.',qLow:"Let's revise this. Don't worry.",
+  fLead:'Here is the formula:',fList:'I have these formulas offline: {l}. Which one?',
+  offTopic:"{n}, that's not a study question. Let's learn something: a Maths or Science quiz?",
+  care:"{n}, if you're upset, please talk to your mother, father or a teacher you trust right now. You're not alone.",
+  uNeedNet:'This question needs internet. Meanwhile, a quiz or a formula?',
+  cap:"Today's {c} AI questions are used up. Ask again tomorrow, or get the Family plan. Quizzes and formulas still work.",aiLeft:'AI questions today: {u}/{c}',
+  uHow:"I'm fine, {n}! Tell me, what did you study at school today?",uThanks:'Well done {n}! Anything else?',
+  pTitle:"{n}'s progress",pWeek:'Studied this week',pDays:'{d}/7 days',pAsked:'Questions asked',pQuiz:'Quizzes taken',pBy:'By subject',pNone:'No quizzes yet. Type "Maths quiz" in the Ustad tab.',
+  rep:"{n} (Class {c}) this week's report:\n• Studied: {d}/7 days\n• Questions asked: {q}\n• Quizzes taken: {z}{sub}{strong}{weak}\n\nJugnu Ustad",repSub:'\n• {s}: {p}%',repStrong:'\n• Strong: {s}',repWeak:'\n• Needs work: {s}',
+  famTitle:"Children's studies",sendWa:'Send on WhatsApp',noStu:'No children added yet. Add one from the button with your name on the Jugnu screen.',
+  consent:'Share anonymous counts to improve Jugnu',consentNote:"Children's data is never used. All accounts stay on this phone.",fam:'Family plan (demo)',famNote:'Munshi + 3 children, unlimited AI questions.'}
+};
+const ft=(k,l)=>((FS[l||D.lang]||FS.ur)[k])??FS.en[k];
+const SUBJ={maths:{roman:'Maths',ur:'ریاضی',ps:'ریاضي',en:'Maths'},physics:{roman:'Physics',ur:'فزکس',ps:'فزیک',en:'Physics'},chemistry:{roman:'Chemistry',ur:'کیمسٹری',ps:'کیمیا',en:'Chemistry'},biology:{roman:'Biology',ur:'بیالوجی',ps:'بیولوژي',en:'Biology'},english:{roman:'English',ur:'انگریزی',ps:'انګلیسي',en:'English'}};
+const subName=(k,l)=>(SUBJ[k]||{})[l||D.lang]||k;
+/* offline question bank (textbook language: English) */
+const QB=[
+ ['maths','The value of π is about:',['3.14','2.17','1.41','3.41'],0],['maths','(a + b)² = ?',['a² + b²','a² + 2ab + b²','a² − 2ab + b²','2a + 2b'],1],
+ ['maths','A right triangle has sides 3 and 4. The hypotenuse is:',['6','7','5','12'],2],['maths','The angles of a triangle add up to:',['90°','360°','270°','180°'],3],
+ ['maths','√144 = ?',['12','14','11','72'],0],['maths','If 2x + 3 = 11, then x = ?',['3','4','7','5'],1],['maths','Area of a circle with radius r:',['2πr','πd','πr²','r²'],2],
+ ['physics','SI unit of force:',['Newton','Joule','Watt','Pascal'],0],['physics','Speed = ?',['time ÷ distance','distance ÷ time','distance × time','mass × velocity'],1],
+ ['physics',"Newton's second law:",['F = m + a','F = m ÷ a','F = m × a','F = a ÷ m'],2],['physics','Acceleration due to gravity on Earth is about:',['98 m/s²','1.6 m/s²','3 × 10⁸ m/s²','9.8 m/s²'],3],
+ ['physics','SI unit of work and energy:',['Joule','Newton','Watt','Volt'],0],['physics',"Ohm's law:",['V = I ÷ R','V = I × R','V = R ÷ I','V = I + R'],1],
+ ['chemistry','Chemical symbol of sodium:',['So','S','Na','Sd'],2],['chemistry','pH of pure water:',['0','14','1','7'],3],['chemistry','Chemical formula of water:',['H₂O','HO₂','H₂O₂','OH'],0],
+ ['chemistry','Atomic number of carbon:',['12','6','8','14'],1],['chemistry','The gas found most in air:',['Oxygen','Carbon dioxide','Nitrogen','Argon'],2],['chemistry','Table salt is:',['KCl','NaOH','HCl','NaCl'],3],
+ ['biology','Powerhouse of the cell:',['Mitochondria','Nucleus','Ribosome','Cell wall'],0],['biology','Photosynthesis releases:',['Nitrogen','Oxygen','Carbon dioxide','Hydrogen'],1],
+ ['biology','Chambers in the human heart:',['2','3','4','5'],2],['biology','Basic unit of life:',['Tissue','Organ','Atom','Cell'],3],['biology','Red blood cells carry:',['Oxygen','Glucose','Urea','Hormones'],0],['biology','Green pigment in leaves:',['Melanin','Chlorophyll','Haemoglobin','Carotene'],1],
+ ['english','Plural of "child":',['childs','childes','children','childrens'],2],['english','Past tense of "go":',['goed','gone','going','went'],3],['english','Synonym of "happy":',['glad','sad','angry','tired'],0],
+ ['english','Antonym of "ancient":',['old','modern','early','past'],1],['english','"___ honest man"',['a','the','an','no article'],2],['english','"She ___ to school every day."',['go','going','gone','goes'],3]
+];
+const FORM=[
+ [/pythag|فیثاغورث|hypotenuse|وتر/,'Pythagoras: c² = a² + b²  (c = hypotenuse)'],
+ [/quadratic|دو درجی|ax²/,'Quadratic formula: x = (−b ± √(b² − 4ac)) ÷ 2a'],
+ [/circle|daira|دائرہ|دایره|πr/,'Circle: Area = πr², Circumference = 2πr'],
+ [/\(a ?\+ ?b\)|a\+b|square formula|algebra/,'(a + b)² = a² + 2ab + b²\n(a − b)² = a² − 2ab + b²\na² − b² = (a + b)(a − b)'],
+ [/speed|velocity|raftar|رفتار|سرعت/,'Speed = distance ÷ time  (v = s ÷ t)'],
+ [/force|newton|quwwat|قوت|زور/,"Newton's 2nd law: F = m × a"],
+ [/ohm|current|resistance|مزاحمت/,"Ohm's law: V = I × R"],
+ [/density|kasafat|کثافت|کثافت/,'Density = mass ÷ volume  (ρ = m ÷ V)'],
+ [/work|power|کام|طاقت/,'Work = force × distance (W = F × d)\nPower = work ÷ time (P = W ÷ t)'],
+ [/kinetic|potential|energy|توانائی|انرژي/,'Kinetic energy = ½ m v²\nPotential energy = m g h'],
+ [/photosynth|ضیائی|ضیائی تالیف|فوتوسنتیز/,'Photosynthesis: 6CO₂ + 6H₂O + light → C₆H₁₂O₆ + 6O₂'],
+ [/pressure|dabao|دباؤ|فشار/,'Pressure = force ÷ area  (P = F ÷ A)'],
+ [/rectangle|triangle|area|raqba|رقبہ|مستطیل|مثلث/,'Rectangle area = length × width\nTriangle area = ½ × base × height']
+];
+const FORM_NAMES='Pythagoras, Quadratic, Circle, (a+b)², Speed, Force, Ohm, Density, Work/Power, Energy, Photosynthesis, Pressure, Area';
+const STU_CAP=20;
+const RXU={
+ care:/(suicide|khudkushi|khud kushi|mar jana chahta|marna chahta|marna chahti|kill myself|self harm|خودکشی|مرنا چاہت|ځان وژن)/,
+ off:/(girl ?friend|boy ?friend|i love you|love you|pyar|ishq|romance|date karo|sexy|\bsex|nude|porn|kiss|shadi karo|gun|pistol|bomb|drugs|nasha|cigarette|گرل فرینڈ|بوائے فرینڈ|عشق|پیار|نشہ|مینه|عشق)/,
+ quiz:/(quiz|test|mcq|کوئز|ٹیسٹ|ازموینه|کوئیز)/,
+ prog:/(progress|my report|meri report|mera report|کارکردگی|میری رپورٹ|پرمختګ|زما راپور)/,
+ formula:/(formula|فارمولا|فارمول)/,
+ how:/(kaise ho|kaisay ho|kya haal|how are you|how r u|کیسے ہو|کیا حال|څنګه یې|څه حال)/,
+ thanks:/(shukriya|thank|شکریہ|مننه|jazak)/
+};
+function subjOf(s){if(/(phys|fizi|فزکس|طبیعیات|فزیک)/.test(s))return'physics';if(/(chem|کیمس|کیمیا)/.test(s))return'chemistry';if(/(bio|بیالو|حیاتیات|بیولوژ)/.test(s))return'biology';if(/(english|grammar|انگریزی|انګلیسي)/.test(s))return'english';return'maths';}
+/* ---- profiles ---- */
+function ensureProfiles(){if(!D.profiles||!D.profiles.length){D.profiles=[{id:'p0',type:'munshi',name:''}];D.active='p0';}if(!D.profiles.find(p=>p.id===D.active))D.active=D.profiles[0].id;}
+const activeP=()=>{ensureProfiles();return D.profiles.find(p=>p.id===D.active);};
+const isStudent=()=>D.shop&&activeP().type==='student';
+const pName=p=>p.type==='munshi'?(D.shop&&D.shop.owner)||ft('owner'):p.name;
+const students=()=>(D.profiles||[]).filter(p=>p.type==='student');
+function pinHash(p){let h=7;for(const c of 'jugnu:'+p)h=(h*31+c.charCodeAt(0))>>>0;return h.toString(36);}
+function profilesModal(){
+  ensureProfiles();const cur=D.active;
+  modal(`<h1>${esc(ft('who'))}</h1><div class="plist">${D.profiles.map(p=>`<div class="prow ${p.id===cur?'on':''}"><button class="pbtn" data-act="pickProf" data-id="${p.id}"><span class="pav ${p.type}">${esc((pName(p)||'?').trim().charAt(0).toUpperCase())}</span><span><b dir="auto">${esc(pName(p))}</b><small>${p.type==='munshi'?esc({ur:'منشی',ps:'منشي',en:'Munshi',roman:'Munshi'}[D.lang]||'Munshi')+(D.pin?' · 🔒':''):esc(ft('cls'))+' '+esc(p.cls)}</small></span></button>${p.type==='student'?`<button class="btn ghost sm" data-act="linkStu" data-id="${p.id}">${esc(ft('link'))}</button>`:''}</div>`).join('')}</div>
+   ${students().length<3?`<button class="btn ghost full" data-act="addStu">${esc(ft('addStu'))}</button>`:`<p class="note">${esc(ft('maxStu'))}</p>`}
+   ${!isStudent()&&!D.pin&&students().length?`<p class="note">${esc(ft('pinHint'))}</p><button class="btn full" data-act="setPin">${esc(ft('pinChange'))}</button>`:''}
+   <button class="btn ghost full" data-act="closeModal">${esc(t('cancel'))}</button>`);
+}
+function addStuModal(){
+  if(isStudent()){toast(ft('pinAsk'));return;}
+  modal(`<h1>${esc(ft('addStu').replace('+ ',''))}</h1><form id="stuForm" class="stack"><div><label for="stName">${esc(ft('stuName'))}</label><input id="stName" dir="auto" required maxlength="30"></div>
+   <div><label for="stCls">${esc(ft('cls'))}</label><select id="stCls">${['5','6','7','8','9','10','11','12'].map(c=>`<option ${c==='9'?'selected':''}>${c}</option>`).join('')}</select></div>
+   <p class="note">${esc(ft('pinHint'))}</p><div class="row"><button class="btn" type="submit" style="flex:1">${esc(ft('save'))}</button><button class="btn ghost" type="button" data-act="closeModal">${esc(t('cancel'))}</button></div></form>`);
+  $('stuForm').onsubmit=e=>{e.preventDefault();const n=$('stName').value.trim();if(!n)return;ensureProfiles();if(students().length>=3){toast(ft('maxStu'));return;}
+    D.profiles.push({id:uid(),type:'student',name:cap(n),cls:$('stCls').value,created:Date.now(),stats:{days:[],asked:[],quizzes:[]}});save();closeModal();
+    if(!D.pin)setTimeout(()=>pinModal('set'),200);else{render();profilesModal();}};
+}
+function pinModal(mode,then){
+  modal(`<h1>${esc(mode==='set'?ft('pinNew'):ft('pinAsk'))}</h1>${mode==='set'?`<p class="note">${esc(ft('pinHint'))}</p>`:''}<form id="pinForm" class="stack"><input id="pinIn" inputmode="numeric" pattern="[0-9]{4}" maxlength="4" dir="ltr" autocomplete="off" style="font-size:28px;letter-spacing:.5em;text-align:center" required>
+   <div class="row"><button class="btn" type="submit" style="flex:1">OK</button><button class="btn ghost" type="button" data-act="closeModal">${esc(t('cancel'))}</button></div>${mode==='set'&&D.pin?`<button class="btn danger full" type="button" data-act="rmPin">${esc(ft('pinRemove'))}</button>`:''}</form>`);
+  const inp=$('pinIn');setTimeout(()=>inp.focus(),50);
+  $('pinForm').onsubmit=e=>{e.preventDefault();const v=toAsciiDigits(inp.value).replace(/\D/g,'');if(v.length!==4){toast(ft('pinNew'));return;}
+    if(mode==='set'){D.pin=pinHash(v);save();closeModal();toast(ft('pinOn'),true);render();return;}
+    if(pinHash(v)===D.pin){closeModal();then&&then();}else{inp.value='';toast(ft('pinWrong'));}};
+}
+function switchTo(id){const p=D.profiles.find(x=>x.id===id);if(!p)return;
+  const go2=()=>{D.active=id;save();closeModal();S.chat=S.chat||[];go(p.type==='student'?'ustad':'jugnu',{draft:null,cid:null});};
+  if(p.type==='munshi'&&isStudent()&&D.pin){pinModal('ask',go2);return;}go2();}
+function linkModal(id){const p=D.profiles.find(x=>x.id===id);if(!p)return;const code=String(100000+(parseInt(pinHash(p.id+p.name),36)%900000));
+  modal(`<h1 dir="auto">${esc(p.name)} · ${esc(ft('link'))}</h1><div class="linkcode num">${code.slice(0,3)} ${code.slice(3)}</div><p class="note">${esc(ft('linkNote'))}</p>
+   ${!isStudent()?`<button class="btn danger full" data-act="rmStu" data-id="${p.id}">${esc(ft('removeStu'))}</button>`:''}<button class="btn ghost full" data-act="closeModal">${esc(t('cancel'))}</button>`);}
+/* ---- student stats + parent report ---- */
+function stuStats(p){p.stats=p.stats||{days:[],asked:[],quizzes:[]};return p.stats;}
+function markStudy(p,asked){const st=stuStats(p);const td=todayISO();if(!st.days.includes(td))st.days.push(td);if(st.days.length>60)st.days=st.days.slice(-60);if(asked){st.asked.push(td);if(st.asked.length>500)st.asked=st.asked.slice(-500);}save();}
+function weekSummary(p){const st=stuStats(p);const wk=todayISO(new Date(Date.now()-6*86400000));
+  const days=st.days.filter(d=>d>=wk).length,asked=st.asked.filter(d=>d>=wk).length,qz=st.quizzes.filter(q=>q.d>=wk);
+  const by={};st.quizzes.slice(-20).forEach(q=>{(by[q.sub]=by[q.sub]||{s:0,t:0});by[q.sub].s+=q.score;by[q.sub].t+=q.total;});
+  const subs=Object.keys(by).map(k=>({k,p:Math.round(by[k].s/by[k].t*100)})).sort((a,b)=>b.p-a.p);
+  return{days,asked,quizzes:qz.length,subs};}
+function famReport(p,l){const w=weekSummary(p);l=l||D.lang;
+  const strong=w.subs.filter(x=>x.p>=70).map(x=>subName(x.k,l)),weak=w.subs.filter(x=>x.p<60).map(x=>subName(x.k,l));
+  return fill(ft('rep',l),{n:p.name,c:p.cls,d:w.days,q:w.asked,z:w.quizzes})
+   .replace('{sub}',w.subs.map(x=>fill(ft('repSub',l),{s:subName(x.k,l),p:x.p})).join(''))
+   .replace('{strong}',strong.length?fill(ft('repStrong',l),{s:joinL(strong,l)}):'')
+   .replace('{weak}',weak.length?fill(ft('repWeak',l),{s:joinL(weak,l)}):'');}
+function aiQuota(){const td=todayISO();if(!D.aiDay||D.aiDay.d!==td)D.aiDay={d:td,n:0};return D.aiDay;}
+/* ---- Ustad screen ---- */
+function uChat(){const p=activeP();S.uchat=S.uchat||{};return S.uchat[p.id]=S.uchat[p.id]||[];}
+function profChip(){const p=activeP();return `<button class="pchip" data-act="profiles" aria-label="${esc(ft('prof'))}"><span class="pav ${p.type}">${esc((pName(p)||'?').trim().charAt(0).toUpperCase())}</span><span dir="auto">${esc(pName(p))}</span> ▾</button>`;}
+function ustadView(){const p=activeP();
+  return `<div class="jhome ustadT">
+   <div class="jhero"><span class="ffw listening" id="jFF">${ffSVG()}</span><div><div class="jname">Ustad<small>jugnu</small></div><div class="jstat" id="jStat" aria-live="polite">${esc(jt('listening'))}</div><span class="jmode" id="jMode"></span></div>${profChip()}</div>
+   <div class="jchat" id="jChat" aria-live="polite"></div>
+   <div class="jchips">${ft('uChips').map(q=>`<button class="jchip" data-act="uAsk" data-q="${esc(q)}" dir="auto">${esc(q)}</button>`).join('')}</div>
+   <form class="jform" id="jForm"><label for="jIn" class="sr">Ustad</label><input id="jIn" dir="auto" autocomplete="off" enterkeyhint="send" placeholder="${esc(ft('uPh'))}"><button class="btn" type="submit">${esc(t('go'))}</button></form>
+   <p class="jhint" id="uCap">${esc(D.plan==='family'?ft('famNote'):fill(ft('aiLeft'),{u:aiQuota().n,c:STU_CAP}))}</p></div>`;}
+function uMsgHTML(m,i){const l=m.l||D.lang;
+  let h=`<div class="jmsg ${m.who==='me'?'jme':'jai'} l-${l}" dir="${RTL(l)?'rtl':'ltr'}">${esc(m.text||'')}`;
+  if(m.quiz){const q=QB[m.quiz.qi];h+=`<div class="qcard" dir="ltr"><p class="qq">${esc(q[1])}</p>${q[2].map((o,j)=>{const st=m.quiz.pick==null?'':(j===q[3]?'ok':(j===m.quiz.pick?'bad':''));return `<button class="qopt ${st}" data-act="uAns" data-id="${i}:${j}" ${m.quiz.pick!=null?'disabled':''}>${esc(o)}</button>`;}).join('')}</div>`;}
+  if(m.btns&&m.btns.length)h+=`<div class="jbtns">${m.btns.map(b=>`<button class="jchip" data-act="${b.act}" data-id="${esc(b.id||'')}">${esc(b.label)}</button>`).join('')}</div>`;
+  return h+'</div>';}
+function renderU(){const c=$('jChat');if(!c)return;c.innerHTML=uChat().map(uMsgHTML).join('');c.scrollTop=c.scrollHeight;const cp=$('uCap');if(cp)cp.textContent=D.plan==='family'?ft('famNote'):fill(ft('aiLeft'),{u:aiQuota().n,c:STU_CAP});}
+function uPush(m){const ch=uChat();ch.push(m);if(ch.length>80)ch.splice(0,ch.length-80);renderU();}
+function ustadMount(){const ch=uChat();if(!ch.length)ch.push({who:'ai',text:fill(ft('uGreet'),{n:activeP().name}),l:D.lang});renderU();updMode();
+  $('jForm').onsubmit=e=>{e.preventDefault();const v=$('jIn').value;$('jIn').value='';uSend(v);};setTimeout(()=>{if($('jFF')&&!jBusy)jState('idle');},1500);}
+function ustadAnswer(text,l){const s=' '+toAsciiDigits(text).toLowerCase()+' ';const n=activeP().name;
+  if(RXU.care.test(s))return{text:fill(ft('care',l),{n})};
+  if(RXU.off.test(s))return{text:fill(ft('offTopic',l),{n})};
+  if(RXU.quiz.test(s))return{quiz:subjOf(s)};
+  if(RXU.prog.test(s))return{text:famReport(activeP(),l)};
+  const f=FORM.filter(([rx])=>rx.test(s));
+  if(f.length)return{text:ft('fLead',l)+'\n'+f.slice(0,2).map(x=>x[1]).join('\n\n')};
+  if(RXU.formula.test(s))return{text:fill(ft('fList',l),{l:FORM_NAMES})};
+  if(RXU.how.test(s))return{text:fill(ft('uHow',l),{n})};
+  if(RXU.thanks.test(s))return{text:fill(ft('uThanks',l),{n})};
+  return{ai:true};}
+function startQuiz(sub,l){const pool=QB.map((q,i)=>q[0]===sub?i:-1).filter(i=>i>=0).sort(()=>Math.random()-.5).slice(0,5);
+  S.quiz={pid:D.active,sub,list:pool,i:0,score:0,l};uPush({who:'ai',text:fill(ft('qStart',l),{s:subName(sub,l)}),l});uPush({who:'ai',quiz:{qi:pool[0],pick:null},l});}
+function uAnswerPick(mi,opt){const ch=uChat();const m=ch[mi];const Q=S.quiz;if(!m||!m.quiz||m.quiz.pick!=null||!Q)return;m.quiz.pick=opt;const q=QB[m.quiz.qi];const l=Q.l;
+  if(opt===q[3]){Q.score++;uPush({who:'ai',text:ft('qRight',l),l});jState('happy');}else{uPush({who:'ai',text:fill(ft('qWrong',l),{a:q[2][q[3]]}),l});jState('idle');}
+  Q.i++;const p=activeP();markStudy(p,false);
+  if(Q.i<Q.list.length){setTimeout(()=>uPush({who:'ai',quiz:{qi:Q.list[Q.i],pick:null},l}),350);}
+  else{stuStats(p).quizzes.push({d:todayISO(),sub:Q.sub,score:Q.score,total:Q.list.length});if(stuStats(p).quizzes.length>100)stuStats(p).quizzes.shift();save();
+    const r=Q.score/Q.list.length;uPush({who:'ai',text:fill(ft('qDone',l),{s:Q.score,t:Q.list.length,m:ft(r>=.8?'qGood':r>=.6?'qOk':'qLow',l)}),btns:[{act:'uQuiz',id:Q.sub,label:subName(Q.sub,l)+' '+({ur:'کوئز',ps:'کوئز'}[l]||'quiz')},{act:'uProg',id:'',label:ft('progress',l)}],l});S.quiz=null;}
+}
+async function uSend(q){q=String(q||'').trim();if(!q||jBusy)return;jBusy=true;const l=detectLang(q);const p=activeP();
+  uPush({who:'me',text:q,l});markStudy(p,true);jState('thinking');await sleep(400);
+  const a=ustadAnswer(q,l);
+  if(a.quiz){startQuiz(a.quiz,l);jBusy=false;jState('idle');return;}
+  if(!a.ai){uPush({who:'ai',text:a.text,l});jState('happy');setTimeout(()=>{if(!jBusy)jState('idle');},1300);jBusy=false;return;}
+  const qa=aiQuota();
+  if(!aiOn()){uPush({who:'ai',text:ft('uNeedNet',l),btns:[{act:'uQuiz',id:'maths',label:subName('maths',l)+' '+({ur:'کوئز',ps:'کوئز'}[l]||'quiz')}],l});jState('idle');jBusy=false;return;}
+  if(D.plan!=='family'&&qa.n>=STU_CAP){uPush({who:'ai',text:fill(ft('cap',l),{c:STU_CAP}),l});jState('idle');jBusy=false;return;}
+  const r=await askTutor(q,l,p);if(r){qa.n++;save();}
+  uPush({who:'ai',text:r||ft('uNeedNet',l),l});jState(r?'happy':'idle');setTimeout(()=>{if(!jBusy)jState('idle');},1300);jBusy=false;}
+async function askTutor(q,l,p){
+  try{const hist=uChat().filter(m=>m.text).slice(-7,-1).map(m=>(m.who==='me'?'Student: ':'Ustad: ')+m.text).join('\n');
+    const prompt=`You are Ustad Jugnu, a kind, patient tutor for a Pakistani school student named ${p.name}, Class ${p.cls}, following the Khyber Pakhtunkhwa (KP) Textbook Board curriculum.
+Rules:
+- Reply ONLY in ${LNAME[l]}, the same language and script the student used. Technical terms and formulas may stay in English as in the textbook.
+- Teach, do not just hand over answers: explain step by step in simple words, give one small example, and for homework give a hint first and ask the student to try.
+- Keep it short: at most 6 short lines. No emojis. No dashes.
+- Only school study topics (Maths, Science, English, Urdu, Islamiyat, Pakistan Studies, General Knowledge, study tips). If the question is not about studies, kindly say so in one line and suggest a study topic.
+- Never discuss romance, adult content, violence, drugs or anything unsafe for a child. Never ask for personal details, addresses, photos or phone numbers.
+- If the student sounds upset or unsafe, gently tell them to talk to their parents or a trusted teacher now.
+Recent chat:
+${hist||'(none)'}
+Student's new message: """${q}"""
+Reply with only JSON like {"reply":"..."}`;
+    const r=await SAMPLE.json(prompt,{modelTier:'quick',cache:false});
+    return r&&typeof r.reply==='string'&&r.reply.trim()?r.reply.trim().slice(0,1200):null;
+  }catch(err){if(err&&['not_granted','unavailable','capability_disabled','capability_removed'].includes(err.code)){SAMPLE=null;updMode();}return null;}
+}
+function progressView(){const p=activeP();const w=weekSummary(p);const l=D.lang;
+  return `<div class="stack"><div class="page"><div class="shopname"><div><h1 dir="auto">${esc(fill(ft('pTitle'),{n:p.name}))}</h1><p class="soft small">${esc(ft('cls'))} <span class="num">${esc(p.cls)}</span></p></div></div>
+   <div class="tiles"><div class="tile"><small>${esc(ft('pWeek'))}</small><b class="num w">${w.days}/7</b></div><div class="tile"><small>${esc(ft('pAsked'))}</small><b class="num">${w.asked}</b></div><div class="tile"><small>${esc(ft('pQuiz'))}</small><b class="num">${w.quizzes}</b></div></div></div>
+   <div class="page"><h2 style="margin-top:0">${esc(ft('pBy'))}</h2>${w.subs.length?w.subs.map(x=>`<div class="sbar"><span>${esc(subName(x.k,l))}</span><div class="sb"><i style="width:${x.p}%;background:${x.p>=70?'var(--wasooli)':x.p>=60?'var(--amber)':'var(--udhaar)'}"></i></div><b class="num">${x.p}%</b></div>`).join(''):`<p class="soft">${esc(ft('pNone'))}</p>`}</div>
+   <div class="page"><pre class="rep" dir="auto">${esc(famReport(p,l))}</pre></div></div>`;}
+function famSection(){const st=students();const l=D.lang;
+  return `<div class="page stack"><h2 style="margin-top:0">${esc(ft('famTitle'))}</h2>${st.length?st.map(p=>{const tx=famReport(p,l);return `<pre class="rep" dir="auto">${esc(tx)}</pre><a class="btn wa full" href="https://wa.me/?text=${encodeURIComponent(tx)}" target="_blank" rel="noopener">${esc(ft('sendWa'))}</a>`;}).join(''):`<p class="soft">${esc(ft('noStu'))}</p>`}</div>`;}
+
+/* ================= modal ================= */
+function modal(html){$('modalHost').innerHTML=`<div class="modal" role="dialog" aria-modal="true"><div class="page stack">${html}</div></div>`;}
+function closeModal(){$('modalHost').innerHTML='';}
+
+/* ================= canvas documents (receipt + statement) ================= */
+const DOCFONT={ur:'"Noto Nastaliq Urdu"',ps:'"Noto Naskh Arabic"',en:'Sora',roman:'Sora'};
+async function fontsReady(){
+  const f=DOCFONT[D.lang]||'Sora';
+  try{await Promise.all([document.fonts.load(`700 40px ${f}`,'اردو پښتو Aa'),document.fonts.load(`400 30px ${f}`,'اردو پښتو Aa'),document.fonts.load('700 40px Sora','Rs 0123'),document.fonts.load('400 28px Sora','Rs 0123')]);await document.fonts.ready;}catch(e){}
+}
+function mkCtx(w,h){const c=document.createElement('canvas');c.width=w;c.height=h;const x=c.getContext('2d');x.fillStyle='#FFFFFF';x.fillRect(0,0,w,h);x.textBaseline='middle';return{c,x};}
+function F(size,weight,latin){return `${weight||400} ${size}px ${latin?'Sora':(DOCFONT[D.lang]||'Sora')}, Sora, sans-serif`;}
+function txt(x,s,px,py,o){o=o||{};x.save();x.font=F(o.size||28,o.weight,o.latin);x.fillStyle=o.color||'#1F1A17';x.direction=o.latin?'ltr':(isRTL()?'rtl':'ltr');x.textAlign=o.align||'left';x.fillText(s,px,py,o.max||undefined);x.restore();}
+function line(x,x1,y1,x2,y2,c,w,dash){x.save();x.strokeStyle=c||'#D8C9A6';x.lineWidth=w||2;if(dash)x.setLineDash(dash);x.beginPath();x.moveTo(x1,y1);x.lineTo(x2,y2);x.stroke();x.restore();}
+function docHeader(x,W,title,sub){
+  x.fillStyle='#5E1A1A';x.fillRect(0,0,W,190);x.fillStyle='#E2B04A';x.fillRect(0,190,W,8);
+  const s=D.shop,r=isRTL(),edge=r?W-60:60,far=r?60:W-60;
+  txt(x,s.name,edge,72,{size:46,weight:700,color:'#FFF6E3',align:r?'right':'left',max:W-420});
+  const contact=[s.city,s.jc?`JazzCash ${s.jc}`:'',s.ep?`Easypaisa ${s.ep}`:''].filter(Boolean).join('   ·   ');
+  txt(x,contact,edge,140,{size:24,color:'#F6DFA6',align:r?'right':'left',max:W-360,latin:!/[؀-ۿ]/.test(s.city||'')});
+  txt(x,title,far,72,{size:44,weight:700,color:'#E2B04A',align:r?'left':'right'});
+  if(sub)txt(x,sub,far,140,{size:24,color:'#F6DFA6',align:r?'left':'right',latin:true});
+}
+function docFooter(x,W,H,pg){
+  line(x,60,H-90,W-60,H-90,'#E2B04A',3);
+  const r=isRTL();txt(x,t('made'),r?W-60:60,H-55,{size:22,color:'#4A3F36',align:r?'right':'left'});
+  txt(x,'jugnu · ConceptAI'+(pg?`   ${pg}`:''),r?60:W-60,H-55,{size:20,color:'#4A3F36',align:r?'left':'right',latin:true});
+}
+async function receiptCanvas(e){
+  await fontsReady();
+  const W=1240,H=1240,{c,x}=mkCtx(W,H),r=isRTL(),cu=cust(e.cid);
+  const edge=r?W-80:80,far=r?80:W-80,A=r?'right':'left',B=r?'left':'right';
+  docHeader(x,W,t('receipt'),`${t('receiptNo')==='Receipt no.'?'No.':'#'} R-${String(e.rno||0).padStart(4,'0')}   ${dmy(e.date)}`);
+  const rowsY=[300,400,500];
+  const lab=(s,y)=>txt(x,s,edge,y,{size:28,color:'#4A3F36',align:A});
+  lab(t('from'),rowsY[0]);txt(x,cu?cu.name:'',far,rowsY[0],{size:38,weight:700,align:B,latin:!/[؀-ۿ]/.test(cu?.name||'')});line(x,80,rowsY[0]+45,W-80,rowsY[0]+45,'#E6D9BC',2,[6,6]);
+  lab(t('method'),rowsY[1]);txt(x,e.note||t('cash'),far,rowsY[1],{size:32,align:B,latin:!/[؀-ۿ]/.test(e.note||t('cash'))});line(x,80,rowsY[1]+45,W-80,rowsY[1]+45,'#E6D9BC',2,[6,6]);
+  lab(t('date'),rowsY[2]);txt(x,dmy(e.date),far,rowsY[2],{size:32,align:B,latin:true});line(x,80,rowsY[2]+45,W-80,rowsY[2]+45,'#E6D9BC',2,[6,6]);
+  // amount box
+  x.fillStyle='#FBF3DE';x.fillRect(80,600,W-160,190);x.strokeStyle='#17643A';x.lineWidth=4;x.strokeRect(80,600,W-160,190);
+  txt(x,t('amtRecv'),edge+(r?-30:30),655,{size:30,color:'#4A3F36',align:A});
+  txt(x,rs(e.amount),W/2,730,{size:76,weight:700,color:'#17643A',align:'center',latin:true});
+  const remain=balanceAfter(e);
+  txt(x,t('remain'),edge,860,{size:30,color:'#4A3F36',align:A});
+  txt(x,rs(remain)+(remain<0?' (advance)':''),far,860,{size:40,weight:700,color:remain>0?'#A61E14':'#17643A',align:B,latin:true});
+  // signature + stamp
+  line(x,r?80:W-480,1030,r?480:W-80,1030,'#1F1A17',2);
+  txt(x,t('sign'),r?280:W-280,1065,{size:24,color:'#4A3F36',align:'center'});
+  txt(x,t('thanks'),edge,1040,{size:28,color:'#5E1A1A',align:A,weight:600});
+  x.save();x.translate(W/2,960);x.rotate(-0.12);x.strokeStyle='rgba(23,100,58,.55)';x.lineWidth=5;x.strokeRect(-130,-48,260,96);x.restore();
+  txt(x,'PAID',W/2,955,{size:46,weight:700,color:'rgba(23,100,58,.6)',align:'center',latin:true});
+  docFooter(x,W,H);
+  x.strokeStyle='#D8C9A6';x.lineWidth=3;x.setLineDash([14,10]);x.strokeRect(20,20,W-40,H-40);
+  return c;
+}
+async function statementCanvases(cid){
+  await fontsReady();
+  const cu=cust(cid),es=entriesOf(cid),W=1240,H=1754,per=26,pages=Math.max(1,Math.ceil(es.length/per)),out=[],r=isRTL();
+  // column layout in reading order: no, date, detail, credit, received, balance
+  const widths=[80,170,370,190,190,120+0];const total=W-120;widths[5]=total-widths.slice(0,5).reduce((a,b)=>a+b,0);
+  const cols=[];let pos=60;for(const w of widths){cols.push({x:pos,w});pos+=w;}
+  const colX=i=>{const c=cols[i];return r?{x:W-c.x-c.w,w:c.w}:c;};
+  const head=[t('colNo'),t('colDate'),t('colDet'),t('colCr'),t('colRv'),t('colBal')];
+  let run=0,tc=0,tr=0,idx=0;
+  for(let p=0;p<pages;p++){
+    const {c,x}=mkCtx(W,H);
+    docHeader(x,W,t('statement'),dmy(todayISO()));
+    const isLatinName=!/[؀-ۿ]/.test(cu.name);
+    txt(x,cu.name,r?W-60:60,260,{size:40,weight:700,align:r?'right':'left',latin:isLatinName});
+    if(cu.phone)txt(x,cu.phone,r?60:W-60,260,{size:26,color:'#4A3F36',align:r?'left':'right',latin:true});
+    let y=330;
+    x.fillStyle='#F4E8CC';x.fillRect(60,y,W-120,64);line(x,60,y+64,W-60,y+64,'#C0392B',4);
+    head.forEach((h,i)=>{const cc=colX(i);txt(x,h,cc.x+cc.w/2,y+33,{size:24,weight:700,color:'#5E1A1A',align:'center'});});
+    y+=64;
+    const rowH=44;
+    for(let k=0;k<per&&idx<es.length;k++,idx++){
+      const e=es[idx],sg=SIGN[e.type];run+=sg*e.amount;if(sg>0)tc+=e.amount;else tr+=e.amount;
+      if(k%2===1){x.fillStyle='#FFFBF0';x.fillRect(60,y,W-120,rowH);}
+      const cells=[String(idx+1),dmy(e.date),t(e.type+'S')+(e.note?' · '+e.note:''),sg>0?num(e.amount):'',sg<0?num(e.amount):'',num(run)+(run<0?' ↓':'')];
+      cells.forEach((v,i)=>{const cc=colX(i);const isTxt=i===2;const latin=i!==2||!/[؀-ۿ]/.test(v);
+        txt(x,v,isTxt?(r?cc.x+cc.w-12:cc.x+12):cc.x+cc.w/2,y+rowH/2,{size:isTxt?22:24,align:isTxt?(r?'right':'left'):'center',latin,color:i===3?'#A61E14':i===4?'#17643A':'#1F1A17',weight:i===5?700:400,max:cc.w-20});});
+      line(x,60,y+rowH,W-60,y+rowH,'#E6D9BC',2);y+=rowH;
+    }
+    // red margin + column rules
+    const top=330,bottom=y;cols.forEach((cc0,i)=>{if(i===0)return;const cc=colX(i);const lx=r?cc.x+cc.w:cc.x;line(x,lx,top,lx,bottom,i===1?'#C0392B':'#E6D9BC',i===1?3:2);});
+    x.strokeStyle='#D8C9A6';x.lineWidth=2;x.strokeRect(60,top,W-120,bottom-top);
+    if(p===pages-1){
+      y+=30;x.fillStyle='#FBF3DE';x.fillRect(60,y,W-120,170);line(x,60,y,W-60,y,'#1F1A17',3);line(x,60,y+170,W-60,y+170,'#1F1A17',3);line(x,60,y+176,W-60,y+176,'#1F1A17',3);
+      const L=(lab,val,yy,col)=>{txt(x,lab,r?W-90:90,yy,{size:28,color:'#4A3F36',align:r?'right':'left'});txt(x,val,r?90:W-90,yy,{size:32,weight:700,color:col,align:r?'left':'right',latin:true});};
+      L(t('totCr'),rs(tc),y+40,'#A61E14');L(t('totRv'),rs(tr),y+90,'#17643A');
+      const b=balance(cid);L(b>=0?t('owesMe'):t('iOwe'),rs(b),y+140,b>0?'#A61E14':'#17643A');
+      const pay=[D.shop.jc?`JazzCash ${D.shop.jc}`:'',D.shop.ep?`Easypaisa ${D.shop.ep}`:'',D.shop.iban?`IBAN ${D.shop.iban}`:''].filter(Boolean).join('   ·   ');
+      if(pay)txt(x,pay,W/2,y+240,{size:24,color:'#5E1A1A',align:'center',latin:true});
+    }
+    docFooter(x,W,H,`${p+1}/${pages}`);
+    out.push(c);
+  }
+  return out;
+}
+async function canvasesToPdf(canvases,wmm,hmm){
+  const J=window.jspdf&&window.jspdf.jsPDF;if(!J)return null;
+  const doc=new J({unit:'mm',format:[wmm,hmm],orientation:wmm>hmm?'l':'p'});
+  canvases.forEach((c,i)=>{if(i)doc.addPage([wmm,hmm],wmm>hmm?'l':'p');doc.addImage(c.toDataURL('image/jpeg',0.92),'JPEG',0,0,wmm,hmm);});
+  return doc.output('blob');
+}
+async function saveBlob(name,blob){
+  try{if(inViewer()){const dl=await window.claude.use('downloads');if(dl){await dl.save({filename:name,data:blob});return true;}}}catch(e){if(e&&e.code==='declined')return false;}
+  try{const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},1500);return true;}catch(e){toast('Download failed');return false;}
+}
+function docModal(title,canvases,base,wmm,hmm,custObj){
+  const img=canvases[0].toDataURL('image/png');
+  modal(`<h1>${esc(title)}</h1><img class="preview" src="${img}" alt="${esc(title)}">${canvases.length>1?`<p class="note"><span class="num">${canvases.length}</span> ${esc(t('page'))}</p>`:''}
+    <button class="btn full" data-act="docPdf">${ICON.rcpt} ${esc(t(base==='receipt'?'pdfR':'pdfS'))}</button>
+    <div class="row"><button class="btn wa" data-act="docShare" style="flex:1">${ICON.share} ${esc(jt('share'))}</button><button class="btn ghost" data-act="docPrint" style="flex:1">${ICON.print} ${esc(jt('print'))}</button></div>
+    <button class="btn ghost full" data-act="docImg">${esc(t('img'))}</button>
+    ${inViewer()?`<p class="note">${esc(jt('viewer'))}</p>`:''}
+    <button class="btn ghost full" data-act="closeModal">${esc(t('cancel'))}</button>`);
+  window.__doc={canvases,base,wmm,hmm,custObj};
+}
+async function docAction(kind){
+  const d=window.__doc;if(!d)return;const stamp=todayISO();const nm=(d.custObj?.name||'').replace(/[^\w؀-ۿ]+/g,'-');
+  if(kind==='pdf'){toast(t('making'));const blob=await canvasesToPdf(d.canvases,d.wmm,d.hmm);if(!blob){toast('PDF tool not loaded. Saving image.');return docAction('img');}await saveBlob(`${d.base}-${nm}-${stamp}.pdf`,blob);}
+  if(kind==='img'){const blob=await new Promise(r=>d.canvases[0].toBlob(r,'image/png'));await saveBlob(`${d.base}-${nm}-${stamp}.png`,blob);}
+  if(kind==='print'){
+    if(inViewer()){toast(jt('viewer'));return;}
+    const blob=await canvasesToPdf(d.canvases,d.wmm,d.hmm);
+    if(blob){const url=URL.createObjectURL(blob);const w=window.open(url,'_blank');if(w){setTimeout(()=>{try{w.print();}catch(e){}},900);return;}}
+    $('printArea').innerHTML=d.canvases.map(c=>`<img src="${c.toDataURL('image/png')}" alt="">`).join('');setTimeout(()=>window.print(),300);
+  }
+  if(kind==='share'){
+    if(inViewer()){toast(jt('viewer'));return;}
+    const title=t(d.base==='receipt'?'receipt':'statement')+' · '+(D.shop?.name||'');
+    try{
+      const pdf=await canvasesToPdf(d.canvases,d.wmm,d.hmm);
+      if(pdf){const f=new File([pdf],`${d.base}-${nm}-${stamp}.pdf`,{type:'application/pdf'});if(navigator.canShare&&navigator.canShare({files:[f]})){await navigator.share({files:[f],title});return;}}
+      const png=await new Promise(r=>d.canvases[0].toBlob(r,'image/png'));const f2=new File([png],`${d.base}-${nm}.png`,{type:'image/png'});
+      if(navigator.canShare&&navigator.canShare({files:[f2]})){await navigator.share({files:[f2],title});return;}
+      toast(jt('noShare'));
+    }catch(e){if(e&&e.name!=='AbortError')toast(jt('noShare'));}
+  }
+}
+
+/* ================= reminders ================= */
+function reminderText(c){
+  const s=D.shop,b=balance(c.id);
+  const pay=[s.jc?`JazzCash: ${s.jc}`:'',s.ep?`Easypaisa: ${s.ep}`:'',s.iban?`Bank/Raast: ${s.iban}`:''].filter(Boolean).join('\n');
+  const recent=entriesOf(c.id).slice(-3).map(e=>`${dmy(e.date)}  ${t(e.type+'S')}  ${rs(e.amount)}`).join('\n');
+  const L={
+    ur:`السلام علیکم ${c.name}،\n${s.name} پر آپ کا بقایا ${rs(b)} ہے۔\n\nآخری اندراج:\n${recent}\n${pay?`\nآپ سیدھا یہاں ادائیگی کر سکتے ہیں:\n${pay}\n`:''}\nادائیگی کے بعد اسی نمبر پر بتا دیں۔ شکریہ!`,
+    ps:`السلام علیکم ${c.name}،\nپه ${s.name} کې ستاسو پاتې پور ${rs(b)} دی.\n\nوروستۍ لیکنې:\n${recent}\n${pay?`\nتاسو کولی شئ مستقیم دلته پیسې ولېږئ:\n${pay}\n`:''}\nد پیسو له لېږلو وروسته په همدې شمېره خبر راکړئ. مننه!`,
+    en:`Assalam o alaikum ${c.name},\nYour balance at ${s.name} is ${rs(b)}.\n\nRecent:\n${recent}\n${pay?`\nYou can pay directly:\n${pay}\n`:''}\nPlease reply here after paying. Thank you!`,
+    roman:`Assalam o alaikum ${c.name},\n${s.name} par aap ka baqaya ${rs(b)} hai.\n\nAakhri indraaj:\n${recent}\n${pay?`\nAap seedha yahan payment kar sakte hain:\n${pay}\n`:''}\nPayment ke baad isi number par bata dein. Shukriya!`};
+  return L[D.lang]||L.roman;
+}
+
+/* ================= binding & actions ================= */
+function shopFromForm(){return{name:$('sName').value.trim(),owner:$('sOwner').value.trim(),city:$('sCity').value.trim(),jc:$('sJc').value.trim(),ep:$('sEp').value.trim(),iban:$('sIban').value.trim()};}
+function bindAfter(){
+  const sf=$('setupForm');if(sf)sf.onsubmit=e=>{e.preventDefault();D.shop=Object.assign(shopFromForm(),{created:Date.now()});save();S.chat=[];go('jugnu');toast(t('savedShop'));};
+  const qf=$('quickForm');if(qf)qf.onsubmit=e=>{e.preventDefault();const v=$('quick').value.trim();if(!v)return;const p=parseEntry(v);if(!p){toast(t('parseFail'));return;}S.cid=null;go('entry',{draft:Object.assign(p,{fromQuick:true,raw:v})});};
+  const sr=$('search');if(sr)sr.oninput=()=>{S.q=sr.value;const pos=sr.selectionStart;render();const n=$('search');if(n){n.focus();n.setSelectionRange(pos,pos);}};
+  const ef=$('entryForm');if(ef){const nm=$('eName'),ty=$('eType');
+    nm.onchange=()=>{const c=findByName(nm.value);if(c&&c.type==='supplier'&&(ty.value==='credit'||ty.value==='payment'))ty.value=ty.value==='credit'?'goods':'paid';};
+    ef.onsubmit=e=>{e.preventDefault();const name=nm.value.trim(),amount=Math.round(parseFloat(toAsciiDigits(String($('eAmt').value)).replace(/[^\d.]/g,'')));
+      if(!name||!amount||amount<=0){toast(t('nameAmt'));return;}
+      const type=ty.value,date=$('eDate').value||todayISO(),note=$('eNote').value.trim();
+      const d=S.draft||{};const {c,saved}=commitEntry({id:d.id,name,amount,type,date,note});
+      if(d.fromJugnu){const dr=S.drafts[d.fromJugnu];if(dr)Object.assign(dr,{status:'yes',name:c.name,amount,type,date,note});go('jugnu',{draft:null});jSaved(c,saved,dr?dr.l:D.lang);return;}
+      go('customer',{cid:c.id,draft:null});toast(t('saved'),true);
+      if(!c.phone)setTimeout(()=>{if(S.screen==='customer'&&S.cid===c.id)editCustModal();},450);
+    };}
+  const shf=$('shopForm');if(shf)shf.onsubmit=e=>{e.preventDefault();D.shop=Object.assign(D.shop,shopFromForm());save();toast(t('savedShop'));go('home');};
+  const imp=$('importFile');if(imp)imp.onchange=()=>{const f=imp.files&&imp.files[0];if(!f)return;const rd=new FileReader();rd.onload=()=>restoreFrom(String(rd.result));rd.readAsText(f);};
+}
+function restoreFrom(txt){try{const d=JSON.parse(txt);if(!d||!Array.isArray(d.customers)||!Array.isArray(d.entries))throw 0;window.__restore=d;
+  modal(`<h1>${esc(t('backup'))}</h1><p class="soft"><span class="num">${d.customers.length}</span> · <span class="num">${d.entries.length}</span> ${esc(t('entries'))}</p><div class="row"><button class="btn" data-act="doRestore" style="flex:1">OK</button><button class="btn ghost" data-act="closeModal">${esc(t('cancel'))}</button></div>`);}catch(e){toast('Invalid backup');}}
+function editCustModal(){const c=cust(S.cid);if(!c)return;
+  modal(`<h1>${esc(c.name)}</h1><form id="custForm" class="stack"><div><label for="cName">${esc(t('name'))}</label><input id="cName" dir="auto" required value="${esc(c.name)}"></div><div><label for="cPhone">${esc(t('phone'))}</label><input id="cPhone" inputmode="tel" dir="ltr" value="${esc(c.phone||'')}" placeholder="0300 1234567"></div><div><label for="cType">${esc(t('kind'))}</label><select id="cType"><option value="customer" ${c.type==='customer'?'selected':''}>${esc(t('customer'))}</option><option value="supplier" ${c.type==='supplier'?'selected':''}>${esc(t('supplier'))}</option></select></div><div class="row"><button class="btn" type="submit" style="flex:1">${esc(t('saveCust'))}</button><button class="btn ghost" type="button" data-act="closeModal">${esc(t('cancel'))}</button></div></form>`);
+  $('custForm').onsubmit=e=>{e.preventDefault();c.name=cap($('cName').value)||c.name;c.phone=$('cPhone').value.trim();c.type=$('cType').value;save();closeModal();render();};}
+function download(name,text,type){saveBlob(name,new Blob([text],{type}));}
+async function copyText(txt,ok){try{await navigator.clipboard.writeText(txt);toast(ok||'Copied');}catch(e){modal(`<textarea id="cpy" readonly style="min-height:180px" dir="auto">${esc(txt)}</textarea><button class="btn ghost full" data-act="closeModal">OK</button>`);const ta=$('cpy');ta.focus();ta.select();}}
+function loadDemo(){
+  const today=new Date(),ago=n=>todayISO(new Date(today.getTime()-n*86400000)),L=D.lang||'ur';
+  const N={ur:['علی جنرل سٹور (نمونہ)','محمد علی','مردان','احمد','بلال','سعدیہ باجی','حاجی صاحب','نقد','جاز کیش'],ps:['علي جنرل سټور (نمونه)','محمد علي','مردان','احمد','بلال','سعدیه باجي','حاجي صاحب','نغدې','جاز کیش'],en:['Ali General Store (demo)','Muhammad Ali','Mardan','Ahmed','Bilal','Sadia Baji','Haji Sahib','Cash','JazzCash'],roman:['Ali General Store (demo)','Muhammad Ali','Mardan','Ahmed','Bilal','Sadia Baji','Haji Sahib','Naqad','JazzCash']}[L];
+  if(!D.shop)D.shop={name:N[0],owner:N[1],city:N[2],jc:'0300 0000000',ep:'0345 0000000',iban:'',created:Date.now(),demo:true};
+  const mk=(name,phone,type)=>{const c={id:uid(),name,phone,type,created:Date.now(),demo:true};D.customers.push(c);return c;};
+  let k=0;const add=(c,type,amount,date,note)=>{const e={id:uid(),cid:c.id,type,amount,date,note:note||'',created:Date.now()-1e6+(k++)*1000,demo:true};if(type==='payment')e.rno=D.seq++;D.entries.push(e);};
+  const a=mk(N[3],'0300 1111111','customer');add(a,'credit',3500,ago(12));add(a,'payment',1500,ago(9),N[7]);add(a,'credit',2000,ago(3));
+  const b=mk(N[4],'0301 2222222','customer');add(b,'credit',6200,ago(16));add(b,'credit',850,ago(11));add(b,'payment',2000,ago(5),N[8]);
+  const s=mk(N[5],'0302 3333333','customer');add(s,'credit',1250,ago(2));
+  const h=mk(N[6],'0303 4444444','supplier');add(h,'goods',25000,ago(10));add(h,'paid',10000,ago(7));
+  ensureProfiles();if(!students().length){const nm={ur:'علی',ps:'علي',en:'Ali',roman:'Ali'}[L];const td=n=>ago(n);
+    D.profiles.push({id:uid(),type:'student',name:nm,cls:'9',demo:true,stats:{days:[td(0),td(1),td(2),td(4),td(5)],asked:[td(0),td(0),td(1),td(2),td(2),td(4),td(5),td(5)],quizzes:[{d:td(1),sub:'maths',score:4,total:5},{d:td(2),sub:'physics',score:2,total:5},{d:td(4),sub:'biology',score:4,total:5},{d:td(5),sub:'maths',score:5,total:5}]}});}
+  save();S.chat=[];go('jugnu');
+}
+document.addEventListener('click',async e=>{
+  const lb=e.target.closest('[data-lang]');if(lb){D.lang=lb.dataset.lang;save();if(S.chat.length<=1)S.chat=[];render();return;}
+  const el=e.target.closest('[data-act]');if(!el)return;const act=el.dataset.act,id=el.dataset.id;
+  switch(act){
+    case 'home':S.cid=null;go('home',{draft:null});break;
+    case 'settings':go('settings');break;
+    case 'pilot':go('pilot');break;
+    case 'demo':loadDemo();break;
+    case 'newEntry':S.cid=null;go('entry',{draft:null});break;
+    case 'openCust':if(id)go('customer',{cid:id,draft:null});else go('home');break;
+    case 'addFor':{const c=cust(S.cid);go('entry',{draft:{name:c.name,amount:'',type:c.type==='supplier'?'goods':'credit',date:todayISO(),note:''}});break;}
+    case 'editCust':editCustModal();break;
+    case 'jhome':case 'jugnu':go('jugnu',{draft:null});break;
+    case 'tab':S.cid=null;go(el.dataset.t,{draft:null});break;
+    case 'jAsk':jSend(el.dataset.q);break;
+    case 'jOpen':closeModal();go('customer',{cid:id,draft:null});break;
+    case 'jRemind':{const c=cust(id);if(c)doRemind(c);break;}
+    case 'jStmt':{if(!cust(id))break;S.cid=id;toast(t('making'));const cs=await statementCanvases(id);docModal(t('statement'),cs,'statement',210,297,cust(id));break;}
+    case 'jYes':{const d=S.drafts[id];if(!d||d.status)break;const r=commitEntry(d);d.status='yes';jSaved(r.c,r.saved,d.l);break;}
+    case 'jEdit':{const d=S.drafts[id];if(!d||d.status)break;S.cid=null;go('entry',{draft:Object.assign({},d,{fromQuick:true,fromJugnu:id})});break;}
+    case 'profiles':profilesModal();break;
+    case 'pickProf':switchTo(id);break;
+    case 'addStu':addStuModal();break;
+    case 'setPin':if(isStudent())break;pinModal('set');break;
+    case 'rmPin':D.pin=null;save();closeModal();toast(ft('pinOff'));render();break;
+    case 'linkStu':linkModal(id);break;
+    case 'rmStu':if(isStudent())break;D.profiles=D.profiles.filter(p=>p.id!==id);if(D.active===id)D.active='p0';save();closeModal();render();break;
+    case 'togPlan':D.plan=D.plan==='family'?'free':'family';save();render();break;
+    case 'togConsent':D.consent=!D.consent;save();render();break;
+    case 'uAsk':uSend(el.dataset.q);break;
+    case 'uAns':{const [mi,o]=String(id).split(':').map(Number);uAnswerPick(mi,o);break;}
+    case 'uQuiz':if(!jBusy)startQuiz(id||'maths',D.lang);break;
+    case 'uProg':go('progress');break;
+    case 'jMore':jMore(id||D.lang);break;
+    case 'jNo':{const d=S.drafts[id];if(!d||d.status)break;d.status='no';jPush({who:'ai',text:jt('cancelled',d.l),l:d.l});break;}
+    case 'rowMenu':{const en=D.entries.find(x=>x.id===id);if(!en)break;
+      modal(`<h1>${esc(t(en.type+'S'))} · <span class="num">${rs(en.amount)}</span></h1><p class="soft small"><span class="num">${dmy(en.date)}</span>${en.note?' · '+esc(en.note):''}</p>
+        ${en.type==='payment'?`<button class="btn full" data-act="receipt" data-id="${en.id}">${ICON.rcpt} ${esc(t('pdfR'))}</button>`:''}
+        <button class="btn ghost full" data-act="editEntry" data-id="${en.id}">${ICON.pen} ${esc(t('edit'))}</button>
+        <button class="btn danger full" data-act="delEntry" data-id="${en.id}">${ICON.bin} ${esc(t('del'))}</button>
+        <button class="btn ghost full" data-act="closeModal">${esc(t('cancel'))}</button>`);break;}
+    case 'editEntry':{closeModal();const en=D.entries.find(x=>x.id===id);if(en)go('entry',{draft:{id:en.id,name:cust(en.cid).name,amount:en.amount,type:en.type,date:en.date,note:en.note}});break;}
+    case 'delEntry':modal(`<h1>${esc(t('delQ'))}</h1><div class="row"><button class="btn danger" data-act="doDel" data-id="${esc(id)}" style="flex:1">${esc(t('del'))}</button><button class="btn ghost" data-act="closeModal">${esc(t('cancel'))}</button></div>`);break;
+    case 'doDel':D.entries=D.entries.filter(x=>x.id!==id);save();closeModal();render();break;
+    case 'receipt':{const en=D.entries.find(x=>x.id===id);if(!en)break;toast(t('making'));const c=await receiptCanvas(en);D.receiptsMade=(D.receiptsMade||0)+1;save();docModal(t('receipt'),[c],'receipt',148,148,cust(en.cid));break;}
+    case 'statement':{toast(t('making'));const cs=await statementCanvases(S.cid);docModal(t('statement'),cs,'statement',210,297,cust(S.cid));break;}
+    case 'docPdf':docAction('pdf');break;
+    case 'docImg':docAction('img');break;
+    case 'docPrint':docAction('print');break;
+    case 'docShare':docAction('share');break;
+    case 'remind':{const c=cust(S.cid);if(c)doRemind(c);break;}
+    case 'closeModal':closeModal();break;
+    case 'exportCSV':{const rows=[['date','name','type','amount_pkr','signed','note','receipt_no']].concat(D.entries.slice().sort((a,b)=>a.date<b.date?-1:a.date>b.date?1:a.created-b.created).map(e=>[e.date,cust(e.cid)?.name||'',e.type,e.amount,SIGN[e.type]*e.amount,e.note||'',e.rno||'']));
+      download(`jugnu-khata-${todayISO()}.csv`,'﻿'+rows.map(r=>r.map(v=>`"${String(v).replace(/"/g,'""')}"`).join(',')).join('\n'),'text/csv');break;}
+    case 'exportJSON':download(`jugnu-backup-${todayISO()}.json`,JSON.stringify(D),'application/json');break;
+    case 'copyBackup':copyText(JSON.stringify(D),t('bkCopy'));break;
+    case 'pasteRestore':modal(`<h1>${esc(t('bkRestoreP'))}</h1><textarea id="pasteBox" dir="ltr"></textarea><div class="row"><button class="btn" data-act="doPaste" style="flex:1">${esc(t('go'))}</button><button class="btn ghost" data-act="closeModal">${esc(t('cancel'))}</button></div>`);break;
+    case 'doPaste':{const v=$('pasteBox').value;closeModal();restoreFrom(v);break;}
+    case 'doRestore':{const d=window.__restore;if(d){D=Object.assign(blank(),d);if(!D.seq)D.seq=1;save();closeModal();go('home');}break;}
+    case 'wipe':modal(`<h1>${esc(t('wipe'))}?</h1><div class="row"><button class="btn danger" data-act="doWipe" style="flex:1">${esc(t('del'))}</button><button class="btn ghost" data-act="closeModal">${esc(t('cancel'))}</button></div>`);break;
+    case 'doWipe':{const l=D.lang;D=blank();D.lang=l;save();closeModal();go('home');break;}
+    case 'copyPilot':copyText('Jugnu pilot report\n'+(window.__pilotRows||[]).map(r=>`${r[0]}: ${r[1]}`).join('\n'),t('copyRep'));break;
+  }
+});
+/* offline: once opened from the hosted link, the app and its tools are saved on the phone */
+if('serviceWorker' in navigator&&(location.protocol==='https:'||location.hostname==='localhost')&&!inViewer()){window.addEventListener('load',()=>{navigator.serviceWorker.register('sw.js').catch(()=>{});});}
+document.addEventListener('keydown',e=>{if((e.key==='Enter'||e.key===' ')&&e.target.matches&&e.target.matches('tr.tap')){e.preventDefault();e.target.click();}});
+render();
+</script>
