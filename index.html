@@ -359,6 +359,11 @@ body.jlight .pchip span[dir]{max-width:64px}
 .jamb p{margin:0 0 4px;font-weight:700;font-size:14px}
 .jamb .jnew{font-weight:400}
 .jamb .jpick{background:#FFFFFF;color:#0F1D18;border-color:#E2C277}
+.usyl{align-self:flex-start;border:1px dashed #3A5A7A;background:#0F1A26;color:#CFE3FA;border-radius:999px;padding:6px 12px;font:inherit;font-size:13px;cursor:pointer;min-height:36px;max-width:100%;text-align:start}
+body.jlight .usyl{background:#EAF2FB;border-color:#9DBCE0;color:#123E72}
+.urow{display:flex;gap:8px;flex-wrap:wrap}
+.uexam{border:1px solid #F2A516;background:#2A1E05;color:#FFD873;border-radius:999px;padding:6px 12px;font:inherit;font-size:13px;font-weight:700;cursor:pointer;min-height:36px}
+body.jlight .uexam{background:#FFF3D6;color:#6B4400}
 </style>
 
 <div class="wrap">
@@ -966,7 +971,7 @@ function settingsView(){
     <label for="importFile" class="btn ghost full" style="margin:0;color:var(--ink)">${esc(t('bkRestoreF'))}</label><input id="importFile" type="file" accept=".json,application/json,text/plain" hidden>
     <button class="btn ghost full" data-act="pasteRestore">${esc(t('bkRestoreP'))}</button></div>
    ${fbCardHTML()}
-   <div class="page stack"><h2 style="margin-top:0">${esc(t('danger'))}</h2><button class="btn danger full" data-act="wipe">${esc(t('wipe'))}</button><p class="note">Jugnu Munshi · ConceptAI · v0.12.3</p></div></div>`;
+   <div class="page stack"><h2 style="margin-top:0">${esc(t('danger'))}</h2><button class="btn danger full" data-act="wipe">${esc(t('wipe'))}</button><p class="note">Jugnu Munshi · ConceptAI · v0.13</p></div></div>`;
 }
 function pilotView(){
   const now=Date.now(),wk=7*86400000;
@@ -1311,11 +1316,11 @@ function profilesModal(){
 function addStuModal(){
   if(isStudent()){toast(ft('pinAsk'));return;}
   modal(`<h1>${esc(ft('addStu').replace('+ ',''))}</h1><form id="stuForm" class="stack"><div><label for="stName">${esc(ft('stuName'))}</label><input id="stName" dir="auto" required maxlength="30"></div>
-   <div><label for="stCls">${esc(ft('cls'))}</label><select id="stCls">${['5','6','7','8','9','10','11','12'].map(c=>`<option ${c==='9'?'selected':''}>${c}</option>`).join('')}</select></div>
+   <div><label for="stCls">${esc(ft('cls'))}</label><select id="stCls">${['1','2','3','4','5','6','7','8','9','10','11','12','O','A'].map(c=>`<option value="${c}" ${c==='9'?'selected':''}>${c==='O'?'O Level':c==='A'?'A Level':c}</option>`).join('')}</select></div>
    <p class="note">${esc(ft('pinHint'))}</p><div class="row"><button class="btn" type="submit" style="flex:1">${esc(ft('save'))}</button><button class="btn ghost" type="button" data-act="closeModal">${esc(t('cancel'))}</button></div></form>`);
   $('stuForm').onsubmit=e=>{e.preventDefault();const n=$('stName').value.trim();if(!n)return;ensureProfiles();if(students().length>=3){toast(ft('maxStu'));return;}
-    D.profiles.push({id:uid(),type:'student',name:cap(n),cls:$('stCls').value,created:Date.now(),stats:{days:[],asked:[],quizzes:[]}});save();closeModal();
-    if(!D.pin)setTimeout(()=>pinModal('set'),200);else{render();profilesModal();}};
+    const np={id:uid(),type:'student',name:cap(n),cls:$('stCls').value,created:Date.now(),stats:{days:[],asked:[],quizzes:[]}};D.profiles.push(np);save();closeModal();
+    setTimeout(()=>sylModal(np.id,()=>{if(!D.pin)setTimeout(()=>pinModal('set'),200);else{render();profilesModal();}}),150);};
 }
 function pinModal(mode,then){
   modal(`<h1>${esc(mode==='set'?ft('pinNew'):ft('pinAsk'))}</h1>${mode==='set'?`<p class="note">${esc(ft('pinHint'))}</p>`:''}<form id="pinForm" class="stack"><input id="pinIn" inputmode="numeric" pattern="[0-9]{4}" maxlength="4" dir="ltr" autocomplete="off" style="font-size:28px;letter-spacing:.5em;text-align:center" required>
@@ -1349,9 +1354,137 @@ function aiQuota(){const td=todayISO();if(!D.aiDay||D.aiDay.d!==td)D.aiDay={d:td
 /* ---- Ustad screen ---- */
 function uChat(){const p=activeP();S.uchat=S.uchat||{};return S.uchat[p.id]=S.uchat[p.id]||[];}
 function profChip(){const p=activeP();return `<button class="pchip" data-act="profiles" aria-label="${esc(ft('prof'))}"><span class="pav ${p.type}">${esc((pName(p)||'?').trim().charAt(0).toUpperCase())}</span><span dir="auto">${esc(pName(p))}</span> ▾</button>`;}
+/* v0.13 Ustad syllabus: class, board, medium, group, exam board; teaches from that exact syllabus */
+Object.assign(SUBJ,{urdu:{roman:'Urdu',ur:'اردو',ps:'اردو',en:'Urdu'},pashto:{roman:'Pashto',ur:'پشتو',ps:'پښتو',en:'Pashto'},islamiat:{roman:'Islamiat',ur:'اسلامیات',ps:'اسلامیات',en:'Islamiat'},pakst:{roman:'Pak Studies',ur:'مطالعہ پاکستان',ps:'د پاکستان پېژندنه',en:'Pakistan Studies'},cs:{roman:'Computer',ur:'کمپیوٹر',ps:'کمپیوټر',en:'Computer Science'},gsci:{roman:'General Science',ur:'جنرل سائنس',ps:'عمومي ساینس',en:'General Science'}});
+const SYL_T={
+ roman:{sylT:'Syllabus / Board',clsL:'Class',boardL:'Syllabus',bkp:'KP Textbook Board (sarkari aur zyada tar private schools)',bfed:'Federal Board (FBISE)',bcam:'Cambridge (O / A Level)',baku:'Aga Khan Board (AKU-EB)',bown:'School ki apni kitabein',bookL:'Kitab ya series ka naam',medL:'Medium',men:'English',mur:'Urdu',grpL:'Group',gbio:'Science (Biology)',gcs:'Science (Computer)',garts:'Arts / General',examL:'Exam board',sylBtn:'Syllabus chunein',sylAsk:'Pehle apna syllabus chun lein, taake main bilkul aap ki kitabon ke mutabiq parhaun.',sylSaved:'Syllabus save ho gaya.',sylChange:'Syllabus badlein',newBooks:'Naye curriculum (NCP 2026) ki kitabein March 2027 se',oLev:'O Level',aLev:'A Level'},
+ ur:{sylT:'نصاب / بورڈ',clsL:'جماعت',boardL:'نصاب',bkp:'کے پی ٹیکسٹ بک بورڈ (سرکاری اور زیادہ تر پرائیویٹ اسکول)',bfed:'فیڈرل بورڈ (ایف بی آئی ایس ای)',bcam:'کیمبرج (او / اے لیول)',baku:'آغا خان بورڈ',bown:'اسکول کی اپنی کتابیں',bookL:'کتاب یا سیریز کا نام',medL:'میڈیم',men:'انگلش',mur:'اردو',grpL:'گروپ',gbio:'سائنس (بیالوجی)',gcs:'سائنس (کمپیوٹر)',garts:'آرٹس / جنرل',examL:'امتحانی بورڈ',sylBtn:'نصاب چنیں',sylAsk:'پہلے اپنا نصاب چن لیں، تاکہ میں بالکل آپ کی کتابوں کے مطابق پڑھاؤں۔',sylSaved:'نصاب محفوظ ہو گیا۔',sylChange:'نصاب بدلیں',newBooks:'نئے نصاب (این سی پی 2026) کی کتابیں مارچ 2027 سے',oLev:'او لیول',aLev:'اے لیول'},
+ ps:{sylT:'نصاب / بورډ',clsL:'ټولګی',boardL:'نصاب',bkp:'د خیبر پښتونخوا درسي کتابونو بورډ (دولتي او ډېری خصوصي)',bfed:'فیډرل بورډ',bcam:'کېمبرج (او / اې لیول)',baku:'آغا خان بورډ',bown:'د ښوونځي خپل کتابونه',bookL:'د کتاب یا سلسلې نوم',medL:'ژبه (میډیم)',men:'انګلیسي',mur:'اردو',grpL:'ګروپ',gbio:'ساینس (بیولوژي)',gcs:'ساینس (کمپیوټر)',garts:'آرټس / عمومي',examL:'د ازموینې بورډ',sylBtn:'نصاب وټاکئ',sylAsk:'لومړی خپل نصاب وټاکئ، چې ستاسو د کتابونو سره سم درس درکړم.',sylSaved:'نصاب خوندي شو.',sylChange:'نصاب بدل کړئ',newBooks:'د نوي نصاب (NCP 2026) کتابونه له مارچ 2027 نه',oLev:'او لیول',aLev:'اې لیول'},
+ en:{sylT:'Syllabus / board',clsL:'Class',boardL:'Syllabus',bkp:'KP Textbook Board (government and most private schools)',bfed:'Federal Board (FBISE)',bcam:'Cambridge (O / A Level)',baku:'Aga Khan Board (AKU-EB)',bown:"My school's own books",bookL:'Book or series name',medL:'Medium',men:'English',mur:'Urdu',grpL:'Group',gbio:'Science (Biology)',gcs:'Science (Computer)',garts:'Arts / General',examL:'Exam board',sylBtn:'Choose syllabus',sylAsk:'First choose your syllabus, so I teach exactly from your books.',sylSaved:'Syllabus saved.',sylChange:'Change syllabus',newBooks:'New curriculum (NCP 2026) books from March 2027',oLev:'O Level',aLev:'A Level'}};
+function st(k,l){l=l||D.lang||'roman';return (SYL_T[l]&&SYL_T[l][k])||SYL_T.roman[k]||k;}
+const EXAMB=['Peshawar','Mardan','Swat','Malakand','Abbottabad','Bannu','Kohat','D.I. Khan'];
+const NCP_START='2027-03-01';
+function hiCls(c){return ['9','10','11','12'].includes(String(c));}
+function sylOf(p){const s=Object.assign({board:'kp',medium:'en',group:'',exam:'',book:''},p.syl||{});s.cls=String((p.syl&&p.syl.cls)||p.cls||'9');return s;}
+function clsLabel(c,l){return c==='O'?st('oLev',l):c==='A'?st('aLev',l):c;}
+function sylShort(p,l){if(!p.syl)return '';const s=sylOf(p);const b={kp:'KP Board',fed:'Federal',cam:'Cambridge',aku:'AKU-EB',own:s.book||st('bown',l)}[s.board];
+  return [st('clsL',l)+' '+clsLabel(s.cls,l),b,s.board!=='cam'?st('m'+s.medium,l):'',hiCls(s.cls)&&s.group?st('g'+s.group,l):'',s.board==='kp'&&hiCls(s.cls)&&s.exam?s.exam:''].filter(Boolean).join(' · ');}
+function sylPrompt(p){const s=sylOf(p);const td=todayISO();const c=s.cls;
+  let cur;
+  if(s.board==='kp'){cur=hiCls(c)?(td>=NCP_START?'the Khyber Pakhtunkhwa (KP) Textbook Board books for the new National Curriculum of Pakistan (NCP) 2026, which KP adopted for classes 9 to 12 from March 2027':'the current Khyber Pakhtunkhwa (KP) Textbook Board books (the new NCP 2026 books start in March 2027; do not teach chapters only found in the new books)'):'the Khyber Pakhtunkhwa (KP) Textbook Board books';}
+  else if(s.board==='fed')cur='the Federal Board (FBISE, Islamabad) syllabus and National Curriculum textbooks';
+  else if(s.board==='cam')cur=(c==='A'?'the Cambridge International A Level':c==='O'?'the Cambridge O Level':'the Cambridge (CAIE) lower secondary')+' syllabus; use Cambridge exam style and command words (state, explain, describe, calculate)';
+  else if(s.board==='aku')cur='the Aga Khan University Examination Board (AKU-EB) SSC/HSSC syllabus; prefer understanding over memorising, as AKU-EB papers test concepts';
+  else cur='the school\'s own books'+(s.book?' ("'+String(s.book).slice(0,60)+'")':'')+'; if unsure of the exact chapter, teach the standard Pakistani curriculum for this class';
+  const cls=c==='O'?'O Level':c==='A'?'A Level':'Class '+c;
+  const bits=[cls+', following '+cur+'.'];
+  if(s.board!=='cam')bits.push('Medium: '+(s.medium==='ur'?'Urdu medium (use Urdu terms from the Urdu-medium textbook, with the English term in brackets once)':'English medium (use the English textbook terms)')+'.');
+  if(hiCls(c)&&s.group)bits.push('Group: '+{bio:'Science with Biology',cs:'Science with Computer Science',arts:'Arts / General'}[s.group]+'.');
+  if(s.board==='kp'&&hiCls(c)&&s.exam)bits.push('Exam board: BISE '+s.exam+' (when asked about exams, follow KP board paper style: objective MCQs plus short and long questions).');
+  bits.push('Pashto is a compulsory subject in KP schools, so help with Pashto too when asked.');
+  return bits.join(' ');}
+function sylModal(pid,afterNew){const p=D.profiles.find(x=>x.id===pid);if(!p)return;const s=sylOf(p);const l=D.lang;
+  const CL=['1','2','3','4','5','6','7','8','9','10','11','12','O','A'];
+  modal(`<h1>${esc(st('sylT'))}</h1><p class="soft small" dir="auto">${esc(p.name)}</p>
+   <form id="sylForm" class="stack">
+    <div><label for="syB">${esc(st('boardL'))}</label><select id="syB">${['kp','fed','cam','aku','own'].map(b=>`<option value="${b}" ${s.board===b?'selected':''}>${esc(st('b'+b))}</option>`).join('')}</select></div>
+    <div id="syBookW" ${s.board==='own'?'':'hidden'}><label for="syBook">${esc(st('bookL'))}</label><input id="syBook" dir="auto" maxlength="60" value="${esc(s.book)}" placeholder="Oxford, Peak, Paramount…"></div>
+    <div class="grid2"><div><label for="syC">${esc(st('clsL'))}</label><select id="syC">${CL.map(c=>`<option value="${c}" ${s.cls===c?'selected':''}>${esc(clsLabel(c,l))}</option>`).join('')}</select></div>
+     <div id="syMW"><label for="syM">${esc(st('medL'))}</label><select id="syM"><option value="en" ${s.medium==='en'?'selected':''}>${esc(st('men'))}</option><option value="ur" ${s.medium==='ur'?'selected':''}>${esc(st('mur'))}</option></select></div></div>
+    <div id="syHi" class="grid2"><div><label for="syG">${esc(st('grpL'))}</label><select id="syG">${['bio','cs','arts'].map(g=>`<option value="${g}" ${s.group===g?'selected':''}>${esc(st('g'+g))}</option>`).join('')}</select></div>
+     <div id="syEW"><label for="syE">${esc(st('examL'))}</label><select id="syE">${EXAMB.map(e=>`<option ${s.exam===e?'selected':''}>${e}</option>`).join('')}</select></div></div>
+    <p class="note" id="syNote"></p>
+    <div class="row"><button class="btn" type="submit" style="flex:1">${esc(ft('save'))}</button>${afterNew?'':`<button class="btn ghost" type="button" data-act="closeModal">${esc(t('cancel'))}</button>`}</div>
+   </form>`);
+  const sync=()=>{const b=$('syB').value,c=$('syC').value;$('syBookW').hidden=b!=='own';$('syMW').style.visibility=b==='cam'?'hidden':'visible';
+    $('syHi').hidden=!hiCls(c);$('syEW').style.visibility=b==='kp'?'visible':'hidden';
+    $('syNote').textContent=(b==='kp'&&hiCls(c)&&todayISO()<NCP_START)?st('newBooks'):'';
+    if(b==='cam'&&!['O','A'].includes(c)&&+c>=9)$('syC').value=+c>=11?'A':'O';};
+  ['syB','syC'].forEach(id=>$(id).onchange=sync);sync();
+  $('sylForm').onsubmit=e=>{e.preventDefault();const b=$('syB').value,c=$('syC').value;
+    p.syl={board:b,cls:c,medium:b==='cam'?'en':$('syM').value,group:hiCls(c)?$('syG').value:'',exam:b==='kp'&&hiCls(c)?$('syE').value:'',book:b==='own'?$('syBook').value.trim().slice(0,60):''};
+    p.cls=c;save();closeModal();toast(st('sylSaved'),true);render();if(afterNew&&typeof afterNew==='function')afterNew();};}
+
+/* v0.13 Exam tayyari: board-style practice tests (AI written, clearly labelled), answer marking, link to real past papers */
+const EX_T={
+ roman:{exBtn:'Exam tayyari',exT:'Exam tayyari',subL:'Subject',topL:'Chapter / topic (optional)',topPh:'Misaal: Chapter 3, ya Newton ke qawaneen',modeL:'Kya chahiye?',mMcq:'10 MCQs ka test (foran nateeja)',mShort:'Short + long sawal (main jawab check karunga)',go:'Shuru karein',making:'Board ke andaz mein paper bana raha hoon…',fail:'Abhi paper nahi ban saka. Thori der baad dobara koshish karein.',qOf:'Sawal {i} / {n}',right:'Shabash! Sahi jawab.',wrong:'Sahi jawab: {a}',done:'Test mukammal: {s} / {t} sahi.',again:'Naya test',papers:'Asli past papers dhoondein',note:'Ye practice sawal AI ne aap ke board ke andaz mein banaye hain, asli purane paper nahi.',shortIntro:'Ye sawal hal karein. Har jawab yahan likh kar bhejein, main board ke andaz mein marks dunga:',ansHint:'Jawab ke shuru mein sawal number likhein, jaise "Q2: ..."',stop:'Exam mode band',stopped:'Exam mode band ho gaya.',checking:'Jawab check kar raha hoon…',marks:'Marks: {m} / {t}',model:'Behtar jawab:'},
+ ur:{exBtn:'امتحان کی تیاری',exT:'امتحان کی تیاری',subL:'مضمون',topL:'باب / موضوع (اختیاری)',topPh:'مثال: باب 3، یا نیوٹن کے قوانین',modeL:'کیا چاہیے؟',mMcq:'10 ایم سی کیوز کا ٹیسٹ (فوری نتیجہ)',mShort:'مختصر اور تفصیلی سوال (میں جواب چیک کروں گا)',go:'شروع کریں',making:'بورڈ کے انداز میں پرچہ بنا رہا ہوں…',fail:'ابھی پرچہ نہیں بن سکا۔ تھوڑی دیر بعد دوبارہ کوشش کریں۔',qOf:'سوال {i} / {n}',right:'شاباش! صحیح جواب۔',wrong:'صحیح جواب: {a}',done:'ٹیسٹ مکمل: {s} / {t} صحیح۔',again:'نیا ٹیسٹ',papers:'اصل پرانے پرچے ڈھونڈیں',note:'یہ مشقی سوال اے آئی نے آپ کے بورڈ کے انداز میں بنائے ہیں، اصل پرانے پرچے نہیں۔',shortIntro:'یہ سوال حل کریں۔ ہر جواب یہاں لکھ کر بھیجیں، میں بورڈ کے انداز میں نمبر دوں گا:',ansHint:'جواب کے شروع میں سوال نمبر لکھیں، جیسے "Q2: ..."',stop:'امتحانی موڈ بند',stopped:'امتحانی موڈ بند ہو گیا۔',checking:'جواب چیک کر رہا ہوں…',marks:'نمبر: {m} / {t}',model:'بہتر جواب:'},
+ ps:{exBtn:'د ازموینې تیاری',exT:'د ازموینې تیاری',subL:'مضمون',topL:'څپرکی / موضوع (اختیاري)',topPh:'بېلګه: درېیم څپرکی',modeL:'څه غواړئ؟',mMcq:'د ۱۰ MCQs ازموینه (سمدستي پایله)',mShort:'لنډې او اوږدې پوښتنې (زه به ځوابونه وګورم)',go:'پیل کړئ',making:'د بورډ په ډول پرچه جوړوم…',fail:'اوس پرچه جوړه نه شوه. لږ وروسته بیا هڅه وکړئ.',qOf:'پوښتنه {i} / {n}',right:'شاباس! سم ځواب.',wrong:'سم ځواب: {a}',done:'ازموینه پوره شوه: {s} / {t} سم.',again:'نوې ازموینه',papers:'اصلي زاړه پرچې ولټوئ',note:'دا تمریني پوښتنې AI ستاسو د بورډ په ډول جوړې کړې، اصلي زاړه پرچې نه دي.',shortIntro:'دا پوښتنې حل کړئ. هر ځواب دلته ولیکئ، زه به د بورډ په ډول نمرې درکړم:',ansHint:'د ځواب په سر کې د پوښتنې شمېره ولیکئ، لکه "Q2: ..."',stop:'د ازموینې حالت بند',stopped:'د ازموینې حالت بند شو.',checking:'ځواب ګورم…',marks:'نمرې: {m} / {t}',model:'ښه ځواب:'},
+ en:{exBtn:'Exam prep',exT:'Exam preparation',subL:'Subject',topL:'Chapter / topic (optional)',topPh:"e.g. Chapter 3, or Newton's laws",modeL:'What do you want?',mMcq:'10-MCQ test (instant result)',mShort:'Short + long questions (I will mark your answers)',go:'Start',making:'Making a paper in your board style…',fail:'Could not make the paper right now. Please try again shortly.',qOf:'Question {i} / {n}',right:'Well done! Correct.',wrong:'Correct answer: {a}',done:'Test finished: {s} / {t} correct.',again:'New test',papers:'Find real past papers',note:'These practice questions are written by AI in your board style. They are not real past papers.',shortIntro:'Solve these. Send each answer here and I will mark it the way your board does:',ansHint:'Start your answer with the question number, like "Q2: ..."',stop:'Stop exam mode',stopped:'Exam mode stopped.',checking:'Checking your answer…',marks:'Marks: {m} / {t}',model:'Better answer:'}};
+function et(k,l){l=l||D.lang||'roman';return (EX_T[l]&&EX_T[l][k])||EX_T.roman[k]||k;}
+function examSubjects(p){const s=sylOf(p);const base=['maths','english','urdu','pashto','islamiat'];
+  if(!hiCls(s.cls)&&!['O','A'].includes(s.cls))return base.concat(+s.cls>=4?['gsci','pakst']:['gsci']);
+  const g=s.group==='cs'?['physics','chemistry','cs']:s.group==='arts'?['gsci','cs']:['physics','chemistry','biology'];return g.concat(base,['pakst']);}
+function subLang(sub,p){const s=sylOf(p);if(sub==='english')return 'English';if(sub==='urdu')return 'Urdu (Urdu script)';if(sub==='pashto')return 'Pashto (Pashto script)';
+  if(s.board==='cam')return 'English';return s.medium==='ur'?'Urdu (Urdu script), keeping scientific symbols and formulas as in the textbook':'English';}
+function examModal(){const p=activeP();const subs=examSubjects(p);const l=D.lang;
+  modal(`<h1>📝 ${esc(et('exT'))}</h1><p class="soft small" dir="auto">${esc(sylShort(p)||'')}</p>
+   <form id="exForm" class="stack"><div><label for="exS">${esc(et('subL'))}</label><select id="exS">${subs.map(k=>`<option value="${k}">${esc(subName(k,l))}</option>`).join('')}</select></div>
+   <div><label for="exTp">${esc(et('topL'))}</label><input id="exTp" dir="auto" maxlength="80" placeholder="${esc(et('topPh'))}"></div>
+   <div><label>${esc(et('modeL'))}</label><div class="seg" style="grid-template-columns:1fr"><button type="button" data-exm="mcq" aria-pressed="true">${esc(et('mMcq'))}</button><button type="button" data-exm="short" aria-pressed="false">${esc(et('mShort'))}</button></div></div>
+   <p class="note">${esc(et('note'))}</p>
+   <div class="row"><button class="btn" type="submit" style="flex:1">${esc(et('go'))}</button><button class="btn ghost" type="button" data-act="closeModal">${esc(t('cancel'))}</button></div></form>`);
+  let mode='mcq';document.querySelectorAll('[data-exm]').forEach(b=>b.onclick=()=>{mode=b.dataset.exm;document.querySelectorAll('[data-exm]').forEach(x=>x.setAttribute('aria-pressed',String(x===b)));});
+  $('exForm').onsubmit=e=>{e.preventDefault();const sub=$('exS').value,tp=$('exTp').value.trim().slice(0,80);closeModal();mode==='mcq'?examMcq(sub,tp):examShort(sub,tp);};}
+function examGate(l){if(!aiOn()){uPush({who:'ai',text:ft('uNeedNet',l),l});return false;}const qa=aiQuota();if(D.plan!=='family'&&qa.n>=STU_CAP){uPush({who:'ai',text:fill(ft('cap',l),{c:STU_CAP}),l});return false;}return true;}
+async function exAI(prompt){let r=null;try{r=await aiJSON(prompt,'@cf/openai/gpt-oss-120b');}catch(e){r=null;}return r;}
+async function examMcq(sub,tp){const p=activeP(),l=D.lang;if(jBusy||!examGate(l))return;jBusy=true;jState('thinking');
+  uPush({who:'me',text:'📝 '+subName(sub,l)+(tp?' · '+tp:''),l});uPush({who:'ai',text:et('making'),l});
+  const prompt=`You are an experienced Pakistani board examiner. The student: ${sylPrompt(p)}
+Write 10 ORIGINAL multiple choice questions for the subject "${SUBJ[sub]?SUBJ[sub].en:sub}"${tp?` on this chapter or topic: "${tp}"`:' covering the important chapters of this class'}, exactly in the style and difficulty of this student's board exam MCQ section. Mix easy, medium and hard. Each question has 4 options and exactly one correct option. Keep each question under 30 words.
+Language of questions and options: ${subLang(sub,p)}. Write the "why" explanation in ${LNAME[l]}, one short line.
+Do not copy real past papers word for word. No dashes. Reply with only JSON: {"questions":[{"q":"","options":["","","",""],"answer":0,"why":""}]}`;
+  const r=await exAI(prompt);const list=(r&&Array.isArray(r.questions)?r.questions:[]).filter(x=>x&&x.q&&Array.isArray(x.options)&&x.options.length===4&&Number.isInteger(+x.answer)&&+x.answer>=0&&+x.answer<4).slice(0,10)
+    .map(x=>({q:String(x.q).slice(0,300),o:x.options.map(o=>String(o).slice(0,120)),a:+x.answer,w:String(x.why||'').slice(0,240)}));
+  jBusy=false;jState('idle');
+  if(list.length<3){uPush({who:'ai',text:et('fail'),btns:[{act:'examOpen',id:'',label:et('again')}],l});return;}
+  const qa=aiQuota();qa.n++;save();
+  S.exam={pid:p.id,sub,tp,list,i:0,score:0};uPush({who:'ai',text:fill(et('qOf'),{i:1,n:list.length}),mcq:Object.assign({pick:null},list[0]),l});}
+function examPick(mi,o){const ch=uChat();const m=ch[mi];const E=S.exam;if(!m||!m.mcq||m.mcq.pick!=null||!E)return;const l=m.l||D.lang;
+  m.mcq.pick=o;const ok=o===m.mcq.a;if(ok)E.score++;
+  uPush({who:'ai',text:(ok?et('right'):fill(et('wrong'),{a:m.mcq.o[m.mcq.a]}))+(m.mcq.w?'\n'+m.mcq.w:''),l});
+  E.i++;
+  if(E.i<E.list.length){uPush({who:'ai',text:fill(et('qOf'),{i:E.i+1,n:E.list.length}),mcq:Object.assign({pick:null},E.list[E.i]),l});return;}
+  const p=D.profiles.find(x=>x.id===E.pid);if(p){const s=stuStats(p);s.quizzes.push({d:todayISO(),sub:E.sub,score:E.score,total:E.list.length});if(s.quizzes.length>200)s.quizzes.splice(0,s.quizzes.length-200);save();}
+  const r=E.score/E.list.length;uPush({who:'ai',text:fill(et('done'),{s:E.score,t:E.list.length})+'\n'+ft(r>=.8?'qGood':r>=.6?'qOk':'qLow',l),btns:[{act:'examOpen',id:'',label:et('again')},{act:'ePapers',id:E.sub,label:et('papers')}],l});
+  jState(r>=.6?'happy':'idle');S.exam=null;}
+async function examShort(sub,tp){const p=activeP(),l=D.lang;if(jBusy||!examGate(l))return;jBusy=true;jState('thinking');
+  uPush({who:'me',text:'📝 '+subName(sub,l)+(tp?' · '+tp:''),l});uPush({who:'ai',text:et('making'),l});
+  const prompt=`You are an experienced Pakistani board examiner. The student: ${sylPrompt(p)}
+Write an ORIGINAL practice set for the subject "${SUBJ[sub]?SUBJ[sub].en:sub}"${tp?` on: "${tp}"`:' from the important chapters of this class'} in the exact style of this student's board paper: 4 short questions (2 or 3 marks each) and 1 long question (5 to 8 marks, may have parts a and b).
+Language of the questions: ${subLang(sub,p)}. No dashes. Do not copy real past papers word for word.
+Reply with only JSON: {"questions":[{"q":"","marks":2}]} with the long question last.`;
+  const r=await exAI(prompt);const qs=(r&&Array.isArray(r.questions)?r.questions:[]).filter(x=>x&&x.q).slice(0,6).map(x=>({q:String(x.q).slice(0,500),m:Math.max(1,Math.min(10,Math.round(+x.marks)||2))}));
+  jBusy=false;jState('idle');
+  if(qs.length<2){uPush({who:'ai',text:et('fail'),btns:[{act:'examOpen',id:'',label:et('again')}],l});return;}
+  const qa=aiQuota();qa.n++;save();
+  S.examQ={pid:p.id,sub,qs};
+  uPush({who:'ai',text:et('shortIntro')+'\n\n'+qs.map((x,i)=>`Q${i+1} (${x.m}): ${x.q}`).join('\n\n')+'\n\n'+et('ansHint'),btns:[{act:'eStop',id:'',label:et('stop')},{act:'ePapers',id:sub,label:et('papers')}],l});}
+async function examMark(ans){const p=activeP(),l=detectLang(ans)||D.lang;const E=S.examQ;if(!E)return false;if(!examGate(l))return true;
+  jBusy=true;jState('thinking');uPush({who:'me',text:ans,l});uPush({who:'ai',text:et('checking'),l});
+  const prompt=`You are a fair Pakistani board examiner marking a student's answer. The student: ${sylPrompt(p)}
+Subject: ${SUBJ[E.sub]?SUBJ[E.sub].en:E.sub}. The questions were:
+${E.qs.map((x,i)=>`Q${i+1} (${x.m} marks): ${x.q}`).join('\n')}
+Student's answer (it may say which question, like "Q2"; if not, choose the question it answers): """${ans.slice(0,2500)}"""
+Mark it the way the board marking scheme would: key points, correct terms, steps for numericals. Be encouraging but honest.
+Write "feedback" and "model" in ${LNAME[l]}; technical terms may stay as in the textbook. Feedback: at most 3 short lines on what was good and what was missing. Model: a short ideal answer. No dashes.
+Reply with only JSON: {"q":2,"marks":1,"out_of":2,"feedback":"","model":""}`;
+  const r=await exAI(prompt);jBusy=false;
+  if(!r||r.feedback==null){jState('idle');uPush({who:'ai',text:et('fail'),l});return true;}
+  const qa=aiQuota();qa.n++;save();
+  const qn=Math.round(+r.q)||0,m=Math.max(0,+r.marks||0),t2=Math.max(1,+r.out_of||((E.qs[qn-1]||{}).m)||1);
+  uPush({who:'ai',text:(qn?'Q'+qn+' · ':'')+fill(et('marks'),{m:Math.min(m,t2),t:t2})+'\n'+String(r.feedback).slice(0,600)+(r.model?'\n\n'+et('model')+'\n'+String(r.model).slice(0,900):''),btns:[{act:'eStop',id:'',label:et('stop')}],l});
+  const s=stuStats(p);s.quizzes.push({d:todayISO(),sub:E.sub,score:Math.min(m,t2),total:t2});save();
+  jState(m/t2>=.6?'happy':'idle');return true;}
+function examPapers(sub){const p=activeP();const s=sylOf(p);
+  const b={kp:'BISE '+(s.exam||'KPK'),fed:'FBISE',cam:'Cambridge '+(s.cls==='A'?'A Level':'O Level'),aku:'AKU-EB',own:''}[s.board]||'';
+  const q=[b,s.cls==='O'||s.cls==='A'?'':'class '+s.cls,SUBJ[sub]?SUBJ[sub].en:sub,'past papers'].filter(Boolean).join(' ');
+  try{window.open('https://www.google.com/search?q='+encodeURIComponent(q),'_blank','noopener');}catch(e){}}
+
 function ustadView(){const p=activeP();
   return `<div class="jhome ustadT">
    <div class="jhero"><span class="ffw listening" id="jFF">${ffSVG()}</span><div><div class="jname">Ustad<small>jugnu</small></div><div class="jstat" id="jStat" aria-live="polite">${esc(jt('listening'))}</div><span class="jmode" id="jMode"></span><button class="jtheme" data-act="jTheme" aria-label="Light / dark">${jLight()?'☾':'☀'}</button></div>${profChip()}</div>
+   <div class="urow"><button class="usyl" data-act="sylOpen" data-id="${p.id}">📘 ${esc(sylShort(p)||st('sylBtn'))}</button><button class="uexam" data-act="examOpen">📝 ${esc(et('exBtn'))}</button></div>
    <div class="jchat" id="jChat" aria-live="polite"></div>
    <div class="jchips">${ft('uChips').map(q=>`<button class="jchip" data-act="uAsk" data-q="${esc(q)}" dir="auto">${esc(q)}</button>`).join('')}</div>
    <form class="jform" id="jForm"><label for="jIn" class="sr">Ustad</label><input id="jIn" dir="auto" autocomplete="off" enterkeyhint="send" placeholder="${esc(ft('uPh'))}"><button type="button" class="vbtn" data-rec="1" title="${esc(jt('vBtn'))}" aria-label="${esc(jt('vBtn'))}"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg></button><input type="file" accept="audio/*" hidden data-voice="1"><button class="btn" type="submit">${esc(t('go'))}</button></form>
@@ -1359,11 +1492,12 @@ function ustadView(){const p=activeP();
 function uMsgHTML(m,i){const l=m.l||D.lang;
   let h=`<div class="jmsg ${m.who==='me'?'jme':'jai'} l-${l}" dir="${RTL(l)?'rtl':'ltr'}">${esc(m.text||'')}`;
   if(m.quiz){const q=QB[m.quiz.qi];h+=`<div class="qcard" dir="ltr"><p class="qq">${esc(q[1])}</p>${q[2].map((o,j)=>{const st=m.quiz.pick==null?'':(j===q[3]?'ok':(j===m.quiz.pick?'bad':''));return `<button class="qopt ${st}" data-act="uAns" data-id="${i}:${j}" ${m.quiz.pick!=null?'disabled':''}>${esc(o)}</button>`;}).join('')}</div>`;}
+  if(m.mcq){const q=m.mcq;h+=`<div class="qcard" dir="auto"><p class="qq">${esc(q.q)}</p>${q.o.map((o,j)=>{const stt=q.pick==null?'':(j===q.a?'ok':(j===q.pick?'bad':''));return `<button class="qopt ${stt}" data-act="eAns" data-id="${i}:${j}" ${q.pick!=null?'disabled':''}>${esc(o)}</button>`;}).join('')}</div>`;}
   if(m.btns&&m.btns.length)h+=`<div class="jbtns">${m.btns.map(b=>`<button class="jchip" data-act="${b.act}" data-id="${esc(b.id||'')}">${esc(b.label)}</button>`).join('')}</div>`;
   return h+'</div>';}
 function renderU(){const c=$('jChat');if(!c)return;c.innerHTML=uChat().map(uMsgHTML).join('');c.scrollTop=c.scrollHeight;const cp=$('uCap');if(cp)cp.textContent=D.plan==='family'?ft('famNote'):fill(ft('aiLeft'),{u:aiQuota().n,c:STU_CAP});}
 function uPush(m){const ch=uChat();ch.push(m);if(ch.length>80)ch.splice(0,ch.length-80);renderU();}
-function ustadMount(){const ch=uChat();if(!ch.length)ch.push({who:'ai',text:fill(ft('uGreet'),{n:activeP().name}),l:D.lang});renderU();updMode();
+function ustadMount(){const ch=uChat();if(!ch.length){ch.push({who:'ai',text:fill(ft('uGreet'),{n:activeP().name}),l:D.lang});if(!activeP().syl)ch.push({who:'ai',text:st('sylAsk'),btns:[{act:'sylOpen',id:activeP().id,label:st('sylBtn')}],l:D.lang});}renderU();updMode();
   $('jForm').onsubmit=e=>{e.preventDefault();const v=$('jIn').value;$('jIn').value='';uSend(v);};setTimeout(()=>{if($('jFF')&&!jBusy)jState('idle');},1500);}
 function ustadAnswer(text,l){const s=' '+toAsciiDigits(text).toLowerCase()+' ';const n=activeP().name;
   if(RXU.care.test(s))return{text:fill(ft('care',l),{n})};
@@ -1385,9 +1519,10 @@ function uAnswerPick(mi,opt){const ch=uChat();const m=ch[mi];const Q=S.quiz;if(!
   else{stuStats(p).quizzes.push({d:todayISO(),sub:Q.sub,score:Q.score,total:Q.list.length});if(stuStats(p).quizzes.length>100)stuStats(p).quizzes.shift();save();
     const r=Q.score/Q.list.length;uPush({who:'ai',text:fill(ft('qDone',l),{s:Q.score,t:Q.list.length,m:ft(r>=.8?'qGood':r>=.6?'qOk':'qLow',l)}),btns:[{act:'uQuiz',id:Q.sub,label:subName(Q.sub,l)+' '+({ur:'کوئز',ps:'کوئز'}[l]||'quiz')},{act:'uProg',id:'',label:ft('progress',l)}],l});S.quiz=null;}
 }
-async function uSend(q){q=String(q||'').trim();if(!q||jBusy)return;jBusy=true;const l=detectLang(q);const p=activeP();
+async function uSend(q){q=String(q||'').trim();if(!q||jBusy)return;if(S.examQ&&S.examQ.pid===D.active){await examMark(q);return;}jBusy=true;const l=detectLang(q);const p=activeP();
   uPush({who:'me',text:q,l});markStudy(p,true);jState('thinking');await sleep(400);
-  const a=ustadAnswer(q,l);
+  let a=ustadAnswer(q,l);
+  if(!a.ai&&!a.quiz&&aiOn()&&String(a.text||'').startsWith(ft('fLead',l))&&/(samjh|explain|detail|tafseel|tafsil|kaise|kese|kaisay|kyun|kyon|process|describe|derive|prove|example|misaal|سمجھا|تفصیل|وضاحت|کیسے|کیوں|مثال|څنګه|ولې|تشریح|بېلګه)/i.test(q))a={ai:true};
   if(a.quiz){startQuiz(a.quiz,l);jBusy=false;jState('idle');return;}
   if(!a.ai){uPush({who:'ai',text:a.text,l});jState('happy');setTimeout(()=>{if(!jBusy)jState('idle');},1300);jBusy=false;return;}
   const qa=aiQuota();
@@ -1397,24 +1532,25 @@ async function uSend(q){q=String(q||'').trim();if(!q||jBusy)return;jBusy=true;co
   uPush({who:'ai',text:r||ft('uNeedNet',l),l});jState(r?'happy':'idle');setTimeout(()=>{if(!jBusy)jState('idle');},1300);jBusy=false;}
 async function askTutor(q,l,p){
   try{const hist=uChat().filter(m=>m.text).slice(-7,-1).map(m=>(m.who==='me'?'Student: ':'Ustad: ')+m.text).join('\n');
-    const prompt=`You are Ustad Jugnu, a kind, patient tutor for a Pakistani school student named ${p.name}, Class ${p.cls}, following the Khyber Pakhtunkhwa (KP) Textbook Board curriculum.
+    const prompt=`You are Ustad Jugnu, a kind, patient tutor for a Pakistani school student named ${p.name}. ${sylPrompt(p)}
 Rules:
 - Reply ONLY in ${LNAME[l]}, the same language and script the student used. Technical terms and formulas may stay in English as in the textbook.
 - Teach, do not just hand over answers: explain step by step in simple words, give one small example, and for homework give a hint first and ask the student to try.
 - Keep it short: at most 6 short lines. No emojis. No dashes.
-- Only school study topics (Maths, Science, English, Urdu, Islamiyat, Pakistan Studies, General Knowledge, study tips). If the question is not about studies, kindly say so in one line and suggest a study topic.
+- Only school study topics (Maths, Science, English, Urdu, Pashto, Islamiyat, Pakistan Studies, Computer, General Knowledge, exam preparation, study tips). If the question is not about studies, kindly say so in one line and suggest a study topic.
 - Never discuss romance, adult content, violence, drugs or anything unsafe for a child. Never ask for personal details, addresses, photos or phone numbers.
 - If the student sounds upset or unsafe, gently tell them to talk to their parents or a trusted teacher now.
 Recent chat:
 ${hist||'(none)'}
 Student's new message: """${q}"""
 Reply with only JSON like {"reply":"..."}`;
-    const r=await aiJSON(prompt);
+    let r=null;try{r=await aiJSON(prompt,'@cf/openai/gpt-oss-120b');}catch(e1){if(e1&&['not_granted','unavailable','capability_disabled','capability_removed'].includes(e1.code))throw e1;r=null;}
+    if(!r||typeof r.reply!=='string'||!r.reply.trim())r=await aiJSON(prompt);
     return r&&typeof r.reply==='string'&&r.reply.trim()?r.reply.trim().slice(0,1200):null;
   }catch(err){if(err&&['not_granted','unavailable','capability_disabled','capability_removed'].includes(err.code)){SAMPLE=null;updMode();}return null;}
 }
 function progressView(){const p=activeP();const w=weekSummary(p);const l=D.lang;
-  return `<div class="stack"><div class="page"><div class="shopname"><div><h1 dir="auto">${esc(fill(ft('pTitle'),{n:p.name}))}</h1><p class="soft small">${esc(ft('cls'))} <span class="num">${esc(p.cls)}</span></p></div></div>
+  return `<div class="stack"><div class="page"><div class="shopname"><div><h1 dir="auto">${esc(fill(ft('pTitle'),{n:p.name}))}</h1><p class="soft small" dir="auto">${esc(sylShort(p)||(ft('cls')+' '+p.cls))}</p><button class="btn ghost sm" data-act="sylOpen" data-id="${p.id}" style="margin-top:6px">📘 ${esc(st('sylChange'))}</button></div></div>
    <div class="tiles"><div class="tile"><small>${esc(ft('pWeek'))}</small><b class="num w">${w.days}/7</b></div><div class="tile"><small>${esc(ft('pAsked'))}</small><b class="num">${w.asked}</b></div><div class="tile"><small>${esc(ft('pQuiz'))}</small><b class="num">${w.quizzes}</b></div></div></div>
    <div class="page"><h2 style="margin-top:0">${esc(ft('pBy'))}</h2>${w.subs.length?w.subs.map(x=>`<div class="sbar"><span>${esc(subName(x.k,l))}</span><div class="sb"><i style="width:${x.p}%;background:${x.p>=70?'var(--wasooli)':x.p>=60?'var(--amber)':'var(--udhaar)'}"></i></div><b class="num">${x.p}%</b></div>`).join(''):`<p class="soft">${esc(ft('pNone'))}</p>`}</div>
    <div class="page"><pre class="rep" dir="auto">${esc(famReport(p,l))}</pre></div></div>`;}
@@ -1761,6 +1897,11 @@ document.addEventListener('click',async e=>{
   const lb=e.target.closest('[data-lang]');if(lb){D.lang=lb.dataset.lang;save();if(S.chat.length<=1)S.chat=[];render();return;}
   const el=e.target.closest('[data-act]');if(!el)return;const act=el.dataset.act,id=el.dataset.id;
   if(acctAct(act,id))return;
+  if(act==='sylOpen'){sylModal(id);return;}
+  if(act==='examOpen'){examModal();return;}
+  if(act==='eAns'){const [mi,o]=String(id).split(':').map(Number);examPick(mi,o);return;}
+  if(act==='eStop'){S.examQ=null;S.exam=null;uPush({who:'ai',text:et('stopped'),l:D.lang});return;}
+  if(act==='ePapers'){examPapers(id);return;}
   if(act==='jTheme'){setJTheme(jLight()?'dark':'light');return;}
   if(act==='jThemeSet'){setJTheme(id);return;}
   switch(act){
