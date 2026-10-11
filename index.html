@@ -491,7 +491,7 @@ const JX={
 ['roman','ur','ps','en'].forEach(k=>Object.assign(J[k],JX[k]));
 Object.assign(J.roman,{aiBasic:'Munshi (basic)'});Object.assign(J.ur,{aiBasic:'منشی (بنیادی)'});Object.assign(J.ps,{aiBasic:'منشي (بنسټیز)'});Object.assign(J.en,{aiBasic:'Munshi (basic)'});
 /* Jugnu AI server (free Cloudflare Workers AI). Paste the worker link between the quotes after deploying. */
-const AI_URL='';
+const AI_URL='https://jugnu-ai.mychatgptapplogin.workers.dev/';
 const aiOn=()=>(!!SAMPLE||!!AI_URL)&&navigator.onLine!==false;
 function looseJSON(t){if(t&&typeof t==='object')return t;t=String(t||'').trim();try{return JSON.parse(t);}catch(e){}
   const m=t.match(/```(?:json)?\s*([\s\S]*?)```/);if(m){try{return JSON.parse(m[1]);}catch(e){}}
