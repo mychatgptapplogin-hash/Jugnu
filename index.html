@@ -355,6 +355,10 @@ body.jlight .jcard .jbtns .jyes{background:var(--cover2);border-color:var(--cove
 .pchip span[dir]{max-width:92px}
 body.jlight .pchip span[dir]{max-width:64px}
 @media (max-width:440px){.jhero .pchip span[dir]{display:none}.jhero .pchip{padding:4px 8px 4px 4px}}
+.jamb{margin-top:8px;padding:8px;border-radius:10px;background:#FFF3D6;border:1px solid #F5CF7A;color:#3D2A00}
+.jamb p{margin:0 0 4px;font-weight:700;font-size:14px}
+.jamb .jnew{font-weight:400}
+.jamb .jpick{background:#FFFFFF;color:#0F1D18;border-color:#E2C277}
 </style>
 
 <div class="wrap">
@@ -962,7 +966,7 @@ function settingsView(){
     <label for="importFile" class="btn ghost full" style="margin:0;color:var(--ink)">${esc(t('bkRestoreF'))}</label><input id="importFile" type="file" accept=".json,application/json,text/plain" hidden>
     <button class="btn ghost full" data-act="pasteRestore">${esc(t('bkRestoreP'))}</button></div>
    ${fbCardHTML()}
-   <div class="page stack"><h2 style="margin-top:0">${esc(t('danger'))}</h2><button class="btn danger full" data-act="wipe">${esc(t('wipe'))}</button><p class="note">Jugnu Munshi · ConceptAI · v0.12.2</p></div></div>`;
+   <div class="page stack"><h2 style="margin-top:0">${esc(t('danger'))}</h2><button class="btn danger full" data-act="wipe">${esc(t('wipe'))}</button><p class="note">Jugnu Munshi · ConceptAI · v0.12.3</p></div></div>`;
 }
 function pilotView(){
   const now=Date.now(),wk=7*86400000;
@@ -1019,11 +1023,11 @@ function jugnuMount(){
 }
 function cardHTML(d,id,l){
   const r=(k,v,n)=>`<div class="jr"><span>${esc(tL(k,l))}</span><b class="${n?'num':''}" dir="auto">${esc(v)}</b></div>`;
-  const ex=findByName(d.name);
+  const amb=d.amb&&!d.cid&&!d.status;const ex=d.cid?cust(d.cid):(amb?null:findByName(d.name));
   return `<div class="jcard">${r('name',ex?nameFor(ex,l):(d.name||'—'))}${r('type',tL(d.type+'S',l))}${r('amount',rs(d.amount),1)}${r('date',dmy(d.date),1)}${d.note?r('noteL',d.note):''}
-   ${!d.status&&!findByName(d.name)?`<p class="jnew">${esc(tL('newName',l))}</p>`:''}
-   ${(()=>{if(d.status||d.type!=='credit')return'';const c=findByName(d.name);if(!c||!c.limit)return'';const nb=balance(c.id)+d.amount;return nb>c.limit?`<p class="jover">⚠ ${esc(fill(jt('overLimit',l),{n:nameFor(c,l),l:rs(c.limit),b:rs(nb)}))}</p>`:'';})()}
-   ${d.status?`<p class="jdone ${d.status==='no'?'no':''}">${d.status==='yes'?'✓':'✕'}</p>`:`<div class="jbtns"><button class="jchip jyes" data-act="jYes" data-id="${id}">${esc(jt('yes',l))}</button><button class="jchip" data-act="jEdit" data-id="${id}">${esc(jt('editB',l))}</button><button class="jchip" data-act="jNo" data-id="${id}">${esc(jt('noB',l))}</button></div>`}</div>`;
+   ${!d.status&&!ex&&!amb?`<p class="jnew">${esc(tL('newName',l))}</p>`:''}${amb?ambPickerHTML(d,id,l):''}
+   ${(()=>{if(d.status||d.type!=='credit')return'';const c=ex;if(!c||!c.limit)return'';const nb=balance(c.id)+d.amount;return nb>c.limit?`<p class="jover">⚠ ${esc(fill(jt('overLimit',l),{n:nameFor(c,l),l:rs(c.limit),b:rs(nb)}))}</p>`:'';})()}
+   ${d.status?`<p class="jdone ${d.status==='no'?'no':''}">${d.status==='yes'?'✓':'✕'}</p>`:`<div class="jbtns">${amb?'':`<button class="jchip jyes" data-act="jYes" data-id="${id}">${esc(jt('yes',l))}</button>`}<button class="jchip" data-act="jEdit" data-id="${id}">${esc(jt('editB',l))}</button><button class="jchip" data-act="jNo" data-id="${id}">${esc(jt('noB',l))}</button></div>`}</div>`;
 }
 function msgHTML(m){
   const l=m.l||D.lang;
@@ -1059,7 +1063,7 @@ async function readStory(q,l){
 function storyCards(st,q,l){
   const n=st.entries.length;const sid=uid();
   if(n>1||st.summary)jPush({who:'ai',text:(n>1?fill(jt('stMulti',l),{n}):jt('stSum',l))+(st.summary?'\n“'+st.summary+'”':''),btns:n>1?[{act:'jYesAll',id:sid,label:fill(jt('yesAll',l),{n})}]:[],l});
-  st.entries.forEach((d,i)=>{const id=uid();S.drafts[id]=Object.assign({},d,{raw:q,l,sid});
+  st.entries.forEach((d,i)=>{const id=uid();S.drafts[id]=markAmb(Object.assign({},d,{raw:q,l,sid}),q);
     jPush({who:'ai',text:n>1?(i+1)+'/'+n:jt('confirmQ',l),card:id,l});});
   jState('idle');
 }
@@ -1070,9 +1074,9 @@ Object.assign(J.en,{stSum:'Here is what I understood:',stMulti:'This has {n} ent
 
 function storyPending(sid){return Object.keys(S.drafts).filter(k=>{const d=S.drafts[k];return d&&d.sid===sid&&!d.status;});}
 function storySaveAll(sid){const l=D.lang;const ks=storyPending(sid);let done=0,needName=0;const names=new Set();
-  ks.forEach(k=>{const d=S.drafts[k];if(!d.name){needName++;return;}const r=commitEntry(d);d.status='yes';done++;names.add(r.c.id);});
+  let needPick=0;ks.forEach(k=>{const d=S.drafts[k];if(d.amb&&!d.cid){needPick++;return;}if(!d.name){needName++;return;}const r=commitEntry(d);d.status='yes';done++;names.add(r.c.id);});
   const lines=[...names].map(id=>{const c=cust(id);if(!c)return '';if(c.type==='sales'||c.type==='expense')return '• '+nameFor(c,l);return '• '+nameFor(c,l)+': '+rs(Math.abs(balance(id)));}).filter(Boolean);
-  jPush({who:'ai',text:fill(jt('savedAll',l),{n:done})+(lines.length?'\n'+lines.join('\n'):'')+(needName?'\n'+jt('noName',l):''),l});jState('happy');setTimeout(()=>{if(!jBusy)jState('idle');},1400);}
+  jPush({who:'ai',text:fill(jt('savedAll',l),{n:done})+(lines.length?'\n'+lines.join('\n'):'')+(needName?'\n'+jt('noName',l):'')+(needPick?'\n'+jt('needPick',l):''),l});jState('happy');setTimeout(()=>{if(!jBusy)jState('idle');},1400);}
 Object.assign(J.roman,{yesAll:'Sab {n} likh do',savedAll:'{n} hisaab likh diye, Seth ji.',leftOne:'Is baat ke {n} hisaab abhi baqi hain (upar). Woh bhi likh doon?',yesRest:'Haan, baqi bhi likh do'});
 Object.assign(J.ur,{yesAll:'سب {n} لکھ دو',savedAll:'{n} حساب لکھ دیے، سیٹھ جی۔',leftOne:'اس بات کے {n} حساب ابھی باقی ہیں (اوپر)۔ وہ بھی لکھ دوں؟',yesRest:'ہاں، باقی بھی لکھ دو'});
 Object.assign(J.ps,{yesAll:'ټول {n} ولیکه',savedAll:'{n} حسابونه ولیکل شول.',leftOne:'د دې خبرې {n} حسابونه لا پاتې دي (پورته). هغه هم ولیکم؟',yesRest:'هو، پاتې هم ولیکه'});
@@ -1093,14 +1097,14 @@ function custBtns(cid,l){const c=cust(cid);if(!c)return[];const b=balance(cid);c
   if(c.type==='customer'&&b>0)out.push({act:'jRemind',id:cid,label:jt('remindB',l)});
   out.push({act:'jStmt',id:cid,label:jt('stmtB',l)});return out;}
 function jHandle(a,q,l){
-  if(a.entry){const id=uid();S.drafts[id]=Object.assign({},a.entry,{type:a.entry.type||'credit',raw:q,l});
+  if(a.entry){const id=uid();S.drafts[id]=markAmb(Object.assign({},a.entry,{type:a.entry.type||'credit',raw:q,l}),q);
     jPush({who:'ai',text:a.text||jt('confirmQ',l),card:id,l});jState('idle');return;}
   const btns=a.cid?custBtns(a.cid,l):[];if(a.kind==='com')btns.push({act:'comOpen',id:'',label:ct('open',l)});if(a.kind==='health'&&aiOn())btns.push({act:'jMore',id:l,label:jt('more',l)});
   jPush({who:'ai',text:a.text,btns,l});
   jState(a.text===jt('dont',l)?'idle':'happy');setTimeout(()=>{if(!jBusy)jState('idle');},1400);
 }
 function commitEntry(d){
-  let c=findByName(d.name);if(!c){c={id:uid(),name:cap(d.name),phone:'',type:d.type==='expense'?'expense':d.type==='sale'?'sales':(d.type==='goods'||d.type==='paid')?'supplier':'customer',created:Date.now()};D.customers.push(c);}
+  let c=(d.cid&&cust(d.cid))||findByName(d.name);if(!c){c={id:uid(),name:cap(d.name),phone:'',type:d.type==='expense'?'expense':d.type==='sale'?'sales':(d.type==='goods'||d.type==='paid')?'supplier':'customer',created:Date.now()};D.customers.push(c);}
   let saved;
   if(d.id){saved=D.entries.find(x=>x.id===d.id);if(saved)Object.assign(saved,{cid:c.id,amount:d.amount,type:d.type,date:d.date,note:d.note||''});if(saved&&d.type==='payment'&&!saved.rno)saved.rno=D.seq++;}
   else{saved={id:uid(),cid:c.id,amount:d.amount,type:d.type,date:d.date||todayISO(),note:d.note||'',created:Date.now()};if(d.type==='payment')saved.rno=D.seq++;D.entries.push(saved);}
@@ -1538,7 +1542,7 @@ async function jSendShared(text,vl){
     jState('idle');}
   const l=detectLang(text);const a=jugnuAnswer(text,l);
   if(!a.entry&&/\d/.test(text)&&!jBusy){const d=draftFromAmount(text);
-    if(d){let nd=d;if(aiOn())nd=await refineEntry(text,l,d);const id=uid();S.drafts[id]=Object.assign({},nd,{raw:text,l});
+    if(d){let nd=d;if(aiOn())nd=await refineEntry(text,l,d);const id=uid();S.drafts[id]=markAmb(Object.assign({},nd,{raw:text,l}),text);
       jPush({who:'me',text,l});jPush({who:'ai',text:nd.name?jt('confirmQ',l):jt('noName',l),card:id,l});return;}}
   jSend(text);
 }
@@ -1721,7 +1725,10 @@ function bindAfter(){
     ef.onsubmit=e=>{e.preventDefault();const name=nm.value.trim(),amount=Math.round(parseFloat(toAsciiDigits(String($('eAmt').value)).replace(/[^\d.]/g,'')));
       if(!name||!amount||amount<=0){toast(t('nameAmt'));return;}
       const type=ty.value,date=$('eDate').value||todayISO(),note=$('eNote').value.trim();
-      const d=S.draft||{};const {c,saved}=commitEntry({id:d.id,name,amount,type,date,note});
+      const d=S.draft||{};const same=x=>x&&cust(x)&&norm(cust(x).name)===norm(name);
+      let cid=same(d.cid)?d.cid:(same(S.cid)?S.cid:null);
+      if(!cid&&!d.id){const cs=nameCands(name);if(cs.length>1){window.__efPend={name,amount,type,date,note};modal(`<h1>${esc(fill(jt('whichQ',D.lang),{n:name.trim().split(/\s+/)[0]||name,k:cs.length}))}</h1><div class="plist">${cs.map(x=>`<button class="btn ghost full" data-act="efPick" data-id="${x.id}" style="justify-content:space-between"><b dir="auto">${esc(nameFor(x,D.lang))}</b><span class="num">${esc(phoneTail(x))} · ${esc(rs(Math.abs(balance(x.id))))}</span></button>`).join('')}</div><p class="note">${esc(fill(jt('newHint',D.lang),{n:name.trim().split(/\s+/)[0]||name}))}</p>`);return;}}
+      const {c,saved}=commitEntry({id:d.id,cid,name,amount,type,date,note});
       if(d.fromJugnu){const dr=S.drafts[d.fromJugnu];if(dr)Object.assign(dr,{status:'yes',name:c.name,amount,type,date,note});go('jugnu',{draft:null});jSaved(c,saved,dr?dr.l:D.lang);return;}
       go('customer',{cid:c.id,draft:null});toast(t('saved'),true);
       if(!c.phone)setTimeout(()=>{if(S.screen==='customer'&&S.cid===c.id)editCustModal();},450);
@@ -1733,7 +1740,7 @@ function restoreFrom(txt){try{const d=JSON.parse(txt);if(!d||!Array.isArray(d.cu
   modal(`<h1>${esc(t('backup'))}</h1><p class="soft"><span class="num">${d.customers.length}</span> · <span class="num">${d.entries.length}</span> ${esc(t('entries'))}</p><div class="row"><button class="btn" data-act="doRestore" style="flex:1">OK</button><button class="btn ghost" data-act="closeModal">${esc(t('cancel'))}</button></div>`);}catch(e){toast('Invalid backup');}}
 function editCustModal(){const c=cust(S.cid);if(!c)return;
   modal(`<h1>${esc(c.name)}</h1><form id="custForm" class="stack"><div><label for="cName">${esc(t('name'))}</label><input id="cName" dir="auto" required value="${esc(c.name)}"></div><div><label for="cPhone">${esc(t('phone'))}</label><input id="cPhone" inputmode="tel" dir="ltr" value="${esc(c.phone||'')}" placeholder="0300 1234567"></div><div><label for="cLimit">${esc(t('limitL'))}</label><input id="cLimit" inputmode="numeric" dir="ltr" value="${esc(c.limit||'')}"></div><div ${['expense','sales'].includes(c.type)?'hidden':''}><label for="cType">${esc(t('kind'))}</label><select id="cType"><option value="customer" ${c.type==='customer'?'selected':''}>${esc(t('customer'))}</option><option value="supplier" ${c.type==='supplier'?'selected':''}>${esc(t('supplier'))}</option></select></div><div class="row"><button class="btn" type="submit" style="flex:1">${esc(t('saveCust'))}</button><button class="btn ghost" type="button" data-act="closeModal">${esc(t('cancel'))}</button></div></form>`);
-  $('custForm').onsubmit=e=>{e.preventDefault();c.name=cap($('cName').value)||c.name;c.phone=$('cPhone').value.trim();if(!['expense','sales'].includes(c.type))c.type=$('cType').value;{const lv=Math.round(parseFloat(toAsciiDigits($('cLimit').value).replace(/[^\d.]/g,'')));c.limit=lv>0?lv:0;}save();closeModal();render();};}
+  $('custForm').onsubmit=e=>{e.preventDefault();{const nn=cap($('cName').value);if(nn&&D.customers.some(x=>x.id!==c.id&&norm(x.name)===norm(nn))){toast(jt('dupName',D.lang));return;}}c.name=cap($('cName').value)||c.name;c.phone=$('cPhone').value.trim();if(!['expense','sales'].includes(c.type))c.type=$('cType').value;{const lv=Math.round(parseFloat(toAsciiDigits($('cLimit').value).replace(/[^\d.]/g,'')));c.limit=lv>0?lv:0;}save();closeModal();render();};}
 function download(name,text,type){saveBlob(name,new Blob([text],{type}));}
 async function copyText(txt,ok){try{await navigator.clipboard.writeText(txt);toast(ok||'Copied');}catch(e){modal(`<textarea id="cpy" readonly style="min-height:180px" dir="auto">${esc(txt)}</textarea><button class="btn ghost full" data-act="closeModal">OK</button>`);const ta=$('cpy');ta.focus();ta.select();}}
 function loadDemo(){
@@ -1772,8 +1779,10 @@ document.addEventListener('click',async e=>{
     case 'jRemind':{const c=cust(id);if(c)doRemind(c);break;}
     case 'jStmt':{if(!cust(id))break;S.cid=id;toast(t('making'));const cs=await statementCanvases(id);docModal(t('statement'),cs,'statement',210,297,cust(id));break;}
     case 'vPick':{const f=document.querySelector('input[data-voice]');if(f)f.click();break;}
-    case 'jYes':{const d=S.drafts[id];if(!d||d.status)break;if(!d.name){S.cid=null;go('entry',{draft:Object.assign({},d,{fromQuick:true,fromJugnu:id})});break;}const r=commitEntry(d);d.status='yes';jSaved(r.c,r.saved,d.l);if(d.sid){const left=storyPending(d.sid).length;if(left)jPush({who:'ai',text:fill(jt('leftOne',d.l),{n:left}),btns:[{act:'jYesAll',id:d.sid,label:jt('yesRest',d.l)}],l:d.l});}break;}
+    case 'jPick':{const [did,cid]=String(id).split('|');const d=S.drafts[did],c=cust(cid);if(!d||!c||d.status)break;d.cid=cid;d.name=c.name;delete d.amb;if(c.type==='supplier'){if(d.type==='credit')d.type='goods';if(d.type==='payment')d.type='paid';}renderChat();break;}
+    case 'jYes':{const d=S.drafts[id];if(!d||d.status)break;if(d.amb&&!d.cid){toast(jt('pickFirst',d.l));break;}if(!d.name){S.cid=null;go('entry',{draft:Object.assign({},d,{fromQuick:true,fromJugnu:id})});break;}const r=commitEntry(d);d.status='yes';jSaved(r.c,r.saved,d.l);if(d.sid){const left=storyPending(d.sid).length;if(left)jPush({who:'ai',text:fill(jt('leftOne',d.l),{n:left}),btns:[{act:'jYesAll',id:d.sid,label:jt('yesRest',d.l)}],l:d.l});}break;}
     case 'jYesAll':{storySaveAll(id);break;}
+    case 'efPick':{const pe=window.__efPend;if(!pe)break;closeModal();const d=S.draft||{};const {c,saved}=commitEntry(Object.assign({},pe,{cid:id}));if(d.fromJugnu){const dr=S.drafts[d.fromJugnu];if(dr)Object.assign(dr,{status:'yes',name:c.name,cid:c.id});go('jugnu',{draft:null});jSaved(c,saved,dr?dr.l:D.lang);break;}go('customer',{cid:c.id,draft:null});toast(t('saved'),true);break;}
     case 'jEdit':{const d=S.drafts[id];if(!d||d.status)break;S.cid=null;go('entry',{draft:Object.assign({},d,{fromQuick:true,fromJugnu:id})});break;}
     case 'comOpen':closeModal();go('committee');break;
     case 'comNew':comNewModal();break;
@@ -1829,6 +1838,40 @@ document.addEventListener('click',async e=>{
 if('serviceWorker' in navigator&&(location.protocol==='https:'||location.hostname==='localhost')&&!inViewer()){window.addEventListener('load',()=>{navigator.serviceWorker.register('sw.js').catch(()=>{});});}
 document.addEventListener('change',e=>{const el=e.target;if(el&&el.matches&&el.matches('input[data-voice]')){const f=el.files&&el.files[0];el.value='';if(f)handleVoice(f);}});
 document.addEventListener('keydown',e=>{if((e.key==='Enter'||e.key===' ')&&e.target.matches&&e.target.matches('tr.tap')){e.preventDefault();e.target.click();}});
+
+/* v0.12.3 same-name safety: never guess between two accounts with the same name */
+function nameCands(name,raw){
+  const n=norm(name||'');if(!n)return[];
+  const pool=D.customers.filter(c=>c.type!=='expense'&&c.type!=='sales');
+  let out=pool.filter(c=>norm(c.name)===n);
+  const w=n.split(' ');
+  if(w.length===1){const k=skel(w[0]);out=pool.filter(c=>{const f=words(c.name)[0];return norm(c.name)===n||(f&&k&&skel(f)===k);});}
+  if(raw&&out.length>1){const s=' '+norm(raw)+' ';const full=out.filter(c=>norm(c.name).split(' ').length>1&&s.includes(' '+norm(c.name)+' '));if(full.length)out=full;}
+  return out;
+}
+function markAmb(d,raw){if(!d||d.cid||!d.name||d.type==='expense'||d.type==='sale')return d;const cs=nameCands(d.name,raw||d.raw);
+  if(cs.length>1){const exact=cs.filter(c=>norm(c.name)===norm(d.name));if(exact.length===1&&norm(d.name).split(' ').length>1){d.cid=exact[0].id;return d;}d.amb=cs.map(c=>c.id);}
+  else if(cs.length===1){d.cid=cs[0].id;d.name=cs[0].name;}return d;}
+const _nameInText=nameInText;
+nameInText=function(text){const s=' '+norm(text)+' ';
+  const full=D.customers.filter(c=>{const n=norm(c.name);return n.split(' ').length>1&&s.includes(' '+n+' ');}).sort((a,b)=>norm(b.name).length-norm(a.name).length);
+  if(full.length){const best=full.filter(c=>norm(c.name)===norm(full[0].name));return best.length>1?{c:best[0],tok:null,amb:best.map(c=>c.id)}:{c:best[0],tok:null};}
+  const r=_nameInText(text);if(!r)return r;const cs=nameCands(words(r.c.name)[0],text);if(cs.length>1)r.amb=cs.map(c=>c.id);return r;};
+const _jugnuAnswer=jugnuAnswer;
+jugnuAnswer=function(text,l){const r=_jugnuAnswer(text,l);
+  if(r&&r.entry){markAmb(r.entry,text);return r;}
+  if(r&&r.cid){const h=nameInText(text);if(h&&h.amb&&h.amb.includes(r.cid)){l=l||detectLang(text);
+    return{text:jt('whichMany',l)+'\n'+h.amb.map(id=>{const c=cust(id);return '• '+custLine({c,b:balance(id),d:oldestUnpaidDays(id)},l);}).join('\n')};}}
+  return r;};
+function phoneTail(c){const p=String(c.phone||'').replace(/\D/g,'');return p.length>=4?'…'+p.slice(-4):'';}
+function ambPickerHTML(d,id,l){const first=String(d.name).trim().split(/\s+/)[0]||d.name;
+  return `<div class="jamb"><p>${esc(fill(jt('whichQ',l),{n:first,k:d.amb.length}))}</p><div class="jbtns">${d.amb.map(cid=>{const c=cust(cid);if(!c)return'';const b=balance(cid);
+    return `<button class="jchip jpick" data-act="jPick" data-id="${id}|${cid}"><b dir="auto">${esc(nameFor(c,l))}</b>${phoneTail(c)?` <span class="num">${esc(phoneTail(c))}</span>`:''} · <span class="num">${esc(rs(Math.abs(b)))}</span></button>`;}).join('')}
+    <button class="jchip" data-act="jEdit" data-id="${id}">＋ ${esc(fill(jt('newPerson',l),{n:first}))}</button></div><p class="jnew">${esc(fill(jt('newHint',l),{n:first}))}</p></div>`;}
+Object.assign(J.roman,{whichQ:'Kaunsa {n}? Is naam ke {k} khate hain:',newPerson:'Naya {n} (alag banda)',newHint:'Naye bande ke naam ke saath pehchaan likhein, jaise "{n} Mochi" ya "{n} Mardan".',pickFirst:'Pehle chunein kaunsa khata.',whichMany:'Is naam ke ek se zyada khate hain:',dupName:'Is naam ka khata pehle se hai. Farq ke liye pehchaan likhein: baap ka naam, kaam ya mohalla.',needPick:'Kuch hisaab mein naam do logon ka hai. Upar chunein kaunsa.'});
+Object.assign(J.ur,{whichQ:'کون سا {n}؟ اس نام کے {k} کھاتے ہیں:',newPerson:'نیا {n} (الگ بندہ)',newHint:'نئے بندے کے نام کے ساتھ پہچان لکھیں، جیسے "{n} موچی" یا "{n} مردان"۔',pickFirst:'پہلے چنیں کون سا کھاتہ۔',whichMany:'اس نام کے ایک سے زیادہ کھاتے ہیں:',dupName:'اس نام کا کھاتہ پہلے سے ہے۔ فرق کے لیے پہچان لکھیں: باپ کا نام، کام یا محلہ۔',needPick:'کچھ حساب میں نام دو لوگوں کا ہے۔ اوپر چنیں کون سا۔'});
+Object.assign(J.ps,{whichQ:'کوم {n}؟ د دې نوم {k} حسابونه دي:',newPerson:'نوی {n} (بل سړی)',newHint:'د نوي سړي له نوم سره پېژندنه ولیکئ، لکه "{n} موچي" یا "{n} مردان".',pickFirst:'لومړی وټاکئ کوم حساب.',whichMany:'د دې نوم له یوه زیات حسابونه دي:',dupName:'د دې نوم حساب شته. د توپیر لپاره پېژندنه ولیکئ: د پلار نوم، کار یا کلی.',needPick:'په ځینو حسابونو کې نوم د دوو کسانو دی. پورته وټاکئ.'});
+Object.assign(J.en,{whichQ:'Which {n}? There are {k} accounts with this name:',newPerson:'New {n} (different person)',newHint:'For a new person, add something to tell them apart, like "{n} Mochi" or "{n} Mardan".',pickFirst:'First choose which account.',whichMany:'More than one account has this name:',dupName:'An account with this name already exists. Add something to tell them apart: father\'s name, work or area.',needPick:'Some entries have a name shared by two people. Choose which one above.'});
 
 /* ===== v0.12 accounts, cloud backup, usage counts, feedback, owner's brain (Supabase, plain fetch) ===== */
 const SB_URL='https://otctbjuosvefhziuudmy.supabase.co';
