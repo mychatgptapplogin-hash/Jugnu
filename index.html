@@ -857,7 +857,7 @@ function settingsView(){
     <button class="btn ghost full" data-act="copyBackup">${esc(t('bkCopy'))}</button>
     <label for="importFile" class="btn ghost full" style="margin:0;color:var(--ink)">${esc(t('bkRestoreF'))}</label><input id="importFile" type="file" accept=".json,application/json,text/plain" hidden>
     <button class="btn ghost full" data-act="pasteRestore">${esc(t('bkRestoreP'))}</button></div>
-   <div class="page stack"><h2 style="margin-top:0">${esc(t('danger'))}</h2><button class="btn danger full" data-act="wipe">${esc(t('wipe'))}</button><p class="note">Jugnu Munshi · ConceptAI · v0.10</p></div></div>`;
+   <div class="page stack"><h2 style="margin-top:0">${esc(t('danger'))}</h2><button class="btn danger full" data-act="wipe">${esc(t('wipe'))}</button><p class="note">Jugnu Munshi · ConceptAI · v0.10.1</p></div></div>`;
 }
 function pilotView(){
   const now=Date.now(),wk=7*86400000;
@@ -1379,7 +1379,8 @@ async function recToggle(btn){
   if(REC){REC.stop();return;}
   if(!AI_URL||navigator.onLine===false){(isStudent()?uPush:jPush)({who:'ai',text:jt('vNet',D.lang),l:D.lang});return;}
   let framed=false;try{framed=window.self!==window.top;}catch(e){framed=true;}
-  if(framed||!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia||!window.MediaRecorder){recPick(btn);return;}
+  const why=framed?'frame':!window.isSecureContext?'insecure':!navigator.mediaDevices?'no-media':!navigator.mediaDevices.getUserMedia?'no-gum':!window.MediaRecorder?'no-recorder':'';
+  if(why){(isStudent()?uPush:jPush)({who:'ai',text:jt(why==='frame'?'vInApp':'vNoRec',D.lang)+'\nhttps://mychatgptapplogin-hash.github.io/Jugnu/\n('+why+')',btns:[{act:'vPick',id:'',label:jt('vPickB',D.lang)}],l:D.lang});return;}
   let stream;const ta=Date.now();
   try{stream=await navigator.mediaDevices.getUserMedia({audio:true});}catch(e){
     const nm=(e&&e.name)||'';const push=isStudent()?uPush:jPush;
@@ -1397,10 +1398,10 @@ async function recToggle(btn){
   mr.start(1000);
 }
 document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('button[data-rec]');if(b){e.preventDefault();recToggle(b);}});
-Object.assign(J.roman,{vNoMic:'Mic istemal mein hai ya mila nahi. Call ya doosri app band kar ke dobara dabayein.',vBlocked:'Phone ne mic rok diya hai, ijazat ka sawal hi nahi aaya. iPhone: Settings > Apps > Safari > Microphone > "Ask" ya "Allow" karein, phir Jugnu dobara kholein. Android: Chrome > Site settings > Microphone. Tab tak likh kar bata dein.',vStop:'Rokne ke liye dabayein',vPerm:'Mic ki ijazat nahi mili. Settings mein Jugnu/Safari ko microphone ki ijazat dein, ya likh kar bata dein.'});
-Object.assign(J.ur,{vNoMic:'مائیک استعمال میں ہے یا نہیں ملا۔ کال یا دوسری ایپ بند کر کے دوبارہ دبائیں۔',vBlocked:'فون نے مائیک روک دیا ہے، اجازت کا سوال ہی نہیں آیا۔ آئی فون: Settings > Apps > Safari > Microphone میں "Ask" یا "Allow" کریں، پھر جگنو دوبارہ کھولیں۔ اینڈرائیڈ: Chrome > Site settings > Microphone۔ تب تک لکھ کر بتا دیں۔',vStop:'روکنے کے لیے دبائیں',vPerm:'مائیک کی اجازت نہیں ملی۔ سیٹنگز میں مائیکروفون کی اجازت دیں، یا لکھ کر بتا دیں۔'});
-Object.assign(J.ps,{vNoMic:'مایک بوخت دی یا ونه موندل شو. کال یا بله اپ بنده کړئ او بیا یې کېکاږئ.',vBlocked:'تلیفون مایک بند کړی، د اجازې پوښتنه رانغله. آیفون: Settings > Apps > Safari > Microphone کې "Ask" یا "Allow" کړئ، بیا جګنو بیا خلاص کړئ. اندروید: Chrome > Site settings > Microphone.',vStop:'د درولو لپاره کېکاږئ',vPerm:'د مایک اجازه ونه موندل شوه. په سیټنګ کې د مایکروفون اجازه ورکړئ، یا یې ولیکئ.'});
-Object.assign(J.en,{vNoMic:'The microphone is busy or missing. End any call or other recording app and tap again.',vBlocked:'Your phone blocked the microphone before asking you. iPhone: Settings > Apps > Safari > Microphone, set it to "Ask" or "Allow", then reopen Jugnu. Android: Chrome > Site settings > Microphone. Until then, type it.',vStop:'Tap to stop',vPerm:'Microphone permission was denied. Allow the microphone in Settings, or type it instead.'});
+Object.assign(J.roman,{vInApp:'Is screen ke andar (Claude ya kisi app ke andar) mic record nahi kar sakta. Jugnu ko Safari/Chrome mein ya home screen icon se kholein, wahan mic seedha record karega:',vNoRec:'Ye browser awaaz record nahi kar raha. Jugnu ko Safari (iPhone) ya Chrome (Android) mein kholein:',vPickB:'Voice file chunein',vNoMic:'Mic istemal mein hai ya mila nahi. Call ya doosri app band kar ke dobara dabayein.',vBlocked:'Phone ne mic rok diya hai, ijazat ka sawal hi nahi aaya. iPhone: Settings > Apps > Safari > Microphone > "Ask" ya "Allow" karein, phir Jugnu dobara kholein. Android: Chrome > Site settings > Microphone. Tab tak likh kar bata dein.',vStop:'Rokne ke liye dabayein',vPerm:'Mic ki ijazat nahi mili. Settings mein Jugnu/Safari ko microphone ki ijazat dein, ya likh kar bata dein.'});
+Object.assign(J.ur,{vInApp:'اس اسکرین کے اندر (کلاڈ یا کسی ایپ کے اندر) مائیک ریکارڈ نہیں کر سکتا۔ جگنو کو سفاری/کروم میں یا ہوم اسکرین آئیکن سے کھولیں، وہاں مائیک سیدھا ریکارڈ کرے گا:',vNoRec:'یہ براؤزر آواز ریکارڈ نہیں کر رہا۔ جگنو کو سفاری (آئی فون) یا کروم (اینڈرائیڈ) میں کھولیں:',vPickB:'وائس فائل چنیں',vNoMic:'مائیک استعمال میں ہے یا نہیں ملا۔ کال یا دوسری ایپ بند کر کے دوبارہ دبائیں۔',vBlocked:'فون نے مائیک روک دیا ہے، اجازت کا سوال ہی نہیں آیا۔ آئی فون: Settings > Apps > Safari > Microphone میں "Ask" یا "Allow" کریں، پھر جگنو دوبارہ کھولیں۔ اینڈرائیڈ: Chrome > Site settings > Microphone۔ تب تک لکھ کر بتا دیں۔',vStop:'روکنے کے لیے دبائیں',vPerm:'مائیک کی اجازت نہیں ملی۔ سیٹنگز میں مائیکروفون کی اجازت دیں، یا لکھ کر بتا دیں۔'});
+Object.assign(J.ps,{vInApp:'د دې سکرین دننه (کلاډ یا بله اپ) مایک ثبت نشي کولی. جګنو په سفاري/کروم کې یا د کور سکرین له آیکن پرانیزئ:',vNoRec:'دا براوزر غږ نه ثبتوي. جګنو په سفاري یا کروم کې پرانیزئ:',vPickB:'غږیز فایل وټاکئ',vNoMic:'مایک بوخت دی یا ونه موندل شو. کال یا بله اپ بنده کړئ او بیا یې کېکاږئ.',vBlocked:'تلیفون مایک بند کړی، د اجازې پوښتنه رانغله. آیفون: Settings > Apps > Safari > Microphone کې "Ask" یا "Allow" کړئ، بیا جګنو بیا خلاص کړئ. اندروید: Chrome > Site settings > Microphone.',vStop:'د درولو لپاره کېکاږئ',vPerm:'د مایک اجازه ونه موندل شوه. په سیټنګ کې د مایکروفون اجازه ورکړئ، یا یې ولیکئ.'});
+Object.assign(J.en,{vInApp:'The mic cannot record inside this screen (inside Claude or another app). Open Jugnu in Safari/Chrome or from the home screen icon, where the mic records directly:',vNoRec:'This browser cannot record audio. Open Jugnu in Safari (iPhone) or Chrome (Android):',vPickB:'Choose a voice file',vNoMic:'The microphone is busy or missing. End any call or other recording app and tap again.',vBlocked:'Your phone blocked the microphone before asking you. iPhone: Settings > Apps > Safari > Microphone, set it to "Ask" or "Allow", then reopen Jugnu. Android: Chrome > Site settings > Microphone. Until then, type it.',vStop:'Tap to stop',vPerm:'Microphone permission was denied. Allow the microphone in Settings, or type it instead.'});
 async function transcribe(blob,l){
   const lang=l==='ps'?'ps':l==='en'?'en':'ur';const ctl=new AbortController();const tm=setTimeout(()=>ctl.abort(),45000);
   try{const r=await fetch(AI_URL+'transcribe',{method:'POST',headers:{'content-type':blob.type||'audio/ogg','x-lang':lang},body:blob,signal:ctl.signal});
@@ -1651,6 +1652,7 @@ document.addEventListener('click',async e=>{
     case 'jOpen':closeModal();go('customer',{cid:id,draft:null});break;
     case 'jRemind':{const c=cust(id);if(c)doRemind(c);break;}
     case 'jStmt':{if(!cust(id))break;S.cid=id;toast(t('making'));const cs=await statementCanvases(id);docModal(t('statement'),cs,'statement',210,297,cust(id));break;}
+    case 'vPick':{const f=document.querySelector('input[data-voice]');if(f)f.click();break;}
     case 'jYes':{const d=S.drafts[id];if(!d||d.status)break;if(!d.name){S.cid=null;go('entry',{draft:Object.assign({},d,{fromQuick:true,fromJugnu:id})});break;}const r=commitEntry(d);d.status='yes';jSaved(r.c,r.saved,d.l);break;}
     case 'jEdit':{const d=S.drafts[id];if(!d||d.status)break;S.cid=null;go('entry',{draft:Object.assign({},d,{fromQuick:true,fromJugnu:id})});break;}
     case 'comOpen':closeModal();go('committee');break;
