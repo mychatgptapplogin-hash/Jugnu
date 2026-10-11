@@ -857,7 +857,7 @@ function settingsView(){
     <button class="btn ghost full" data-act="copyBackup">${esc(t('bkCopy'))}</button>
     <label for="importFile" class="btn ghost full" style="margin:0;color:var(--ink)">${esc(t('bkRestoreF'))}</label><input id="importFile" type="file" accept=".json,application/json,text/plain" hidden>
     <button class="btn ghost full" data-act="pasteRestore">${esc(t('bkRestoreP'))}</button></div>
-   <div class="page stack"><h2 style="margin-top:0">${esc(t('danger'))}</h2><button class="btn danger full" data-act="wipe">${esc(t('wipe'))}</button><p class="note">Jugnu Munshi · ConceptAI · v0.11</p></div></div>`;
+   <div class="page stack"><h2 style="margin-top:0">${esc(t('danger'))}</h2><button class="btn danger full" data-act="wipe">${esc(t('wipe'))}</button><p class="note">Jugnu Munshi · ConceptAI · v0.11.1</p></div></div>`;
 }
 function pilotView(){
   const now=Date.now(),wk=7*86400000;
@@ -952,9 +952,9 @@ async function readStory(q,l){
   }catch(e){return null;}
 }
 function storyCards(st,q,l){
-  const n=st.entries.length;
-  if(n>1||st.summary)jPush({who:'ai',text:(n>1?fill(jt('stMulti',l),{n}):jt('stSum',l))+(st.summary?'\n“'+st.summary+'”':''),l});
-  st.entries.forEach((d,i)=>{const id=uid();S.drafts[id]=Object.assign({},d,{raw:q,l});
+  const n=st.entries.length;const sid=uid();
+  if(n>1||st.summary)jPush({who:'ai',text:(n>1?fill(jt('stMulti',l),{n}):jt('stSum',l))+(st.summary?'\n“'+st.summary+'”':''),btns:n>1?[{act:'jYesAll',id:sid,label:fill(jt('yesAll',l),{n})}]:[],l});
+  st.entries.forEach((d,i)=>{const id=uid();S.drafts[id]=Object.assign({},d,{raw:q,l,sid});
     jPush({who:'ai',text:n>1?(i+1)+'/'+n:jt('confirmQ',l),card:id,l});});
   jState('idle');
 }
@@ -962,6 +962,16 @@ Object.assign(J.roman,{stSum:'Main ne ye samjha:',stMulti:'Is baat mein {n} hisa
 Object.assign(J.ur,{stSum:'میں نے یہ سمجھا:',stMulti:'اس بات میں {n} حساب ہیں۔ ہر ایک کو دیکھ کر "ہاں" دبائیں:',stRead:'پوری بات سمجھ رہا ہوں…'});
 Object.assign(J.ps,{stSum:'ما داسې پوه شوم:',stMulti:'په دې خبره کې {n} حسابونه دي. هر یو وګورئ او "هو" کېکاږئ:',stRead:'ټوله خبره پوهېږم…'});
 Object.assign(J.en,{stSum:'Here is what I understood:',stMulti:'This has {n} entries. Check each one and tap "Yes":',stRead:'Reading the whole message…'});
+
+function storyPending(sid){return Object.keys(S.drafts).filter(k=>{const d=S.drafts[k];return d&&d.sid===sid&&!d.status;});}
+function storySaveAll(sid){const l=D.lang;const ks=storyPending(sid);let done=0,needName=0;const names=new Set();
+  ks.forEach(k=>{const d=S.drafts[k];if(!d.name){needName++;return;}const r=commitEntry(d);d.status='yes';done++;names.add(r.c.id);});
+  const lines=[...names].map(id=>{const c=cust(id);if(!c)return '';if(c.type==='sales'||c.type==='expense')return '• '+nameFor(c,l);return '• '+nameFor(c,l)+': '+rs(Math.abs(balance(id)));}).filter(Boolean);
+  jPush({who:'ai',text:fill(jt('savedAll',l),{n:done})+(lines.length?'\n'+lines.join('\n'):'')+(needName?'\n'+jt('noName',l):''),l});jState('happy');setTimeout(()=>{if(!jBusy)jState('idle');},1400);}
+Object.assign(J.roman,{yesAll:'Sab {n} likh do',savedAll:'{n} hisaab likh diye, Seth ji.',leftOne:'Is baat ke {n} hisaab abhi baqi hain (upar). Woh bhi likh doon?',yesRest:'Haan, baqi bhi likh do'});
+Object.assign(J.ur,{yesAll:'سب {n} لکھ دو',savedAll:'{n} حساب لکھ دیے، سیٹھ جی۔',leftOne:'اس بات کے {n} حساب ابھی باقی ہیں (اوپر)۔ وہ بھی لکھ دوں؟',yesRest:'ہاں، باقی بھی لکھ دو'});
+Object.assign(J.ps,{yesAll:'ټول {n} ولیکه',savedAll:'{n} حسابونه ولیکل شول.',leftOne:'د دې خبرې {n} حسابونه لا پاتې دي (پورته). هغه هم ولیکم؟',yesRest:'هو، پاتې هم ولیکه'});
+Object.assign(J.en,{yesAll:'Save all {n}',savedAll:'Saved {n} entries.',leftOne:'{n} more entries from this message are still unsaved (above). Save them too?',yesRest:'Yes, save the rest'});
 async function jSend(q){
   q=String(q||'').trim();if(!q||jBusy)return;jBusy=true;
   const l=detectLang(q);
@@ -1653,7 +1663,8 @@ document.addEventListener('click',async e=>{
     case 'jRemind':{const c=cust(id);if(c)doRemind(c);break;}
     case 'jStmt':{if(!cust(id))break;S.cid=id;toast(t('making'));const cs=await statementCanvases(id);docModal(t('statement'),cs,'statement',210,297,cust(id));break;}
     case 'vPick':{const f=document.querySelector('input[data-voice]');if(f)f.click();break;}
-    case 'jYes':{const d=S.drafts[id];if(!d||d.status)break;if(!d.name){S.cid=null;go('entry',{draft:Object.assign({},d,{fromQuick:true,fromJugnu:id})});break;}const r=commitEntry(d);d.status='yes';jSaved(r.c,r.saved,d.l);break;}
+    case 'jYes':{const d=S.drafts[id];if(!d||d.status)break;if(!d.name){S.cid=null;go('entry',{draft:Object.assign({},d,{fromQuick:true,fromJugnu:id})});break;}const r=commitEntry(d);d.status='yes';jSaved(r.c,r.saved,d.l);if(d.sid){const left=storyPending(d.sid).length;if(left)jPush({who:'ai',text:fill(jt('leftOne',d.l),{n:left}),btns:[{act:'jYesAll',id:d.sid,label:jt('yesRest',d.l)}],l:d.l});}break;}
+    case 'jYesAll':{storySaveAll(id);break;}
     case 'jEdit':{const d=S.drafts[id];if(!d||d.status)break;S.cid=null;go('entry',{draft:Object.assign({},d,{fromQuick:true,fromJugnu:id})});break;}
     case 'comOpen':closeModal();go('committee');break;
     case 'comNew':comNewModal();break;

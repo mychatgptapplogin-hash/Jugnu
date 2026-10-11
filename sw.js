@@ -1,6 +1,6 @@
 /* Jugnu offline worker: keeps the app, PDF tool and fonts on the phone after the first visit,
    and receives text or voice notes shared from WhatsApp (Share > Jugnu). */
-const CACHE='jugnu-v16';
+const CACHE='jugnu-v17';
 const SHARE='jugnu-share';
 const CORE=['./','./index.html','./manifest.webmanifest','./icon-192.png','./icon-512.png'];
 const CDN=['https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js','https://fonts.googleapis.com/css2?family=Noto+Nastaliq+Urdu:wght@400;600;700&family=Noto+Naskh+Arabic:wght@400;600;700&family=Sora:wght@400;600;700&display=swap'];
