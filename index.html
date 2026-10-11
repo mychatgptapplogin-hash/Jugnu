@@ -971,7 +971,7 @@ function settingsView(){
     <label for="importFile" class="btn ghost full" style="margin:0;color:var(--ink)">${esc(t('bkRestoreF'))}</label><input id="importFile" type="file" accept=".json,application/json,text/plain" hidden>
     <button class="btn ghost full" data-act="pasteRestore">${esc(t('bkRestoreP'))}</button></div>
    ${fbCardHTML()}
-   <div class="page stack"><h2 style="margin-top:0">${esc(t('danger'))}</h2><button class="btn danger full" data-act="wipe">${esc(t('wipe'))}</button><p class="note">Jugnu Munshi · ConceptAI · v0.13.1</p></div></div>`;
+   <div class="page stack"><h2 style="margin-top:0">${esc(t('danger'))}</h2><button class="btn danger full" data-act="wipe">${esc(t('wipe'))}</button><p class="note">Jugnu Munshi · ConceptAI · v0.14</p></div></div>`;
 }
 function pilotView(){
   const now=Date.now(),wk=7*86400000;
@@ -1009,7 +1009,7 @@ function jugnuView(){
   return `<div class="jhome">
    <div class="jhero"><span class="ffw listening" id="jFF">${ffSVG()}</span><div><div class="jname">Jugnu<small>munshi</small></div><div class="jstat" id="jStat" aria-live="polite">${esc(jt('listening'))}</div><span class="jmode" id="jMode"></span><button class="jtheme" data-act="jTheme" aria-label="Light / dark">${jLight()?'☾':'☀'}</button></div>${profChip()}</div>
    <div class="jchat" id="jChat" aria-live="polite"></div>
-   <div class="jchips">${jt('chips').map(q=>`<button class="jchip" data-act="jAsk" data-q="${esc(q)}" dir="auto">${esc(q)}</button>`).join('')}</div>
+   <div class="jchips">${smartChipsHTML('j')}</div>
    <form class="jform" id="jForm"><label for="jIn" class="sr">${esc(jt('ask'))}</label><input id="jIn" dir="auto" autocomplete="off" enterkeyhint="send" placeholder="${esc(jt('ph'))}"><button type="button" class="vbtn" data-rec="1" title="${esc(jt('vBtn'))}" aria-label="${esc(jt('vBtn'))}"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg></button><input type="file" accept="audio/*" hidden data-voice="1"><button class="btn" type="submit">${esc(t('go'))}</button></form>
    <p class="jhint">${esc(t('hint'))}</p></div>`;
 }
@@ -1087,7 +1087,7 @@ Object.assign(J.ur,{yesAll:'سب {n} لکھ دو',savedAll:'{n} حساب لکھ 
 Object.assign(J.ps,{yesAll:'ټول {n} ولیکه',savedAll:'{n} حسابونه ولیکل شول.',leftOne:'د دې خبرې {n} حسابونه لا پاتې دي (پورته). هغه هم ولیکم؟',yesRest:'هو، پاتې هم ولیکه'});
 Object.assign(J.en,{yesAll:'Save all {n}',savedAll:'Saved {n} entries.',leftOne:'{n} more entries from this message are still unsaved (above). Save them too?',yesRest:'Yes, save the rest'});
 async function jSend(q){
-  q=String(q||'').trim();if(!q||jBusy)return;jBusy=true;
+  q=String(q||'').trim();if(!q||jBusy)return;hbNote(q,'j');jBusy=true;
   const l=detectLang(q);
   jPush({who:'me',text:q,l});jState('thinking');
   await sleep(450);
@@ -1407,10 +1407,10 @@ function sylModal(pid,afterNew){const p=D.profiles.find(x=>x.id===pid);if(!p)ret
 
 /* v0.13 Exam tayyari: board-style practice tests (AI written, clearly labelled), answer marking, link to real past papers */
 const EX_T={
- roman:{exBtn:'Exam tayyari',exT:'Exam tayyari',subL:'Subject',topL:'Chapter / topic (optional)',topPh:'Misaal: Chapter 3, ya Newton ke qawaneen',modeL:'Kya chahiye?',mMcq:'10 MCQs ka test (foran nateeja)',mShort:'Short + long sawal (main jawab check karunga)',go:'Shuru karein',making:'Board ke andaz mein paper bana raha hoon aur har jawab do baar check kar raha hoon (30 second tak)…',fail:'Abhi paper nahi ban saka. Thori der baad dobara koshish karein.',qOf:'Sawal {i} / {n}',right:'Shabash! Sahi jawab.',wrong:'Sahi jawab: {a}',done:'Test mukammal: {s} / {t} sahi.',again:'Naya test',papers:'Asli past papers dhoondein',note:'Ye practice sawal AI ne aap ke board ke andaz mein banaye hain, asli purane paper nahi.',shortIntro:'Ye sawal hal karein. Har jawab yahan likh kar bhejein, main board ke andaz mein marks dunga:',ansHint:'Jawab ke shuru mein sawal number likhein, jaise "Q2: ..."',stop:'Exam mode band',stopped:'Exam mode band ho gaya.',checking:'Jawab check kar raha hoon…',marks:'Marks: {m} / {t}',model:'Behtar jawab:'},
- ur:{exBtn:'امتحان کی تیاری',exT:'امتحان کی تیاری',subL:'مضمون',topL:'باب / موضوع (اختیاری)',topPh:'مثال: باب 3، یا نیوٹن کے قوانین',modeL:'کیا چاہیے؟',mMcq:'10 ایم سی کیوز کا ٹیسٹ (فوری نتیجہ)',mShort:'مختصر اور تفصیلی سوال (میں جواب چیک کروں گا)',go:'شروع کریں',making:'بورڈ کے انداز میں پرچہ بنا رہا ہوں اور ہر جواب دو بار چیک کر رہا ہوں (30 سیکنڈ تک)…',fail:'ابھی پرچہ نہیں بن سکا۔ تھوڑی دیر بعد دوبارہ کوشش کریں۔',qOf:'سوال {i} / {n}',right:'شاباش! صحیح جواب۔',wrong:'صحیح جواب: {a}',done:'ٹیسٹ مکمل: {s} / {t} صحیح۔',again:'نیا ٹیسٹ',papers:'اصل پرانے پرچے ڈھونڈیں',note:'یہ مشقی سوال اے آئی نے آپ کے بورڈ کے انداز میں بنائے ہیں، اصل پرانے پرچے نہیں۔',shortIntro:'یہ سوال حل کریں۔ ہر جواب یہاں لکھ کر بھیجیں، میں بورڈ کے انداز میں نمبر دوں گا:',ansHint:'جواب کے شروع میں سوال نمبر لکھیں، جیسے "Q2: ..."',stop:'امتحانی موڈ بند',stopped:'امتحانی موڈ بند ہو گیا۔',checking:'جواب چیک کر رہا ہوں…',marks:'نمبر: {m} / {t}',model:'بہتر جواب:'},
- ps:{exBtn:'د ازموینې تیاری',exT:'د ازموینې تیاری',subL:'مضمون',topL:'څپرکی / موضوع (اختیاري)',topPh:'بېلګه: درېیم څپرکی',modeL:'څه غواړئ؟',mMcq:'د ۱۰ MCQs ازموینه (سمدستي پایله)',mShort:'لنډې او اوږدې پوښتنې (زه به ځوابونه وګورم)',go:'پیل کړئ',making:'د بورډ په ډول پرچه جوړوم او هر ځواب دوه ځله ګورم (تر 30 ثانیو)…',fail:'اوس پرچه جوړه نه شوه. لږ وروسته بیا هڅه وکړئ.',qOf:'پوښتنه {i} / {n}',right:'شاباس! سم ځواب.',wrong:'سم ځواب: {a}',done:'ازموینه پوره شوه: {s} / {t} سم.',again:'نوې ازموینه',papers:'اصلي زاړه پرچې ولټوئ',note:'دا تمریني پوښتنې AI ستاسو د بورډ په ډول جوړې کړې، اصلي زاړه پرچې نه دي.',shortIntro:'دا پوښتنې حل کړئ. هر ځواب دلته ولیکئ، زه به د بورډ په ډول نمرې درکړم:',ansHint:'د ځواب په سر کې د پوښتنې شمېره ولیکئ، لکه "Q2: ..."',stop:'د ازموینې حالت بند',stopped:'د ازموینې حالت بند شو.',checking:'ځواب ګورم…',marks:'نمرې: {m} / {t}',model:'ښه ځواب:'},
- en:{exBtn:'Exam prep',exT:'Exam preparation',subL:'Subject',topL:'Chapter / topic (optional)',topPh:"e.g. Chapter 3, or Newton's laws",modeL:'What do you want?',mMcq:'10-MCQ test (instant result)',mShort:'Short + long questions (I will mark your answers)',go:'Start',making:'Making a paper in your board style and double checking every answer (up to 30 seconds)…',fail:'Could not make the paper right now. Please try again shortly.',qOf:'Question {i} / {n}',right:'Well done! Correct.',wrong:'Correct answer: {a}',done:'Test finished: {s} / {t} correct.',again:'New test',papers:'Find real past papers',note:'These practice questions are written by AI in your board style. They are not real past papers.',shortIntro:'Solve these. Send each answer here and I will mark it the way your board does:',ansHint:'Start your answer with the question number, like "Q2: ..."',stop:'Stop exam mode',stopped:'Exam mode stopped.',checking:'Checking your answer…',marks:'Marks: {m} / {t}',model:'Better answer:'}};
+ roman:{mSolve:'Asli past paper ka sawal hal karwayein',solveIntro:'Past paper ka sawal yahan likhein ya paste karein. Main board ke marking ke hisaab se poora hal samjhaunga.',solving:'Hal kar raha hoon…',ppT:'Asli past papers dhoondein',yearL:'Saal',ppGo:'Dhoondein',ppNote:'Ye aap ke board ke asli purane parche internet par dhoondega.',exBtn:'Exam tayyari',exT:'Exam tayyari',subL:'Subject',topL:'Chapter / topic (optional)',topPh:'Misaal: Chapter 3, ya Newton ke qawaneen',modeL:'Kya chahiye?',mMcq:'10 MCQs ka test (foran nateeja)',mShort:'Short + long sawal (main jawab check karunga)',go:'Shuru karein',making:'Board ke andaz mein paper bana raha hoon aur har jawab do baar check kar raha hoon (30 second tak)…',fail:'Abhi paper nahi ban saka. Thori der baad dobara koshish karein.',qOf:'Sawal {i} / {n}',right:'Shabash! Sahi jawab.',wrong:'Sahi jawab: {a}',done:'Test mukammal: {s} / {t} sahi.',again:'Naya test',papers:'Asli past papers dhoondein',note:'Ye practice sawal AI ne aap ke board ke andaz mein banaye hain, asli purane paper nahi.',shortIntro:'Ye sawal hal karein. Har jawab yahan likh kar bhejein, main board ke andaz mein marks dunga:',ansHint:'Jawab ke shuru mein sawal number likhein, jaise "Q2: ..."',stop:'Exam mode band',stopped:'Exam mode band ho gaya.',checking:'Jawab check kar raha hoon…',marks:'Marks: {m} / {t}',model:'Behtar jawab:'},
+ ur:{mSolve:'اصل پرانے پرچے کا سوال حل کروائیں',solveIntro:'پرانے پرچے کا سوال یہاں لکھیں یا پیسٹ کریں۔ میں بورڈ کی مارکنگ کے حساب سے پورا حل سمجھاؤں گا۔',solving:'حل کر رہا ہوں…',ppT:'اصل پرانے پرچے ڈھونڈیں',yearL:'سال',ppGo:'ڈھونڈیں',ppNote:'یہ آپ کے بورڈ کے اصل پرانے پرچے انٹرنیٹ پر ڈھونڈے گا۔',exBtn:'امتحان کی تیاری',exT:'امتحان کی تیاری',subL:'مضمون',topL:'باب / موضوع (اختیاری)',topPh:'مثال: باب 3، یا نیوٹن کے قوانین',modeL:'کیا چاہیے؟',mMcq:'10 ایم سی کیوز کا ٹیسٹ (فوری نتیجہ)',mShort:'مختصر اور تفصیلی سوال (میں جواب چیک کروں گا)',go:'شروع کریں',making:'بورڈ کے انداز میں پرچہ بنا رہا ہوں اور ہر جواب دو بار چیک کر رہا ہوں (30 سیکنڈ تک)…',fail:'ابھی پرچہ نہیں بن سکا۔ تھوڑی دیر بعد دوبارہ کوشش کریں۔',qOf:'سوال {i} / {n}',right:'شاباش! صحیح جواب۔',wrong:'صحیح جواب: {a}',done:'ٹیسٹ مکمل: {s} / {t} صحیح۔',again:'نیا ٹیسٹ',papers:'اصل پرانے پرچے ڈھونڈیں',note:'یہ مشقی سوال اے آئی نے آپ کے بورڈ کے انداز میں بنائے ہیں، اصل پرانے پرچے نہیں۔',shortIntro:'یہ سوال حل کریں۔ ہر جواب یہاں لکھ کر بھیجیں، میں بورڈ کے انداز میں نمبر دوں گا:',ansHint:'جواب کے شروع میں سوال نمبر لکھیں، جیسے "Q2: ..."',stop:'امتحانی موڈ بند',stopped:'امتحانی موڈ بند ہو گیا۔',checking:'جواب چیک کر رہا ہوں…',marks:'نمبر: {m} / {t}',model:'بہتر جواب:'},
+ ps:{mSolve:'د اصلي زاړه پرچې پوښتنه حل کړئ',solveIntro:'د زاړه پرچې پوښتنه دلته ولیکئ یا پیسټ کړئ. زه به یې د بورډ د نمرو سره سم بشپړ حل درته ووایم.',solving:'حل کوم…',ppT:'اصلي زاړه پرچې ولټوئ',yearL:'کال',ppGo:'ولټوئ',ppNote:'دا به ستاسو د بورډ اصلي زاړه پرچې په انټرنېټ کې ولټوي.',exBtn:'د ازموینې تیاری',exT:'د ازموینې تیاری',subL:'مضمون',topL:'څپرکی / موضوع (اختیاري)',topPh:'بېلګه: درېیم څپرکی',modeL:'څه غواړئ؟',mMcq:'د ۱۰ MCQs ازموینه (سمدستي پایله)',mShort:'لنډې او اوږدې پوښتنې (زه به ځوابونه وګورم)',go:'پیل کړئ',making:'د بورډ په ډول پرچه جوړوم او هر ځواب دوه ځله ګورم (تر 30 ثانیو)…',fail:'اوس پرچه جوړه نه شوه. لږ وروسته بیا هڅه وکړئ.',qOf:'پوښتنه {i} / {n}',right:'شاباس! سم ځواب.',wrong:'سم ځواب: {a}',done:'ازموینه پوره شوه: {s} / {t} سم.',again:'نوې ازموینه',papers:'اصلي زاړه پرچې ولټوئ',note:'دا تمریني پوښتنې AI ستاسو د بورډ په ډول جوړې کړې، اصلي زاړه پرچې نه دي.',shortIntro:'دا پوښتنې حل کړئ. هر ځواب دلته ولیکئ، زه به د بورډ په ډول نمرې درکړم:',ansHint:'د ځواب په سر کې د پوښتنې شمېره ولیکئ، لکه "Q2: ..."',stop:'د ازموینې حالت بند',stopped:'د ازموینې حالت بند شو.',checking:'ځواب ګورم…',marks:'نمرې: {m} / {t}',model:'ښه ځواب:'},
+ en:{mSolve:'Solve a real past paper question',solveIntro:'Type or paste a past paper question here. I will solve it fully, the way the board marks it.',solving:'Solving…',ppT:'Find real past papers',yearL:'Year',ppGo:'Search',ppNote:'Searches the internet for real past papers from your board.',exBtn:'Exam prep',exT:'Exam preparation',subL:'Subject',topL:'Chapter / topic (optional)',topPh:"e.g. Chapter 3, or Newton's laws",modeL:'What do you want?',mMcq:'10-MCQ test (instant result)',mShort:'Short + long questions (I will mark your answers)',go:'Start',making:'Making a paper in your board style and double checking every answer (up to 30 seconds)…',fail:'Could not make the paper right now. Please try again shortly.',qOf:'Question {i} / {n}',right:'Well done! Correct.',wrong:'Correct answer: {a}',done:'Test finished: {s} / {t} correct.',again:'New test',papers:'Find real past papers',note:'These practice questions are written by AI in your board style. They are not real past papers.',shortIntro:'Solve these. Send each answer here and I will mark it the way your board does:',ansHint:'Start your answer with the question number, like "Q2: ..."',stop:'Stop exam mode',stopped:'Exam mode stopped.',checking:'Checking your answer…',marks:'Marks: {m} / {t}',model:'Better answer:'}};
 function et(k,l){l=l||D.lang||'roman';return (EX_T[l]&&EX_T[l][k])||EX_T.roman[k]||k;}
 function examSubjects(p){const s=sylOf(p);const base=['maths','english','urdu','pashto','islamiat'];
   if(!hiCls(s.cls)&&!['O','A'].includes(s.cls))return base.concat(+s.cls>=4?['gsci','pakst']:['gsci']);
@@ -1421,28 +1421,34 @@ function examModal(){const p=activeP();const subs=examSubjects(p);const l=D.lang
   modal(`<h1>📝 ${esc(et('exT'))}</h1><p class="soft small" dir="auto">${esc(sylShort(p)||'')}</p>
    <form id="exForm" class="stack"><div><label for="exS">${esc(et('subL'))}</label><select id="exS">${subs.map(k=>`<option value="${k}">${esc(subName(k,l))}</option>`).join('')}</select></div>
    <div><label for="exTp">${esc(et('topL'))}</label><input id="exTp" dir="auto" maxlength="80" placeholder="${esc(et('topPh'))}"></div>
-   <div><label>${esc(et('modeL'))}</label><div class="seg" style="grid-template-columns:1fr"><button type="button" data-exm="mcq" aria-pressed="true">${esc(et('mMcq'))}</button><button type="button" data-exm="short" aria-pressed="false">${esc(et('mShort'))}</button></div></div>
+   <div><label>${esc(et('modeL'))}</label><div class="seg" style="grid-template-columns:1fr"><button type="button" data-exm="mcq" aria-pressed="true">${esc(et('mMcq'))}</button><button type="button" data-exm="short" aria-pressed="false">${esc(et('mShort'))}</button><button type="button" data-exm="solve" aria-pressed="false">${esc(et('mSolve'))}</button></div></div>
    <p class="note">${esc(et('note'))}</p>
-   <div class="row"><button class="btn" type="submit" style="flex:1">${esc(et('go'))}</button><button class="btn ghost" type="button" data-act="closeModal">${esc(t('cancel'))}</button></div></form>`);
+   <div class="row"><button class="btn" type="submit" style="flex:1">${esc(et('go'))}</button><button class="btn ghost" type="button" data-act="closeModal">${esc(t('cancel'))}</button></div></form>
+   <div class="page stack" style="box-shadow:none;margin-top:4px"><h2 style="margin:0">🔎 ${esc(et('ppT'))}</h2><p class="note">${esc(et('ppNote'))}</p>
+    <div class="row"><select id="ppY" style="flex:1">${Array.from({length:10},(_,i)=>new Date().getFullYear()-i).map(y=>`<option>${y}</option>`).join('')}</select><button class="btn ghost" type="button" id="ppGo">${esc(et('ppGo'))}</button></div></div>`);
+  $('ppGo').onclick=()=>examPapers($('exS').value,$('ppY').value);
   let mode='mcq';document.querySelectorAll('[data-exm]').forEach(b=>b.onclick=()=>{mode=b.dataset.exm;document.querySelectorAll('[data-exm]').forEach(x=>x.setAttribute('aria-pressed',String(x===b)));});
-  $('exForm').onsubmit=e=>{e.preventDefault();const sub=$('exS').value,tp=$('exTp').value.trim().slice(0,80);closeModal();mode==='mcq'?examMcq(sub,tp):examShort(sub,tp);};}
+  $('exForm').onsubmit=e=>{e.preventDefault();const sub=$('exS').value,tp=$('exTp').value.trim().slice(0,80);closeModal();mode==='mcq'?examMcq(sub,tp):mode==='short'?examShort(sub,tp):examSolveStart(sub);};}
 function examGate(l){if(!aiOn()){uPush({who:'ai',text:ft('uNeedNet',l),l});return false;}const qa=aiQuota();if(D.plan!=='family'&&qa.n>=STU_CAP){uPush({who:'ai',text:fill(ft('cap',l),{c:STU_CAP}),l});return false;}return true;}
-async function exAI(prompt,effort){let r=null;try{r=await aiJSONx(prompt,'@cf/openai/gpt-oss-120b',effort||'medium');}catch(e){r=null;}return r;}
+function levelRule(p){const c=sylOf(p).cls;const n=+c;
+  if(c==='A'||n>=11)return 'Use only Class '+(c==='A'?'A Level':c)+' textbook concepts.';
+  return 'Level rules for this student: no calculus of any kind (no derivatives, integrals, or rates like a = 4t or v = 3t²), no variable acceleration, no projectile at an angle, no topics from higher classes. Every question must give all the information needed and have one clear answer.';}
+async function exAI(prompt,effort){let r=null;try{r=await aiJSONx(prompt,'@cf/openai/gpt-oss-120b',effort||'low');}catch(e){r=null;}return r;}
 async function aiJSONx(prompt,model,effort){if(SAMPLE)return aiJSON(prompt,model);evt('ai');const ctl=new AbortController();const tm=setTimeout(()=>ctl.abort(),60000);
   try{const r=await fetch(AI_URL,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({prompt,model,effort}),signal:ctl.signal});if(!r.ok)throw{code:'http_'+r.status};const j=await r.json();return looseJSON(j.text);}finally{clearTimeout(tm);}}
 async function exVerify(list,p,sub){
   const pr=`You are checking a multiple choice test before it is given to a Pakistani student. The student: ${sylPrompt(p)} Subject: ${SUBJ[sub]?SUBJ[sub].en:sub}.
-Solve every question yourself, carefully and independently, writing the short working in "work" (for physics use g = 10 m/s² unless the question gives another value). Then give the index (0 to 3) of the option that is exactly correct. Give -1 if no option is exactly correct, if more than one option is correct, or if the question needs topics not taught in this class.
+Solve every question yourself, carefully and independently, writing the short working in "work" (for physics use g = 10 m/s² unless the question gives another value). Then give the index (0 to 3) of the option that is exactly correct. Give -1 if no option is exactly correct, if more than one option is correct, if information is missing or unclear, or if the question breaks these level rules: ${levelRule(p)}
 Questions:
 ${list.map((x,i)=>`${i}. ${x.q}\n   options: ${x.o.map((o,j)=>j+') '+o).join('   ')}`).join('\n')}
 Reply with only JSON: {"answers":[{"i":0,"work":"","answer":0}]}`;
-  const r=await exAI(pr,'medium');if(!r||!Array.isArray(r.answers))return null;
+  const r=await exAI(pr,'low');if(!r||!Array.isArray(r.answers))return null;
   const m={};r.answers.forEach(x=>{if(x&&Number.isInteger(+x.i))m[+x.i]=+x.answer;});
   return list.filter((x,i)=>m[i]===x.a);}
 async function examMcq(sub,tp){const p=activeP(),l=D.lang;if(jBusy||!examGate(l))return;jBusy=true;jState('thinking');
   uPush({who:'me',text:'📝 '+subName(sub,l)+(tp?' · '+tp:''),l});uPush({who:'ai',text:et('making'),l});
   const prompt=`You are an experienced Pakistani board examiner. The student: ${sylPrompt(p)}
-Write 12 ORIGINAL multiple choice questions for the subject "${SUBJ[sub]?SUBJ[sub].en:sub}"${tp?` on this chapter or topic: "${tp}"`:' covering the important chapters of this class'}, exactly in the style and difficulty of this student's board exam MCQ section. Mix easy, medium and hard. Each question has 4 options and exactly one correct option. Keep each question under 30 words. Use only concepts taught in this class's textbook (for example no calculus before Class 11).
+Write 12 ORIGINAL multiple choice questions for the subject "${SUBJ[sub]?SUBJ[sub].en:sub}"${tp?` on this chapter or topic: "${tp}"`:' covering the important chapters of this class'}, exactly in the style and difficulty of this student's board exam MCQ section. Mix easy, medium and hard. Each question has 4 options and exactly one correct option. Keep each question under 30 words. ${levelRule(p)}
 Language of questions and options: ${subLang(sub,p)}. Write the "why" explanation in ${LNAME[l]}, one short line.
 Accuracy matters most: for every question, first solve it yourself and write the short working in "work", then set "answer" to the index (0 to 3) of the option that matches your working. Exactly one option must be correct and the numbers must work out exactly. For physics use g = 10 m/s² unless the question gives another value. Do not copy real past papers word for word. No dashes. Reply with only JSON: {"questions":[{"q":"","options":["","","",""],"work":"","answer":0,"why":""}]}`;
   const r=await exAI(prompt);const list=(r&&Array.isArray(r.questions)?r.questions:[]).filter(x=>x&&x.q&&Array.isArray(x.options)&&x.options.length===4&&Number.isInteger(+x.answer)&&+x.answer>=0&&+x.answer<4).slice(0,12)
@@ -1472,7 +1478,7 @@ Reply with only JSON: {"questions":[{"q":"","marks":2}]} with the long question 
   jBusy=false;jState('idle');
   if(qs.length<2){uPush({who:'ai',text:et('fail'),btns:[{act:'examOpen',id:'',label:et('again')}],l});return;}
   const qa=aiQuota();qa.n++;save();
-  S.examQ={pid:p.id,sub,qs};
+  S.examSolve=null;S.examQ={pid:p.id,sub,qs};
   uPush({who:'ai',text:et('shortIntro')+'\n\n'+qs.map((x,i)=>`Q${i+1} (${x.m}): ${x.q}`).join('\n\n')+'\n\n'+et('ansHint'),btns:[{act:'eStop',id:'',label:et('stop')},{act:'ePapers',id:sub,label:et('papers')}],l});}
 async function examMark(ans){const p=activeP(),l=detectLang(ans)||D.lang;const E=S.examQ;if(!E)return false;if(!examGate(l))return true;
   jBusy=true;jState('thinking');uPush({who:'me',text:ans,l});uPush({who:'ai',text:et('checking'),l});
@@ -1490,9 +1496,22 @@ Reply with only JSON: {"q":2,"marks":1,"out_of":2,"feedback":"","model":""}`;
   uPush({who:'ai',text:(qn?'Q'+qn+' · ':'')+fill(et('marks'),{m:Math.min(m,t2),t:t2})+'\n'+String(r.feedback).slice(0,600)+(r.model?'\n\n'+et('model')+'\n'+String(r.model).slice(0,900):''),btns:[{act:'eStop',id:'',label:et('stop')}],l});
   const s=stuStats(p);s.quizzes.push({d:todayISO(),sub:E.sub,score:Math.min(m,t2),total:t2});save();
   jState(m/t2>=.6?'happy':'idle');return true;}
-function examPapers(sub){const p=activeP();const s=sylOf(p);
+function examSolveStart(sub){const p=activeP(),l=D.lang;S.examQ=null;S.examSolve={pid:p.id,sub};uPush({who:'me',text:'📝 '+subName(sub,l)+' · '+et('mSolve'),l});
+  uPush({who:'ai',text:et('solveIntro'),btns:[{act:'eStop',id:'',label:et('stop')},{act:'ePapers',id:sub,label:et('papers')}],l});}
+async function examSolve(q){const p=activeP(),l=detectLang(q)||D.lang;const E=S.examSolve;if(!examGate(l))return true;
+  jBusy=true;jState('thinking');uPush({who:'me',text:q,l});uPush({who:'ai',text:et('solving'),l});
+  const prompt=`You are an expert Pakistani teacher writing the ideal full-marks answer to a real board exam question. The student: ${sylPrompt(p)} Subject: ${SUBJ[E.sub]?SUBJ[E.sub].en:E.sub}.
+Question (from a real past paper, typed by the student): """${q.slice(0,2500)}"""
+Write the answer exactly the way the board marking scheme expects: for an MCQ, the correct option and one line why; for short questions, the key points; for numericals, Given, Formula, Solution with units, Result; for long questions, a structured answer with headings. Then add one line "Tip:" on how marks are lost on this question. ${levelRule(p)}
+Write the answer in ${subLang(E.sub,p)}; write the Tip in ${LNAME[l]}. Solve carefully and check your arithmetic. No dashes.
+Reply with only JSON: {"answer":"","tip":""}`;
+  const r=await exAI(prompt,'low');jBusy=false;
+  if(!r||!r.answer){jState('idle');uPush({who:'ai',text:et('fail'),l});return true;}
+  const qa=aiQuota();qa.n++;save();
+  uPush({who:'ai',text:String(r.answer).slice(0,2500)+(r.tip?'\n\n💡 '+String(r.tip).slice(0,300):''),btns:[{act:'eStop',id:'',label:et('stop')}],l});jState('happy');return true;}
+function examPapers(sub,year){const p=activeP();const s=sylOf(p);
   const b={kp:'BISE '+(s.exam||'KPK'),fed:'FBISE',cam:'Cambridge '+(s.cls==='A'?'A Level':'O Level'),aku:'AKU-EB',own:''}[s.board]||'';
-  const q=[b,s.cls==='O'||s.cls==='A'?'':'class '+s.cls,SUBJ[sub]?SUBJ[sub].en:sub,'past papers'].filter(Boolean).join(' ');
+  const q=[b,s.cls==='O'||s.cls==='A'?'':'class '+s.cls,SUBJ[sub]?SUBJ[sub].en:sub,'past paper',year||''].filter(Boolean).join(' ');
   try{window.open('https://www.google.com/search?q='+encodeURIComponent(q),'_blank','noopener');}catch(e){}}
 
 function ustadView(){const p=activeP();
@@ -1500,7 +1519,7 @@ function ustadView(){const p=activeP();
    <div class="jhero"><span class="ffw listening" id="jFF">${ffSVG()}</span><div><div class="jname">Ustad<small>jugnu</small></div><div class="jstat" id="jStat" aria-live="polite">${esc(jt('listening'))}</div><span class="jmode" id="jMode"></span><button class="jtheme" data-act="jTheme" aria-label="Light / dark">${jLight()?'☾':'☀'}</button></div>${profChip()}</div>
    <div class="urow"><button class="usyl" data-act="sylOpen" data-id="${p.id}">📘 ${esc(sylShort(p)||st('sylBtn'))}</button><button class="uexam" data-act="examOpen">📝 ${esc(et('exBtn'))}</button></div>
    <div class="jchat" id="jChat" aria-live="polite"></div>
-   <div class="jchips">${ft('uChips').map(q=>`<button class="jchip" data-act="uAsk" data-q="${esc(q)}" dir="auto">${esc(q)}</button>`).join('')}</div>
+   <div class="jchips">${smartChipsHTML('u')}</div>
    <form class="jform" id="jForm"><label for="jIn" class="sr">Ustad</label><input id="jIn" dir="auto" autocomplete="off" enterkeyhint="send" placeholder="${esc(ft('uPh'))}"><button type="button" class="vbtn" data-rec="1" title="${esc(jt('vBtn'))}" aria-label="${esc(jt('vBtn'))}"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg></button><input type="file" accept="audio/*" hidden data-voice="1"><button class="btn" type="submit">${esc(t('go'))}</button></form>
    <p class="jhint" id="uCap">${esc(D.plan==='family'?ft('famNote'):fill(ft('aiLeft'),{u:aiQuota().n,c:STU_CAP}))}</p></div>`;}
 function uMsgHTML(m,i){const l=m.l||D.lang;
@@ -1533,7 +1552,7 @@ function uAnswerPick(mi,opt){const ch=uChat();const m=ch[mi];const Q=S.quiz;if(!
   else{stuStats(p).quizzes.push({d:todayISO(),sub:Q.sub,score:Q.score,total:Q.list.length});if(stuStats(p).quizzes.length>100)stuStats(p).quizzes.shift();save();
     const r=Q.score/Q.list.length;uPush({who:'ai',text:fill(ft('qDone',l),{s:Q.score,t:Q.list.length,m:ft(r>=.8?'qGood':r>=.6?'qOk':'qLow',l)}),btns:[{act:'uQuiz',id:Q.sub,label:subName(Q.sub,l)+' '+({ur:'کوئز',ps:'کوئز'}[l]||'quiz')},{act:'uProg',id:'',label:ft('progress',l)}],l});S.quiz=null;}
 }
-async function uSend(q){q=String(q||'').trim();if(!q||jBusy)return;if(S.examQ&&S.examQ.pid===D.active){await examMark(q);return;}jBusy=true;const l=detectLang(q);const p=activeP();
+async function uSend(q){q=String(q||'').trim();if(!q||jBusy)return;hbNote(q,'u');if(S.examQ&&S.examQ.pid===D.active){await examMark(q);return;}if(S.examSolve&&S.examSolve.pid===D.active){await examSolve(q);return;}jBusy=true;const l=detectLang(q);const p=activeP();
   uPush({who:'me',text:q,l});markStudy(p,true);jState('thinking');await sleep(400);
   let a=ustadAnswer(q,l);
   if(!a.ai&&!a.quiz&&aiOn()&&String(a.text||'').startsWith(ft('fLead',l))&&/(samjh|explain|detail|tafseel|tafsil|kaise|kese|kaisay|kyun|kyon|process|describe|derive|prove|example|misaal|سمجھا|تفصیل|وضاحت|کیسے|کیوں|مثال|څنګه|ولې|تشریح|بېلګه)/i.test(q))a={ai:true};
@@ -1542,7 +1561,7 @@ async function uSend(q){q=String(q||'').trim();if(!q||jBusy)return;if(S.examQ&&S
   const qa=aiQuota();
   if(!aiOn()){uPush({who:'ai',text:ft('uNeedNet',l),btns:[{act:'uQuiz',id:'maths',label:subName('maths',l)+' '+({ur:'کوئز',ps:'کوئز'}[l]||'quiz')}],l});jState('idle');jBusy=false;return;}
   if(D.plan!=='family'&&qa.n>=STU_CAP){uPush({who:'ai',text:fill(ft('cap',l),{c:STU_CAP}),l});jState('idle');jBusy=false;return;}
-  const r=await askTutor(q,l,p);if(r){qa.n++;save();}
+  const r=await askTutor(q,l,p);if(r){qa.n++;if(q.length>8&&!/^(Revise|Ye dobara)/.test(q))p.lastQ=q.slice(0,120);save();}
   uPush({who:'ai',text:r||ft('uNeedNet',l),l});jState(r?'happy':'idle');setTimeout(()=>{if(!jBusy)jState('idle');},1300);jBusy=false;}
 async function askTutor(q,l,p){
   try{const hist=uChat().filter(m=>m.text).slice(-7,-1).map(m=>(m.who==='me'?'Student: ':'Ustad: ')+m.text).join('\n');
@@ -1911,10 +1930,12 @@ document.addEventListener('click',async e=>{
   const lb=e.target.closest('[data-lang]');if(lb){D.lang=lb.dataset.lang;save();if(S.chat.length<=1)S.chat=[];render();return;}
   const el=e.target.closest('[data-act]');if(!el)return;const act=el.dataset.act,id=el.dataset.id;
   if(acctAct(act,id))return;
+  if(el.dataset.k)hbTap(el.dataset.k);
+  if(act==='exQuick'){examMcq(id,'');return;}
   if(act==='sylOpen'){sylModal(id);return;}
   if(act==='examOpen'){examModal();return;}
   if(act==='eAns'){const [mi,o]=String(id).split(':').map(Number);examPick(mi,o);return;}
-  if(act==='eStop'){S.examQ=null;S.exam=null;uPush({who:'ai',text:et('stopped'),l:D.lang});return;}
+  if(act==='eStop'){S.examQ=null;S.exam=null;S.examSolve=null;uPush({who:'ai',text:et('stopped'),l:D.lang});return;}
   if(act==='ePapers'){examPapers(id);return;}
   if(act==='jTheme'){setJTheme(jLight()?'dark':'light');return;}
   if(act==='jThemeSet'){setJTheme(id);return;}
@@ -1993,6 +2014,83 @@ document.addEventListener('click',async e=>{
 if('serviceWorker' in navigator&&(location.protocol==='https:'||location.hostname==='localhost')&&!inViewer()){window.addEventListener('load',()=>{navigator.serviceWorker.register('sw.js').catch(()=>{});});}
 document.addEventListener('change',e=>{const el=e.target;if(el&&el.matches&&el.matches('input[data-voice]')){const f=el.files&&el.files[0];el.value='';if(f)handleVoice(f);}});
 document.addEventListener('keydown',e=>{if((e.key==='Enter'||e.key===' ')&&e.target.matches&&e.target.matches('tr.tap')){e.preventDefault();e.target.click();}});
+
+/* v0.14 personal suggestions: chips learn from what this user taps and asks (stored only on this phone) */
+const HB_KEY='jugnu_habits_v1';
+function hb(){try{const h=JSON.parse(localStorage.getItem(HB_KEY)||'{}');h.tap=h.tap||{};h.cat=h.cat||{};h.shown=h.shown||{};h.style=h.style||{long:0,short:0};return h;}catch(e){return{tap:{},cat:{},shown:{},style:{long:0,short:0}};}}
+function hbSave(h){try{localStorage.setItem(HB_KEY,JSON.stringify(h));}catch(e){}}
+function hbCat(q){const s=' '+toAsciiDigits(String(q)).toLowerCase()+' ';
+  if(/\d{2,}/.test(s)&&!/[?؟]/.test(s))return 'entry';
+  if(/(wasool|wusool|collect|وصول|وصولي)/.test(s))return 'collect';
+  if(/(purana|old|overdue|پرانا|زوړ)/.test(s))return 'old';
+  if(/(yaad|remind|یاد|یادونه)/.test(s))return 'remind';
+  if(/(most|zyada|ziada|زیادہ|زیات|kis ne|کس نے|د چا)/.test(s))return 'owe';
+  if(/(\bsale\b|bikri|galla|سیل|خرڅلاو)/.test(s))return 'sale';
+  if(/(kharch|expense|خرچ|لګښت)/.test(s))return 'exp';
+  if(/(haal|halat|health|حال|how is my shop)/.test(s))return 'health';
+  if(/(idea|mashwar|advice|tip|مشور|مشوره|aidia)/.test(s))return 'idea';
+  if(/(committee|kameti|کمیٹی|کمېټ)/.test(s))return 'com';
+  if(/(quiz|کوئز)/.test(s))return 'quiz';
+  if(/(formula|فارمول)/.test(s))return 'formula';
+  if(/(exam|paper|imtihan|امتحان|پرچ|ازموین)/.test(s))return 'exam';
+  if(/(progress|report|کارکردگی|پرمختګ)/.test(s))return 'progress';
+  return 'chat';}
+function hbNote(q,src){const h=hb();const c=hbCat(q);h.cat[c]=(h.cat[c]||0)+1;
+  const s=String(q).toLowerCase();
+  if(/(detail|tafseel|tafsil|explain|samjhao|aur batao|more|تفصیل|وضاحت|سمجھاؤ|تشریح)/.test(s))h.style.long++;
+  if(/(short|mukhtasar|ek line|briefly|مختصر|لنډ)/.test(s))h.style.short++;
+  h.last=Date.now();hbSave(h);}
+function hbTap(k){const h=hb();h.tap[k]=(h.tap[k]||0)+1;hbSave(h);}
+function hbStyleLine(){const h=hb(),st=h.style;if(st.long>=3&&st.long>st.short*2)return 'This user often asks for more detail: give fuller explanations (still simple words).';
+  if(st.short>=3&&st.short>st.long*2)return 'This user prefers very short answers: keep replies to one or two lines.';return '';}
+const CH={
+ roman:{collect:'Aaj ki wasooli?',owe:'Sab se zyada kis ne dena hai?',old:'Purana udhaar kis ka hai?',total:'Kul udhaar kitna hai?',health:'Dukaan ka haal batao',sale:'Aaj ki sale kitni hui?',exp:'Is mahine ka kharcha?',remind:'{n} ko yaad dihaani bhejo',stmt:'{n} ka goshwara',idea:'Sale barhane ka mashwara do',com:'Committee ka haal',
+   quiz:'{s} quiz',formula:'Formula batao',progress:'Mera progress',exam:'📝 Exam tayyari',weak:'📝 {s} ki practice',revise:'Dohrao: {t}',imp:'{s} ke important sawal'},
+ ur:{collect:'آج کی وصولی؟',owe:'سب سے زیادہ کس نے دینا ہے؟',old:'پرانا ادھار کس کا ہے؟',total:'کل ادھار کتنا ہے؟',health:'دکان کا حال بتاؤ',sale:'آج کی سیل کتنی ہوئی؟',exp:'اس مہینے کا خرچہ؟',remind:'{n} کو یاد دہانی بھیجو',stmt:'{n} کا گوشوارہ',idea:'سیل بڑھانے کا مشورہ دو',com:'کمیٹی کا حال',
+   quiz:'{s} کوئز',formula:'فارمولا بتاؤ',progress:'میری کارکردگی',exam:'📝 امتحان کی تیاری',weak:'📝 {s} کی مشق',revise:'دہراؤ: {t}',imp:'{s} کے اہم سوال'},
+ ps:{collect:'د نن وصولي؟',owe:'تر ټولو زیات پور د چا دی؟',old:'زوړ پور د چا دی؟',total:'ټول پور څومره دی؟',health:'د دوکان حال راته ووایه',sale:'نن څومره خرڅلاو وشو؟',exp:'د دې میاشتې لګښت؟',remind:'{n} ته یادونه ولېږه',stmt:'د {n} ګوشواره',idea:'د خرڅلاو د زیاتولو مشوره راکړه',com:'د کمېټۍ حال',
+   quiz:'د {s} کوئز',formula:'فارمول راته ووایه',progress:'زما پرمختګ',exam:'📝 د ازموینې تیاری',weak:'📝 د {s} تمرین',revise:'بیا: {t}',imp:'د {s} مهمې پوښتنې'},
+ en:{collect:'Collected today?',owe:'Who owes the most?',old:'Who has old dues?',total:'Total outstanding?',health:'How is my shop doing?',sale:"Today's sales?",exp:"This month's expenses?",remind:'Remind {n}',stmt:"{n}'s statement",idea:'Give me an idea to grow sales',com:'Committee status',
+   quiz:'{s} quiz',formula:'Show a formula',progress:'My progress',exam:'📝 Exam prep',weak:'📝 Practise {s}',revise:'Revise: {t}',imp:'Important {s} questions'}};
+function ch(k,l){return (CH[l]&&CH[l][k])||CH.roman[k]||k;}
+function scoreChips(cands){const h=hb();const today=todayISO();
+  return cands.map(c=>{const taps=h.tap[c.k]||0,cat=h.cat[c.c]||0,shown=(h.shown[c.k]||0);
+    let sc=(c.b||0)+3*Math.log1p(taps)+1.5*Math.log1p(cat);
+    if(shown>=6&&taps===0)sc-=Math.min(3,(shown-5)*0.4);
+    const seed=(today+c.k).split('').reduce((a,ch2)=>(a*31+ch2.charCodeAt(0))%997,7)/997;sc+=seed*0.9;return Object.assign({sc},c);}).sort((a,b)=>b.sc-a.sc);}
+let CHIP_CACHE={};
+function markShown(list){const h=hb();list.forEach(c=>h.shown[c.k]=(h.shown[c.k]||0)+1);hbSave(h);}
+function jugnuChipList(){const l=D.lang;const hr=new Date().getHours();const td=todayISO();
+  const cs=D.customers.filter(c=>c.type==='customer').map(c=>({c,b:balance(c.id),d:oldestUnpaidDays(c.id)}));
+  const owing=cs.filter(x=>x.b>0),od=owing.filter(x=>x.d>7).sort((a,b)=>b.d-a.d);
+  const recent=D.entries.slice(-30).reverse().map(e=>cust(e.cid)).find(c=>c&&c.type==='customer');
+  const saleToday=D.entries.some(e=>e.type==='sale'&&e.date===td);
+  const L=[{k:'collect',c:'collect',b:hr<14?2:1},{k:'health',c:'health',b:1}];
+  if(owing.length)L.push({k:'owe',c:'owe',b:1.2},{k:'total',c:'owe',b:.6});
+  if(od.length){L.push({k:'old',c:'old',b:1.8});L.push({k:'remind',c:'remind',b:2.2,n:nameFor(od[0].c,l)});}
+  if(recent)L.push({k:'stmt',c:'remind',b:.8,n:nameFor(recent,l)});
+  L.push({k:'sale',c:'sale',b:hr>=17&&!saleToday?2:.7},{k:'exp',c:'exp',b:new Date().getDate()>=25?1.5:.5});
+  if(aiOn())L.push({k:'idea',c:'idea',b:.9});
+  if((D.committees||[]).length)L.push({k:'com',c:'com',b:1.2});
+  return L.map(x=>Object.assign(x,{t:fill(ch(x.k,l),{n:x.n||''}),act:'jAsk'}));}
+function ustadChipList(){const p=activeP();const l=D.lang;const mo=new Date().getMonth()+1;const w=weekSummary(p);
+  const subs=(typeof examSubjects==='function'&&p.syl)?examSubjects(p):['maths','physics','biology','english'];
+  const qsubs=subs.filter(k=>['maths','physics','chemistry','biology','english'].includes(k));
+  const L=[];
+  const examSeason=(mo>=1&&mo<=4)||mo===9||mo===10;
+  L.push({k:'exam',c:'exam',b:examSeason?2.6:1.4,act:'examOpen'});
+  const weak=w.subs.filter(x=>x.p<60).map(x=>x.k);
+  weak.slice(0,2).forEach(k=>L.push({k:'weak_'+k,c:'exam',b:2.4,act:'exQuick',id:k,s:subName(k,l)}));
+  qsubs.slice(0,4).forEach((k,i)=>L.push({k:'quiz_'+k,c:'quiz',b:1.2-i*0.15,act:'uAsk',s:subName(k,l),q:fill(ch('quiz',l),{s:subName(k,l)})}));
+  if(subs.some(k=>['maths','physics','chemistry'].includes(k)))L.push({k:'formula',c:'formula',b:.9,act:'uAsk'});
+  L.push({k:'progress',c:'progress',b:.7,act:'uAsk'});
+  if(p.lastQ)L.push({k:'revise',c:'chat',b:new Date().getHours()>=16?1.6:1,act:'uAsk',t2:p.lastQ.slice(0,28),q:(D.lang==='en'?'Revise this again and ask me 2 questions: ':'Ye dobara samjhao aur mujh se 2 sawal pucho: ')+p.lastQ});
+  if(aiOn()&&subs[0])L.push({k:'imp_'+subs[0],c:'exam',b:examSeason?1.4:.6,act:'uAsk',s:subName(subs[0],l),q:fill(ch('imp',l),{s:subName(subs[0],l)})+' ('+(sylShort(p)||'')+')'});
+  return L.map(x=>{const base=x.k.split('_')[0];return Object.assign(x,{t:fill(ch(base,l),{s:x.s||'',t:x.t2||''})});});}
+function smartChipsHTML(kind){const key=kind+'|'+D.lang+'|'+(kind==='u'?D.active:'');const now=Date.now();
+  let c=CHIP_CACHE[key];
+  if(!c||now-c.at>20*60000||c.msgs!==S.chat.length&&(S.chat.length-c.msgs)>=6){const all=scoreChips(kind==='j'?jugnuChipList():ustadChipList()).slice(0,5);c={at:now,msgs:S.chat.length,list:all};CHIP_CACHE[key]=c;markShown(all);}
+  return c.list.map(x=>`<button class="jchip" data-act="${x.act}" data-k="${esc(x.k)}" ${x.id?`data-id="${esc(x.id)}"`:''} data-q="${esc(x.q||x.t)}" dir="auto">${esc(x.t)}</button>`).join('');}
 
 /* v0.12.3 same-name safety: never guess between two accounts with the same name */
 function nameCands(name,raw){
@@ -2154,7 +2252,8 @@ save=function(){save0();markDirty();};
 const _commitEntry=commitEntry;commitEntry=function(d){evt('entry');return _commitEntry(d);};
 const _handleVoice=handleVoice;handleVoice=function(b){evt('voice');return _handleVoice(b);};
 const _aiJSON=aiJSON;aiJSON=function(prompt,model){evt('ai');const ex=brainVal('ai_extra');
-  if(ex&&/^You are (Jugnu|Ustad)/.test(prompt))prompt="Extra guidance from Jugnu's owner (follow it unless it breaks the rules below):\n"+ex.slice(0,3000)+"\n\n"+prompt;return _aiJSON(prompt,model);};
+  if(ex&&/^You are (Jugnu|Ustad)/.test(prompt))prompt="Extra guidance from Jugnu's owner (follow it unless it breaks the rules below):\n"+ex.slice(0,3000)+"\n\n"+prompt;
+  const sty=typeof hbStyleLine==='function'?hbStyleLine():'';if(sty&&/(You are Jugnu|You are Ustad|Extra guidance)/.test(prompt.slice(0,200)))prompt=prompt.replace(/(Reply with only JSON)/,sty+'\n$1');return _aiJSON(prompt,model);};
 window.addEventListener('error',()=>evt('error'));
 window.addEventListener('online',()=>{syncPush();evFlush();brainPull();});
 function acctBoot(){evt('open');brainPull();const a=accGet();
