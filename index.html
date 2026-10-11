@@ -223,6 +223,8 @@ body.night .tabs button[aria-current="page"]{color:#FFD25E}
 .ustadT .jform .btn{background:#5FB8FF;color:#06223A}
 body.night.stu .tabs button[aria-current="page"]{color:#9BE7FF}
 .modal .page{color:var(--ink)}
+.vbtn{display:grid;place-items:center;min-width:48px;border-radius:10px;border:1px solid #2B2836;background:#16141F;color:#FFD25E;cursor:pointer}
+.ustadT .vbtn{color:#9BE7FF}
 .jcard .jover{font-size:13px;font-weight:700;color:#7A1A12;background:#FBE3DF;border-radius:6px;padding:4px 8px;margin-top:6px;line-height:1.6}
 .cmem{display:flex;flex-wrap:wrap;gap:6px}
 .cm{border:1px solid var(--line);background:#FFFFFF;color:var(--ink);font:inherit;font-size:14px;border-radius:999px;padding:6px 12px;min-height:40px;cursor:pointer}
@@ -752,6 +754,7 @@ function render(){
   bindAfter();
   if(sc==='jugnu')jugnuMount();
   if(sc==='ustad')ustadMount();
+  if((sc==='jugnu'||sc==='ustad')&&!window.__shareDone){window.__shareDone=true;handleShared();}
 }
 const storageWarn=()=>storageOK?'':`<div class="warnbox">This browser is not letting the app save. Open it in Chrome normally (not private mode), or data will be lost.</div>`;
 function langButtons(){return `<div class="seg" role="group" aria-label="Language"><button class="ur" data-lang="ur" aria-pressed="${D.lang==='ur'}">اردو</button><button class="ps" data-lang="ps" aria-pressed="${D.lang==='ps'}">پښتو</button><button class="lat" data-lang="roman" aria-pressed="${D.lang==='roman'}">Roman Urdu</button><button class="lat" data-lang="en" aria-pressed="${D.lang==='en'}">English</button></div>`;}
@@ -852,7 +855,7 @@ function settingsView(){
     <button class="btn ghost full" data-act="copyBackup">${esc(t('bkCopy'))}</button>
     <label for="importFile" class="btn ghost full" style="margin:0;color:var(--ink)">${esc(t('bkRestoreF'))}</label><input id="importFile" type="file" accept=".json,application/json,text/plain" hidden>
     <button class="btn ghost full" data-act="pasteRestore">${esc(t('bkRestoreP'))}</button></div>
-   <div class="page stack"><h2 style="margin-top:0">${esc(t('danger'))}</h2><button class="btn danger full" data-act="wipe">${esc(t('wipe'))}</button><p class="note">Jugnu Munshi · ConceptAI · v0.8</p></div></div>`;
+   <div class="page stack"><h2 style="margin-top:0">${esc(t('danger'))}</h2><button class="btn danger full" data-act="wipe">${esc(t('wipe'))}</button><p class="note">Jugnu Munshi · ConceptAI · v0.9</p></div></div>`;
 }
 function pilotView(){
   const now=Date.now(),wk=7*86400000;
@@ -891,7 +894,7 @@ function jugnuView(){
    <div class="jhero"><span class="ffw listening" id="jFF">${ffSVG()}</span><div><div class="jname">Jugnu<small>munshi</small></div><div class="jstat" id="jStat" aria-live="polite">${esc(jt('listening'))}</div><span class="jmode" id="jMode"></span></div>${profChip()}</div>
    <div class="jchat" id="jChat" aria-live="polite"></div>
    <div class="jchips">${jt('chips').map(q=>`<button class="jchip" data-act="jAsk" data-q="${esc(q)}" dir="auto">${esc(q)}</button>`).join('')}</div>
-   <form class="jform" id="jForm"><label for="jIn" class="sr">${esc(jt('ask'))}</label><input id="jIn" dir="auto" autocomplete="off" enterkeyhint="send" placeholder="${esc(jt('ph'))}"><button class="btn" type="submit">${esc(t('go'))}</button></form>
+   <form class="jform" id="jForm"><label for="jIn" class="sr">${esc(jt('ask'))}</label><input id="jIn" dir="auto" autocomplete="off" enterkeyhint="send" placeholder="${esc(jt('ph'))}"><label class="vbtn" title="${esc(jt('vBtn'))}" aria-label="${esc(jt('vBtn'))}"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg><input type="file" accept="audio/*" capture hidden data-voice="1"></label><button class="btn" type="submit">${esc(t('go'))}</button></form>
    <p class="jhint">${esc(t('hint'))}</p></div>`;
 }
 function jGreet(){
@@ -910,7 +913,7 @@ function jugnuMount(){
 function cardHTML(d,id,l){
   const r=(k,v,n)=>`<div class="jr"><span>${esc(tL(k,l))}</span><b class="${n?'num':''}" dir="auto">${esc(v)}</b></div>`;
   const ex=findByName(d.name);
-  return `<div class="jcard">${r('name',ex?nameFor(ex,l):d.name)}${r('type',tL(d.type+'S',l))}${r('amount',rs(d.amount),1)}${r('date',dmy(d.date),1)}${d.note?r('noteL',d.note):''}
+  return `<div class="jcard">${r('name',ex?nameFor(ex,l):(d.name||'—'))}${r('type',tL(d.type+'S',l))}${r('amount',rs(d.amount),1)}${r('date',dmy(d.date),1)}${d.note?r('noteL',d.note):''}
    ${!d.status&&!findByName(d.name)?`<p class="jnew">${esc(tL('newName',l))}</p>`:''}
    ${(()=>{if(d.status||d.type!=='credit')return'';const c=findByName(d.name);if(!c||!c.limit)return'';const nb=balance(c.id)+d.amount;return nb>c.limit?`<p class="jover">⚠ ${esc(fill(jt('overLimit',l),{n:nameFor(c,l),l:rs(c.limit),b:rs(nb)}))}</p>`:'';})()}
    ${d.status?`<p class="jdone ${d.status==='no'?'no':''}">${d.status==='yes'?'✓':'✕'}</p>`:`<div class="jbtns"><button class="jchip jyes" data-act="jYes" data-id="${id}">${esc(jt('yes',l))}</button><button class="jchip" data-act="jEdit" data-id="${id}">${esc(jt('editB',l))}</button><button class="jchip" data-act="jNo" data-id="${id}">${esc(jt('noB',l))}</button></div>`}</div>`;
@@ -1196,7 +1199,7 @@ function ustadView(){const p=activeP();
    <div class="jhero"><span class="ffw listening" id="jFF">${ffSVG()}</span><div><div class="jname">Ustad<small>jugnu</small></div><div class="jstat" id="jStat" aria-live="polite">${esc(jt('listening'))}</div><span class="jmode" id="jMode"></span></div>${profChip()}</div>
    <div class="jchat" id="jChat" aria-live="polite"></div>
    <div class="jchips">${ft('uChips').map(q=>`<button class="jchip" data-act="uAsk" data-q="${esc(q)}" dir="auto">${esc(q)}</button>`).join('')}</div>
-   <form class="jform" id="jForm"><label for="jIn" class="sr">Ustad</label><input id="jIn" dir="auto" autocomplete="off" enterkeyhint="send" placeholder="${esc(ft('uPh'))}"><button class="btn" type="submit">${esc(t('go'))}</button></form>
+   <form class="jform" id="jForm"><label for="jIn" class="sr">Ustad</label><input id="jIn" dir="auto" autocomplete="off" enterkeyhint="send" placeholder="${esc(ft('uPh'))}"><label class="vbtn" title="${esc(jt('vBtn'))}" aria-label="${esc(jt('vBtn'))}"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg><input type="file" accept="audio/*" capture hidden data-voice="1"></label><button class="btn" type="submit">${esc(t('go'))}</button></form>
    <p class="jhint" id="uCap">${esc(D.plan==='family'?ft('famNote'):fill(ft('aiLeft'),{u:aiQuota().n,c:STU_CAP}))}</p></div>`;}
 function uMsgHTML(m,i){const l=m.l||D.lang;
   let h=`<div class="jmsg ${m.who==='me'?'jme':'jai'} l-${l}" dir="${RTL(l)?'rtl':'ltr'}">${esc(m.text||'')}`;
@@ -1322,6 +1325,46 @@ function comNewModal(){
 async function shareBackup(l){const json=JSON.stringify(D);const name=`jugnu-backup-${todayISO()}.json`;
   try{const f=new File([json],name,{type:'application/json'});if(!inViewer()&&navigator.canShare&&navigator.canShare({files:[f]})){await navigator.share({files:[f],title:'Jugnu backup'});D.lastBackup=Date.now();save();toast(jt('bkDone',l));return;}}catch(e){if(e&&e.name==='AbortError')return;}
   await saveBlob(name,new Blob([json],{type:'application/json'}));D.lastBackup=Date.now();save();toast(jt('bkDone',l));}
+
+/* ================= Share from WhatsApp (text or voice note) + voice-note button ================= */
+Object.assign(J.roman,{vHear:'Voice note sun raha hoon…',vGot:'Voice note mein ye kaha gaya:',vFail:'Voice note samajh nahi aaya. Dobara bhejein ya likh dein.',vNet:'Voice note samajhne ke liye internet chahiye. Abhi likh kar bata dein.',shareIn:'WhatsApp se aaya:',noName:'Is mein naam nahi mila. "Durust karo" daba kar naam likh dein.',vBtn:'Voice note'});
+Object.assign(J.ur,{vHear:'وائس نوٹ سن رہا ہوں…',vGot:'وائس نوٹ میں یہ کہا گیا:',vFail:'وائس نوٹ سمجھ نہیں آیا۔ دوبارہ بھیجیں یا لکھ دیں۔',vNet:'وائس نوٹ سمجھنے کے لیے انٹرنیٹ چاہیے۔ ابھی لکھ کر بتا دیں۔',shareIn:'واٹس ایپ سے آیا:',noName:'اس میں نام نہیں ملا۔ "درست کرو" دبا کر نام لکھ دیں۔',vBtn:'وائس نوٹ'});
+Object.assign(J.ps,{vHear:'غږیز پیغام اورم…',vGot:'په غږیز پیغام کې دا وویل شول:',vFail:'غږیز پیغام پوه نشوم. بیا یې ولېږئ یا یې ولیکئ.',vNet:'د غږیز پیغام د پوهېدو لپاره انټرنېټ پکار دی. اوس یې ولیکئ.',shareIn:'له واټس اپ راغی:',noName:'په دې کې نوم نشته. "سم یې کړه" کېکاږئ او نوم ولیکئ.',vBtn:'غږیز پیغام'});
+Object.assign(J.en,{vHear:'Listening to the voice note…',vGot:'The voice note says:',vFail:'Could not understand the voice note. Send it again or type it.',vNet:'Voice notes need internet. Please type it for now.',shareIn:'From WhatsApp:',noName:'No name found in this. Tap "Edit" and add the name.',vBtn:'Voice note'});
+function draftFromAmount(text){const am=pAmounts(pTokens(text)).filter(a=>!a.qty).sort((a,b)=>b.v-a.v)[0];if(!am||am.v<10)return null;
+  const s=' '+pTokens(text).join(' ')+' ';const gave=/(diye|diya|bhej|jama|ada|mil|wapis|wasool|paid|sent|received|دیے|دیا|بھیج|جمع|ادا|ملے|واپس|وصول|راکړ|راولېږ)/.test(s);
+  return{name:'',amount:am.v,type:gave?'payment':'credit',date:todayISO(),note:''};}
+async function transcribe(blob,l){
+  const lang=l==='ps'?'ps':l==='en'?'en':'ur';const ctl=new AbortController();const tm=setTimeout(()=>ctl.abort(),45000);
+  try{const r=await fetch(AI_URL+'transcribe',{method:'POST',headers:{'content-type':blob.type||'audio/ogg','x-lang':lang},body:blob,signal:ctl.signal});
+    if(!r.ok)return null;const j=await r.json();return (j.text||'').trim()||null;}catch(e){return null;}finally{clearTimeout(tm);}}
+async function handleVoice(blob){
+  const l=D.lang;const stu=isStudent();const push=stu?uPush:jPush;
+  if(!AI_URL||navigator.onLine===false){push({who:'ai',text:jt('vNet',l),l});return;}
+  push({who:'ai',text:jt('vHear',l),l});jState('listening');
+  const tx=await transcribe(blob,l);
+  if(!tx){push({who:'ai',text:jt('vFail',l),l});jState('idle');return;}
+  push({who:'ai',text:jt('vGot',l)+'\n"'+tx+'"',l});
+  if(stu)uSend(tx);else jSendShared(tx);
+}
+async function jSendShared(text){
+  const l=detectLang(text);const a=jugnuAnswer(text,l);
+  if(!a.entry&&/\d/.test(text)&&!jBusy){const d=draftFromAmount(text);
+    if(d){let nd=d;if(aiOn())nd=await refineEntry(text,l,d);const id=uid();S.drafts[id]=Object.assign({},nd,{raw:text,l});
+      jPush({who:'me',text,l});jPush({who:'ai',text:nd.name?jt('confirmQ',l):jt('noName',l),card:id,l});return;}}
+  jSend(text);
+}
+async function handleShared(){
+  if(!/[?&]shared=1/.test(location.search))return;
+  try{history.replaceState(null,'',location.pathname);}catch(e){}
+  let text='',audio=null;
+  try{const c=await caches.open('jugnu-share');const tr=await c.match('./__share/text');if(tr)text=(await tr.text()).trim();
+    const ar=await c.match('./__share/audio');if(ar)audio=await ar.blob();await c.delete('./__share/text');await c.delete('./__share/audio');}catch(e){}
+  if(!text&&!audio)return;
+  await sleep(300);
+  if(audio){await handleVoice(audio);return;}
+  if(isStudent())uSend(text);else{jPush({who:'ai',text:jt('shareIn',D.lang),l:D.lang});jSendShared(text);}
+}
 
 /* ================= modal ================= */
 function modal(html){$('modalHost').innerHTML=`<div class="modal" role="dialog" aria-modal="true"><div class="page stack">${html}</div></div>`;}
@@ -1536,7 +1579,7 @@ document.addEventListener('click',async e=>{
     case 'jOpen':closeModal();go('customer',{cid:id,draft:null});break;
     case 'jRemind':{const c=cust(id);if(c)doRemind(c);break;}
     case 'jStmt':{if(!cust(id))break;S.cid=id;toast(t('making'));const cs=await statementCanvases(id);docModal(t('statement'),cs,'statement',210,297,cust(id));break;}
-    case 'jYes':{const d=S.drafts[id];if(!d||d.status)break;const r=commitEntry(d);d.status='yes';jSaved(r.c,r.saved,d.l);break;}
+    case 'jYes':{const d=S.drafts[id];if(!d||d.status)break;if(!d.name){S.cid=null;go('entry',{draft:Object.assign({},d,{fromQuick:true,fromJugnu:id})});break;}const r=commitEntry(d);d.status='yes';jSaved(r.c,r.saved,d.l);break;}
     case 'jEdit':{const d=S.drafts[id];if(!d||d.status)break;S.cid=null;go('entry',{draft:Object.assign({},d,{fromQuick:true,fromJugnu:id})});break;}
     case 'comOpen':closeModal();go('committee');break;
     case 'comNew':comNewModal();break;
@@ -1590,6 +1633,7 @@ document.addEventListener('click',async e=>{
 });
 /* offline: once opened from the hosted link, the app and its tools are saved on the phone */
 if('serviceWorker' in navigator&&(location.protocol==='https:'||location.hostname==='localhost')&&!inViewer()){window.addEventListener('load',()=>{navigator.serviceWorker.register('sw.js').catch(()=>{});});}
+document.addEventListener('change',e=>{const el=e.target;if(el&&el.matches&&el.matches('input[data-voice]')){const f=el.files&&el.files[0];el.value='';if(f)handleVoice(f);}});
 document.addEventListener('keydown',e=>{if((e.key==='Enter'||e.key===' ')&&e.target.matches&&e.target.matches('tr.tap')){e.preventDefault();e.target.click();}});
 render();
 </script>
