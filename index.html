@@ -857,7 +857,7 @@ function settingsView(){
     <button class="btn ghost full" data-act="copyBackup">${esc(t('bkCopy'))}</button>
     <label for="importFile" class="btn ghost full" style="margin:0;color:var(--ink)">${esc(t('bkRestoreF'))}</label><input id="importFile" type="file" accept=".json,application/json,text/plain" hidden>
     <button class="btn ghost full" data-act="pasteRestore">${esc(t('bkRestoreP'))}</button></div>
-   <div class="page stack"><h2 style="margin-top:0">${esc(t('danger'))}</h2><button class="btn danger full" data-act="wipe">${esc(t('wipe'))}</button><p class="note">Jugnu Munshi · ConceptAI · v0.9.1</p></div></div>`;
+   <div class="page stack"><h2 style="margin-top:0">${esc(t('danger'))}</h2><button class="btn danger full" data-act="wipe">${esc(t('wipe'))}</button><p class="note">Jugnu Munshi · ConceptAI · v0.10</p></div></div>`;
 }
 function pilotView(){
   const now=Date.now(),wk=7*86400000;
@@ -929,11 +929,45 @@ function msgHTML(m){
 }
 function renderChat(){const c=$('jChat');if(!c)return;c.innerHTML=S.chat.map(msgHTML).join('');c.scrollTop=c.scrollHeight;}
 function jPush(m){S.chat.push(m);if(S.chat.length>80)S.chat.splice(0,S.chat.length-80);renderChat();}
+
+/* v0.10 story reader: understands a whole voice note or long message */
+const STORY_PROMPT="You are the munshi (bookkeeper) of a Pakistani shop. The shopkeeper told you what happened, usually as a voice note turned into text. The text may be Urdu script, Roman Urdu, Pashto, English, or Urdu speech wrongly written in Hindi (Devanagari) script; read it as Urdu either way. Speech-to-text may misspell words; guess the intended word from context.\nExisting accounts: {{ACCTS}}\nText: <<{{TEXT}}>>\nTask: understand the whole story and list EVERY money movement in it, one entry each.\n- \"name\": only the person or business the money is with. If it matches an existing account (even spelled differently or in another script), copy that exact account name. Otherwise write the name in {{LANG}}. Never use words like aaj, kal, maine, banda, larka, gaahak as a name; for \"Haji sahib ka banda\" the name is the Haji sahib account.\n- \"type\": credit = customer took goods or cash on udhaar and now owes the shop; payment = customer paid money to the shop or returned udhaar; goods = supplier delivered stock to the shop on credit; paid = shop paid money to a supplier; expense = shop cost with no person (bijli, gas, bill, kiraya, rent, salary, petrol), name = \"Kharcha\"; sale = total cash sales of the day, name = \"Sale\".\n- Direction help: \"maine X ko diye\" means the shop gave X money (credit for a customer, paid for a supplier); \"X se liye / X ne diye / X ne bheje\" means X gave the shop money (payment for a customer); \"X maal de gaya\" from a supplier is goods.\n- \"amount\": rupees as a plain integer. Convert number words: sau=100, hazar/hazaar=1000, lakh=100000, dedh=1.5, dhai=2.5, sawa=1.25, saarhe=+0.5; Urdu script and Hindi number words the same way (pandrah sau = 1500, do hazar = 2000, paintalis hazar = 45000). Quantities like \"3 kilo\" are not amounts.\n- \"note\": short reason or items in {{LANG}} (e.g. \"3 kilo cheeni, ghee ka dabba\", \"dawai ke liye\", \"pichla udhaar wapis\"), plus JazzCash/Easypaisa/bank if said, else \"\".\n- Do not invent entries. Promises about the future (\"baqi agle hafte dega\") and things that did NOT happen (\"wapis nahi kiye\") are not entries.\n- If the text is only a question or chat with no money movement, return an empty list.\n- \"summary\": one short sentence in {{LANG}} retelling what happened, for the shopkeeper to confirm.\nReply with only JSON: {\"entries\":[{\"name\":\"\",\"type\":\"\",\"amount\":0,\"note\":\"\"}],\"summary\":\"\"}";
+const STORY_LANG={ur:'Urdu script',ps:'Pashto script',en:'English',roman:'Roman Urdu'};
+function looksStory(q){const w=String(q).trim().split(/\s+/).length;return /[ऀ-ॿ]/.test(q)||w>=9||(String(q).match(/\d+/g)||[]).length>=2||/(\bsau\b|hazar|hazaar|\blakh|سو|ہزار|لاکھ|زره|سل)/i.test(q);}
+async function readStory(q,l){
+  try{const accts=D.customers.filter(c=>c.type!=='expense'&&c.type!=='sales').slice(0,80).map(c=>`${c.name} (${c.type})`).concat(['Kharcha (expense)','Sale (sales)']).join(', ');
+    const prompt=STORY_PROMPT.split('{{ACCTS}}').join(accts).split('{{TEXT}}').join(String(q).slice(0,3000)).split('{{LANG}}').join(STORY_LANG[l]||'Roman Urdu');
+    const r=await aiJSON(prompt);if(!r||!Array.isArray(r.entries))return null;
+    const out=[];
+    for(const e of r.entries.slice(0,8)){if(!e)continue;
+      const ty=['credit','payment','goods','paid','expense','sale'].includes(e.type)?e.type:null;const amt=Math.round(Number(e.amount));
+      if(!ty||!(amt>=1&&amt<1e9))continue;
+      let name=String(e.name||'').trim().slice(0,40);const note=String(e.note||'').trim().slice(0,70);
+      if(ty==='sale')name=SALE_ACC[l]||SALE_ACC.roman;
+      else if(ty==='expense')name=EXP_ACC[l]||EXP_ACC.roman;
+      else{if(!name)continue;const ex=findByName(name);name=ex?ex.name:cap(name);}
+      let t2=ty;const ex2=findByName(name);if(ex2&&ex2.type==='supplier'){if(t2==='credit')t2='goods';if(t2==='payment')t2='paid';}
+      out.push({name,amount:amt,type:t2,date:todayISO(),note});}
+    return{entries:out,summary:String(r.summary||'').trim().slice(0,300)};
+  }catch(e){return null;}
+}
+function storyCards(st,q,l){
+  const n=st.entries.length;
+  if(n>1||st.summary)jPush({who:'ai',text:(n>1?fill(jt('stMulti',l),{n}):jt('stSum',l))+(st.summary?'\n“'+st.summary+'”':''),l});
+  st.entries.forEach((d,i)=>{const id=uid();S.drafts[id]=Object.assign({},d,{raw:q,l});
+    jPush({who:'ai',text:n>1?(i+1)+'/'+n:jt('confirmQ',l),card:id,l});});
+  jState('idle');
+}
+Object.assign(J.roman,{stSum:'Main ne ye samjha:',stMulti:'Is baat mein {n} hisaab hain. Har ek ko check kar ke "Haan" dabayein:',stRead:'Poori baat samajh raha hoon…'});
+Object.assign(J.ur,{stSum:'میں نے یہ سمجھا:',stMulti:'اس بات میں {n} حساب ہیں۔ ہر ایک کو دیکھ کر "ہاں" دبائیں:',stRead:'پوری بات سمجھ رہا ہوں…'});
+Object.assign(J.ps,{stSum:'ما داسې پوه شوم:',stMulti:'په دې خبره کې {n} حسابونه دي. هر یو وګورئ او "هو" کېکاږئ:',stRead:'ټوله خبره پوهېږم…'});
+Object.assign(J.en,{stSum:'Here is what I understood:',stMulti:'This has {n} entries. Check each one and tap "Yes":',stRead:'Reading the whole message…'});
 async function jSend(q){
   q=String(q||'').trim();if(!q||jBusy)return;jBusy=true;
   const l=detectLang(q);
   jPush({who:'me',text:q,l});jState('thinking');
   await sleep(450);
+  if(aiOn()&&looksStory(q)){const st=await readStory(q,/[\u0900-\u097F]/.test(q)?D.lang:l);if(st&&st.entries.length){storyCards(st,q,/[\u0900-\u097F]/.test(q)?D.lang:l);jBusy=false;return;}}
   let a=jugnuAnswer(q,l);
   if(a.entry&&aiOn()){a={entry:await refineEntry(q,l,a.entry)};}
   else if(!a.entry&&aiOn()&&(a.text===jt('dont',l)||a.kind==='idea')){const r=await askAI(q,l,a.kind==='idea'?'advice':'chat');if(r)a=r;}
@@ -1379,9 +1413,13 @@ async function handleVoice(blob){
   if(!tx){push({who:'ai',text:jt('vFail',l),l});jState('idle');return;}
   tx=tx.replace(/(\d),(?=\d{3}\b)/g,'$1').replace(/₹\s?/g,'Rs ');
   push({who:'ai',text:jt('vGot',l)+'\n"'+tx+'"',l});
-  if(stu)uSend(tx);else jSendShared(tx);
+  if(stu)uSend(tx);else jSendShared(tx,l);
 }
-async function jSendShared(text){
+async function jSendShared(text,vl){
+  if(aiOn()&&!jBusy){jBusy=true;const l0=vl||(/[\u0900-\u097F]/.test(text)?D.lang:detectLang(text));jState('thinking');
+    const st=await readStory(text,l0);jBusy=false;
+    if(st&&st.entries.length){jPush({who:'me',text,l:l0});storyCards(st,text,l0);return;}
+    jState('idle');}
   const l=detectLang(text);const a=jugnuAnswer(text,l);
   if(!a.entry&&/\d/.test(text)&&!jBusy){const d=draftFromAmount(text);
     if(d){let nd=d;if(aiOn())nd=await refineEntry(text,l,d);const id=uid();S.drafts[id]=Object.assign({},nd,{raw:text,l});
