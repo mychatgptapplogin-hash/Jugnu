@@ -11,5 +11,5 @@ if(path.endsWith('/transcribe')){const buf=await req.arrayBuffer();if(!buf.byteL
 let body;try{body=await req.json();}catch(e){return json({error:'bad_json'},400,cors);}
 const prompt=String(body.prompt||'').slice(0,14000);if(!prompt){return json({error:'empty'},400,cors);}
 const model=MODELS.includes(body.model)?body.model:MODEL;
-try{let out;if(model.indexOf('gpt-oss')>=0){out=await env.AI.run(model,{instructions:SYS,input:prompt,reasoning:{effort:'low'}});}else{out=await env.AI.run(model,{messages:[{role:'system',content:SYS},{role:'user',content:prompt}],max_tokens:700,temperature:0.3});}
+try{let out;if(model.indexOf('gpt-oss')>=0){const eff=['low','medium','high'].includes(body.effort)?body.effort:'low';out=await env.AI.run(model,{instructions:SYS,input:prompt,reasoning:{effort:eff}});}else{out=await env.AI.run(model,{messages:[{role:'system',content:SYS},{role:'user',content:prompt}],max_tokens:700,temperature:0.3});}
 return json({text:pick(out),model},200,cors);}catch(e){return json({error:'ai_failed',detail:String(e).slice(0,300)},502,cors);}}};
