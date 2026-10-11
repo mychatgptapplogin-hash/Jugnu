@@ -1864,7 +1864,7 @@ async function syncPush(force){const a=accGet();if(!a||a.expired||syncing||!onli
     const b=accGet();if(b&&b.uid===a.uid){b.dirty=false;b.lastSync=Date.now();accSet(b);}evFlush();return true;
   }catch(e){return false;}finally{syncing=false;}}
 async function cloudGet(uid){const r=await sbRest('khata_backups?select=data,updated_at&user_id=eq.'+uid);return r&&r[0]?r[0]:null;}
-function adoptData(d){const keepLang=D.lang;D=Object.assign(blank(),d);if(!D.lang)D.lang=keepLang;try{localStorage.setItem(KEY,JSON.stringify(D));}catch(e){}S.chat=[];}
+function adoptData(d){const keepLang=D.lang;D=Object.assign(blank(),d);if(!D.lang)D.lang=keepLang;try{localStorage.setItem(KEY,JSON.stringify(D));}catch(e){}S.chat=[];S.screen='jugnu';S.cid=null;}
 async function afterLogin(isNew){
   const a=accGet();if(!a)return;
   if(D.uid&&D.uid!==a.uid){try{localStorage.setItem('jugnu_khata_prev_'+D.uid,JSON.stringify(D));}catch(e){}toast(at('other'));D=Object.assign(blank(),{lang:D.lang});save0();}
