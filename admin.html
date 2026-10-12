@@ -66,6 +66,8 @@ textarea{min-height:110px;resize:vertical;line-height:1.6}
 .toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--ink);color:#fff;border-radius:999px;padding:9px 18px;font-weight:600;font-size:14px;z-index:9}
 .bar{height:8px;border-radius:4px;background:var(--brand-soft);overflow:hidden;min-width:60px}
 .bar i{display:block;height:100%;background:var(--brand)}
+.g2{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:4px 14px}
+select,input[type=file]{width:100%}
 .empty{text-align:center;color:var(--ink2);padding:24px}
 button:focus-visible,input:focus-visible,textarea:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
 </style>
@@ -102,10 +104,10 @@ async function boot(){if(!A)return loginView();$('outBtn').hidden=false;$('who')
   if(!ok){$('app').innerHTML=`<div class="card login"><h1>Not an admin yet</h1><p class="muted">This account (${esc(fmtPh(A.phone))}) works, but it has no admin rights. Ask your developer to add it as admin, then reload.</p></div>`;return;}
   await loadAll();render();}
 async function loadAll(){const [t,f,b]=await Promise.all([api('rpc/admin_testers',{method:'POST',body:{}}),api('feedback?select=id,user_id,message,app_version,status,created_at&order=created_at.desc&limit=300'),api('brain?select=key,value,updated_at')]);
-  DATA.testers=t||[];DATA.feedback=f||[];DATA.brain={};(b||[]).forEach(x=>DATA.brain[x.key]=x);}
-function tabs(){const T=[['overview','Overview'],['testers','Testers ('+DATA.testers.length+')'],['feedback','Feedback ('+DATA.feedback.filter(x=>x.status==='new').length+' new)'],['brain',"Jugnu's brain"]];
+  DATA.testers=t||[];DATA.feedback=f||[];DATA.brain={};(b||[]).forEach(x=>DATA.brain[x.key]=x);await loadLib();}
+function tabs(){const T=[['overview','Overview'],['testers','Testers ('+DATA.testers.length+')'],['feedback','Feedback ('+DATA.feedback.filter(x=>x.status==='new').length+' new)'],['brain',"Jugnu's brain"],['library','Library ('+LIBDOCS.length+')']];
   return `<div class="tabs" role="tablist">${T.map(([k,l])=>`<button role="tab" data-tab="${k}" aria-selected="${TAB===k}">${esc(l)}</button>`).join('')}<div class="sp"></div><button class="btn ghost sm" id="refresh">Refresh</button></div>`;}
-function render(){const v={overview,testers,feedback,brain}[TAB]();$('app').innerHTML=tabs()+v;bind();}
+function render(){const v={overview,testers,feedback,brain,library}[TAB]();$('app').innerHTML=tabs()+v;bind();}
 function overview(){const T=DATA.testers,wk=Date.now()-7*86400000;
   const active=T.filter(x=>Date.parse(x.last_seen)>wk).length,daily=T.filter(x=>x.days_active_7d>=4).length;
   const sum=k=>T.reduce((s,x)=>s+Number(x[k]||0),0);const backed=T.filter(x=>x.backup_at).length;
@@ -148,12 +150,73 @@ const BRAIN=[
 function brain(){return `<div class="card"><p class="muted" style="margin-top:0">Changes reach phones the next time they open Jugnu with internet. Offline phones keep the last version.</p>
   ${BRAIN.map(([k,l,h,rtl])=>{const v=DATA.brain[k];return `<div class="brain-item"><div class="row"><h3>${esc(l)}</h3><div class="sp"></div><span class="muted">${v?'updated '+esc(ago(v.updated_at)):'not set'}</span></div>${h?`<p class="muted">${esc(h)}</p>`:''}
    <textarea id="b_${k}" dir="${rtl?'rtl':'auto'}" class="${rtl?'ur':''}" maxlength="${k==='ai_extra'?3000:600}">${esc(v?v.value:'')}</textarea><div class="row" style="margin-top:8px"><button class="btn sm" data-save="${k}">Save</button>${v&&v.value?`<button class="btn ghost sm" data-clear="${k}">Clear</button>`:''}</div></div>`;}).join('')}</div>`;}
-function bind(){document.querySelectorAll('[data-tab]').forEach(b=>b.onclick=()=>{TAB=b.dataset.tab;render();});
+function bind(){bindLib();document.querySelectorAll('[data-tab]').forEach(b=>b.onclick=()=>{TAB=b.dataset.tab;render();});
   $('refresh').onclick=async()=>{await loadAll();render();toast('Updated');};
   document.querySelectorAll('[data-save],[data-clear]').forEach(b=>b.onclick=async()=>{const k=b.dataset.save||b.dataset.clear;const val=b.dataset.save?$('b_'+k).value.trim():'';
     try{await api('brain?on_conflict=key',{method:'POST',body:{key:k,value:val,updated_at:new Date().toISOString()},prefer:'resolution=merge-duplicates,return=minimal'});await loadAll();render();toast('Saved. Live for everyone.');}catch(e){toast('Could not save: '+e.message);}});
   document.querySelectorAll('[data-fb]').forEach(b=>b.onclick=async()=>{try{await api('feedback?id=eq.'+b.dataset.fb,{method:'PATCH',body:{status:b.dataset.st},prefer:'return=minimal'});await loadAll();render();}catch(e){toast('Could not update');}});
   document.querySelectorAll('[data-plan]').forEach(s=>s.onchange=async()=>{try{await api('profiles?id=eq.'+s.dataset.plan,{method:'PATCH',body:{plan:s.value},prefer:'return=minimal'});toast('Plan changed to '+s.value);await loadAll();}catch(e){toast('Could not change plan');}});}
+/* ===== Library: books, notes, syllabus and past papers per board / school / class / subject ===== */
+const LB={board:[['any','Any board'],['kp','KP Textbook Board / BISE'],['fed','Federal (FBISE)'],['cam','Cambridge'],['aku','Aga Khan (AKU-EB)'],['own','School\'s own books']],
+ cls:[['any','Any class'],...['1','2','3','4','5','6','7','8','9','10','11','12'].map(c=>[c,'Class '+c]),['O','O Level'],['A','A Level']],
+ subject:[['any','Any subject'],['maths','Maths'],['physics','Physics'],['chemistry','Chemistry'],['biology','Biology'],['english','English'],['urdu','Urdu'],['pashto','Pashto'],['islamiat','Islamiat'],['pakst','Pakistan Studies'],['cs','Computer Science'],['gsci','General Science']],
+ kind:[['textbook','Textbook'],['notes','Notes'],['syllabus','Syllabus / scheme of studies'],['past_paper','Past paper'],['model_paper','Model paper'],['other','Other']],
+ medium:[['any','Any medium'],['en','English medium'],['ur','Urdu medium']]};
+const lbName=(k,v)=>((LB[k].find(x=>x[0]===v)||[])[1])||v;
+const opts=(k,sel)=>LB[k].map(([v,n])=>`<option value="${v}" ${v===sel?'selected':''}>${esc(n)}</option>`).join('');
+function loadJS(src){return new Promise((ok,no)=>{if(document.querySelector(`script[src="${src}"]`))return ok();const s=document.createElement('script');s.src=src;s.onload=ok;s.onerror=()=>no(new Error('load '+src));document.head.appendChild(s);});}
+async function pdfPages(file){await loadJS('https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.min.js');pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.worker.min.js';
+  const doc=await pdfjsLib.getDocument({data:await file.arrayBuffer()}).promise;const out=[];
+  for(let i=1;i<=doc.numPages;i++){const pg=await doc.getPage(i);const tc=await pg.getTextContent();out.push({page:i,text:tc.items.map(x=>x.str+(x.hasEOL?'\n':' ')).join('').replace(/[ \t]+/g,' ').trim()});LIBP(`Reading page ${i} of ${doc.numPages}…`);}
+  return out;}
+async function docxPages(file){await loadJS('https://cdn.jsdelivr.net/npm/mammoth@1.6.0/mammoth.browser.min.js');const r=await mammoth.extractRawText({arrayBuffer:await file.arrayBuffer()});return [{page:null,text:r.value}];}
+function chunkPages(pages){const out=[];let idx=0;const MAX=1500,OV=200;
+  for(const p of pages){const t=(p.text||'').replace(/\n{3,}/g,'\n\n').trim();if(t.length<20)continue;
+    for(let i=0;i<t.length;i+=MAX-OV){let piece=t.slice(i,i+MAX);if(i+MAX<t.length){const cut=Math.max(piece.lastIndexOf('. '),piece.lastIndexOf('۔'),piece.lastIndexOf('\n'));if(cut>MAX*0.6)piece=piece.slice(0,cut+1);}
+      out.push({idx:idx++,page:p.page,content:piece.trim()});if(i+MAX>=t.length)break;}}
+  return out;}
+let LIBDOCS=[],LIBMSG='';
+const LIBP=m=>{LIBMSG=m;const e=$('libProg');if(e)e.textContent=m;};
+async function loadLib(){try{LIBDOCS=await api('library_docs?select=*&order=created_at.desc&limit=500')||[];}catch(e){LIBDOCS=[];}}
+function library(){const by={};LIBDOCS.forEach(d=>{const k=lbName('board',d.board)+' · '+lbName('cls',d.cls);(by[k]=by[k]||[]).push(d);});
+  return `<div class="card"><h3 style="margin:0 0 6px;font-size:16px">Add material</h3><p class="muted" style="margin-top:0">Upload a text PDF, Word file or text file, or paste text. Ustad will answer from it for students of the matching board, class, subject and school, and will name it as the source. Use official material (KP Textbook Board, BISE, FBISE) or material you have permission to use.</p>
+   <form id="libF"><div class="g2">
+    <div><label for="lT">Title</label><input id="lT" required maxlength="200" placeholder="KPTBB Physics Class 9 (English medium)"></div>
+    <div><label for="lK">Type</label><select id="lK">${opts('kind','textbook')}</select></div>
+    <div><label for="lB">Board / syllabus</label><select id="lB">${opts('board','kp')}</select></div>
+    <div><label for="lS">School (only for one school's own material)</label><input id="lS" maxlength="80" placeholder="Leave empty for everyone"></div>
+    <div><label for="lC">Class</label><select id="lC">${opts('cls','9')}</select></div>
+    <div><label for="lSu">Subject</label><select id="lSu">${opts('subject','physics')}</select></div>
+    <div><label for="lM">Medium</label><select id="lM">${opts('medium','any')}</select></div>
+    <div><label for="lY">Year (papers)</label><input id="lY" inputmode="numeric" maxlength="4" placeholder="2024"></div>
+    <div style="grid-column:1/-1"><label for="lSrc">Source (website or who gave it)</label><input id="lSrc" maxlength="300" placeholder="https://kpese.gov.pk/textbook-board-tbb/"></div>
+    <div style="grid-column:1/-1"><label for="lFile">File (PDF, DOCX or TXT, up to 50 MB)</label><input id="lFile" type="file" accept=".pdf,.docx,.txt,application/pdf,text/plain"></div>
+    <div style="grid-column:1/-1"><label for="lTxt">Or paste text</label><textarea id="lTxt" dir="auto" placeholder="Paste chapter text, notes or a past paper here"></textarea></div></div>
+    <div class="row" style="margin-top:12px"><button class="btn" id="libGo">Add to library</button><span class="muted" id="libProg" role="status">${esc(LIBMSG)}</span></div></form></div>
+  <div class="card"><h3 style="margin:0 0 6px;font-size:16px">Test what Ustad finds</h3><div class="row"><select id="tB" style="width:auto">${opts('board','kp')}</select><select id="tC" style="width:auto">${opts('cls','9')}</select><select id="tSu" style="width:auto">${opts('subject','any')}</select><input id="tQ" style="flex:1;min-width:180px" placeholder="Question, e.g. Newton's second law"><button class="btn ghost sm" id="tGo">Search</button></div><div id="tRes"></div></div>
+  <div class="card"><h3 style="margin:0 0 6px;font-size:16px">In the library (${LIBDOCS.length})</h3>${LIBDOCS.length?Object.entries(by).map(([k,ds])=>`<h4 style="margin:14px 0 4px">${esc(k)}</h4><div class="tblw"><table class="tbl"><thead><tr><th>Title</th><th>Subject</th><th>Type</th><th>School</th><th class="n">Passages</th><th>Added</th><th>Status</th><th></th></tr></thead><tbody>${ds.map(d=>`<tr><td><b dir="auto">${esc(d.title)}</b>${d.source?`<div class="muted" style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(d.source)}</div>`:''}</td><td>${esc(lbName('subject',d.subject))}</td><td>${esc(lbName('kind',d.kind))}${d.year?' '+d.year:''}</td><td>${esc(d.school||'All')}</td><td class="n">${d.chunks}</td><td style="white-space:nowrap">${esc(ago(d.created_at))}</td><td>${d.active?'<span class="pill">Live</span>':'<span class="pill mute">Hidden</span>'}</td><td style="white-space:nowrap"><button class="btn ghost sm" data-lact="${d.id}" data-on="${d.active?0:1}">${d.active?'Hide':'Show'}</button> <button class="btn ghost sm" data-ldel="${d.id}">Delete</button></td></tr>`).join('')}</tbody></table></div>`).join(''):'<p class="muted">Nothing yet. Start with the KP Textbook Board books students use most: Class 9 and 10 Physics, Chemistry, Biology and Maths.</p>'}</div>`;}
+async function libAdd(e){e.preventDefault();const btn=$('libGo');const f=$('lFile').files[0];const pasted=$('lTxt').value.trim();const title=$('lT').value.trim();
+  if(!title)return toast('Add a title');if(!f&&pasted.length<50)return toast('Choose a file or paste at least a paragraph');
+  btn.disabled=true;try{let pages=[];
+    if(f){if(f.size>52428800)throw new Error('File is over 50 MB');const ext=(f.name.split('.').pop()||'').toLowerCase();
+      if(ext==='pdf')pages=await pdfPages(f);else if(ext==='docx')pages=await docxPages(f);else pages=[{page:null,text:await f.text()}];}
+    if(pasted)pages.push({page:null,text:pasted});
+    const chunks=chunkPages(pages);const chars=chunks.reduce((s,c)=>s+c.content.length,0);
+    if(!chunks.length)throw new Error('No readable text found. This looks like a scanned PDF (pictures of pages). Use a text PDF or paste the text.');
+    LIBP('Saving…');const yr=parseInt($('lY').value,10);
+    const doc=(await api('library_docs',{method:'POST',body:{title,board:$('lB').value,school:$('lS').value.trim()||null,cls:$('lC').value,subject:$('lSu').value,medium:$('lM').value,kind:$('lK').value,year:yr>1900&&yr<2100?yr:null,source:$('lSrc').value.trim()||null,chars,chunks:chunks.length},prefer:'return=representation'}))[0];
+    if(f){LIBP('Uploading original file…');const path=doc.id+'/'+f.name.replace(/[^\w.\-]+/g,'_');const t=await token();
+      const r=await fetch(SB_URL+'/storage/v1/object/library/'+path,{method:'POST',headers:{apikey:SB_KEY,Authorization:'Bearer '+t,'content-type':f.type||'application/octet-stream','x-upsert':'true'},body:f});
+      if(r.ok)await api('library_docs?id=eq.'+doc.id,{method:'PATCH',body:{storage_path:path},prefer:'return=minimal'});}
+    for(let i=0;i<chunks.length;i+=100){LIBP(`Saving passages ${i+1} to ${Math.min(i+100,chunks.length)} of ${chunks.length}…`);await api('library_chunks',{method:'POST',body:chunks.slice(i,i+100).map(c=>Object.assign({doc_id:doc.id},c)),prefer:'return=minimal'});}
+    LIBP('');toast(`Added: ${chunks.length} passages. Live for students now.`);await loadLib();render();
+  }catch(err){LIBP('');toast(err.message||'Could not add');btn.disabled=false;}}
+function bindLib(){const f=$('libF');if(!f)return;f.onsubmit=libAdd;
+  $('tGo').onclick=async()=>{const el=$('tRes');el.innerHTML='<p class="muted">Searching…</p>';try{const q=$('tQ').value.split(/\s+/).filter(w=>w.length>=3).join(' ');const rows=await api('rpc/lib_search',{method:'POST',body:{q,p_board:$('tB').value,p_cls:$('tC').value,p_subject:$('tSu').value,p_school:null,n:5}});
+    el.innerHTML=rows&&rows.length?rows.map(x=>`<div class="fb"><div class="meta"><b dir="auto">${esc(x.title)}</b><span class="muted">${x.page?'page '+x.page:''}</span></div><p dir="auto" style="white-space:pre-wrap">${esc(String(x.content).slice(0,500))}${x.content.length>500?' …':''}</p></div>`).join(''):'<p class="muted">Nothing found. Ustad will answer from general knowledge for this.</p>';}catch(e){el.innerHTML='<p class="err">Search failed.</p>';}};
+  document.querySelectorAll('[data-lact]').forEach(b=>b.onclick=async()=>{try{await api('library_docs?id=eq.'+b.dataset.lact,{method:'PATCH',body:{active:b.dataset.on==='1'},prefer:'return=minimal'});await loadLib();render();}catch(e){toast('Could not update');}});
+  document.querySelectorAll('[data-ldel]').forEach(b=>b.onclick=async()=>{const d=LIBDOCS.find(x=>x.id===b.dataset.ldel);if(!d||!confirm('Delete "'+d.title+'" from the library? Students will stop getting answers from it.'))return;
+    try{if(d.storage_path){const t=await token();await fetch(SB_URL+'/storage/v1/object/library/'+d.storage_path,{method:'DELETE',headers:{apikey:SB_KEY,Authorization:'Bearer '+t}});}await api('library_docs?id=eq.'+d.id,{method:'DELETE',prefer:'return=minimal'});await loadLib();render();toast('Deleted');}catch(e){toast('Could not delete');}});}
 $('outBtn').onclick=()=>{A=null;saveA();loginView();};
 boot();
 </script>

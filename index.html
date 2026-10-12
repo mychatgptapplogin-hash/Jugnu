@@ -359,6 +359,9 @@ body.jlight .pchip span[dir]{max-width:64px}
 .jamb p{margin:0 0 4px;font-weight:700;font-size:14px}
 .jamb .jnew{font-weight:400}
 .jamb .jpick{background:#FFFFFF;color:#0F1D18;border-color:#E2C277}
+.jid{margin:2px 0 6px;font-size:12.5px;opacity:.85}
+.jpicks .jpick{box-sizing:border-box;width:100%;max-width:100%;border-radius:14px;display:flex;flex-direction:column;align-items:flex-start;gap:2px;text-align:start}
+.jpicks .jpick small{font-size:12px;opacity:.85}
 .usyl{align-self:flex-start;border:1px dashed #3A5A7A;background:#0F1A26;color:#CFE3FA;border-radius:999px;padding:6px 12px;font:inherit;font-size:13px;cursor:pointer;min-height:36px;max-width:100%;text-align:start}
 body.jlight .usyl{background:#EAF2FB;border-color:#9DBCE0;color:#123E72}
 .urow{display:flex;gap:8px;flex-wrap:wrap}
@@ -730,8 +733,8 @@ const norm=s=>s.trim().replace(/\s+/g,' ').toLowerCase();
 function findByName(n){const raw=n;n=norm(n);if(!n)return null;
   const hit=D.customers.find(c=>norm(c.name)===n)||(n.split(' ').length===1?D.customers.find(c=>norm(c.name).split(' ')[0]===n):null);if(hit)return hit;
   const k=words(n).map(skel).join(' ');if(k.replace(/ /g,'').length<2)return null;
-  const full=D.customers.filter(c=>words(c.name).map(skel).join(' ')===k);if(full.length===1){learnAlias(full[0],raw.trim());return full[0];}
-  if(!k.includes(' ')){const fw=D.customers.filter(c=>skel(words(c.name)[0])===k);if(fw.length===1){learnAlias(fw[0],raw.trim());return fw[0];}}
+  const full=D.customers.filter(c=>words(c.name).map(skel).join(' ')===k);if(full.length===1)return full[0];
+  if(!k.includes(' ')){const fw=D.customers.filter(c=>skel(words(c.name)[0])===k);if(fw.length===1)return fw[0];}
   return null;}
 /* Roman <-> Urdu/Pashto name matching: both scripts reduce to the same consonant skeleton (Bilal = بلال = "bll") */
 const AR2L={'ب':'b','پ':'p','ت':'t','ٹ':'t','ټ':'t','ث':'s','ج':'j','چ':'c','ح':'h','خ':'k','د':'d','ڈ':'d','ډ':'d','ذ':'z','ر':'r','ڑ':'r','ړ':'r','ز':'z','ژ':'z','ږ':'z','ځ':'z','س':'s','ش':'s','ښ':'s','ص':'s','ض':'z','ط':'t','ظ':'z','غ':'g','ف':'f','ق':'k','ک':'k','ك':'k','گ':'g','ګ':'g','ل':'l','م':'m','ن':'n','ں':'n','څ':'s'};
@@ -745,7 +748,7 @@ const words=s=>String(s||'').toLowerCase().replace(/[^\p{L}\p{N}\s]/gu,' ').spli
 /* find a customer mentioned anywhere in a message, in either script */
 function nameInText(text){
   const s=' '+norm(text)+' ';
-  for(const c of D.customers){const n=norm(c.name);const f=n.split(' ')[0];if(s.includes(' '+n+' ')||s.includes(n)&&n.length>3||(f.length>=3&&s.includes(' '+f+' ')))return{c,tok:null};}
+  for(const c of D.customers){const n=norm(c.name);const f=n.split(' ')[0];if(s.includes(' '+n+' ')||s.includes(n)&&n.length>3)return{c,tok:null};if(f.length>=3&&s.includes(' '+f+' '))return{c,tok:f};}
   const common=w=>/^\d+$/.test(w)||(typeof P_FILL!=='undefined'&&(P_FILL.has(w)||P_MARK.has(w)||P_VERB.test(w)||P_ITEMS.test(w)||P_QTY.test(w)||P_EXP_W.test(w)))||/^(bill|bal|baal|bol|bola|bolo|bilkul|bhi|saman|maal|hisaab|khata|dukaan|dukan|sale|report|idea|halat|haal)$/.test(w);
   const toks=words(text).filter(w=>!common(w));const ts=toks.map(skel);
   for(const c of D.customers){const cs=words(c.name).map(skel).filter(Boolean);if(!cs.length)continue;
@@ -781,11 +784,14 @@ const EXP_ACC={roman:'Dukaan kharcha',ur:'دکان کا خرچہ',ps:'د دوک�
 function pTokens(raw){return toAsciiDigits(raw).toLowerCase().replace(/(\d),(\d)/g,'$1$2').replace(/(\d)\s*k\b/g,'$1 k').replace(/[!?،؟۔,;:"'()]/g,' ').replace(/\.(?!\d)/g,' ').split(/\s+/).filter(Boolean);}
 function pAmounts(tk){const out=[];
   for(let i=0;i<tk.length;i++){const w=tk[i];let v=null,used=1;
+    if(/^(\+?92|0)?3\d{9}$/.test(w)||/^\d{12,}$/.test(w))continue;
     if(/^\d+(\.\d+)?$/.test(w)){v=parseFloat(w);}else if(NUMW[w]!=null&&UNITW[tk[i+1]]){v=NUMW[w];}
     if(v==null)continue;
     let u=UNITW[tk[i+1]];if(u){v*=u;used=2;const u2=UNITW[tk[i+2]];if(u===100&&u2===1000){v*=1000;used=3;}}
     const next=tk[i+used]||'';out.push({v:Math.round(v),i,end:i+used,qty:P_QTY.test(next),money:/^(rs|rupay|rupaye|ki|ka|ke|کی|کا|کے|روپے|روپۍ)$/.test(next)||/^rs$/.test(tk[i-1]||'')});
     i+=used-1;}
+  for(let k=out.length-1;k>0;k--){const a=out[k-1],b=out[k];const gap=tk.slice(a.end,b.i);
+    if(!a.qty&&!b.qty&&(gap.length===0||(gap.length===1&&/^(aur|and|or|اور|او)$/.test(gap[0])))&&a.end-a.i>=2&&((a.v%100000===0&&b.v<100000)||(a.v%1000===0&&a.v<100000&&b.v<1000))){a.v+=b.v;a.end=b.end;a.money=a.money||b.money;out.splice(k,1);}}
   return out;}
 function parseEntry(raw){
   const tk=pTokens(raw);if(!tk.length)return null;const s=' '+tk.join(' ')+' ';
@@ -817,7 +823,7 @@ function parseEntry(raw){
   else if(gave)type='payment';else type='credit';
   /* name: an existing account anywhere in the sentence, else the words just before ne/ko/se/ka */
   let name='';
-  if(hit){name=hit.c.name;if(hit.tok)learnAlias(hit.c,hit.tok);}
+  let said='';if(hit){name=hit.c.name;if(hit.tok)said=hit.tok;}
   else{
     const stop=w=>P_FILL.has(w)||P_MARK.has(w)||P_VERB.test(w)||P_QTY.test(w)||P_ITEMS.test(w)||/^\d/.test(w)||UNITW[w]||(NUMW[w]!=null)||/^(saman|samaan|maal|mal|stock|bill|ki|ka|ke|wali|wala|baqaya|hisaab|سامان|مال|حساب|سودا|goods|money|paisay|paise|پیسے|پیسې)$/.test(w)||/(jazz|easy|cash|bank|raast|paisa)/.test(w);
     const titles=/^(sahib|sahab|saab|bhai|baji|baaji|chacha|mamu|khan|ji|صاحب|بھائی|باجی|چچا|خان|ماما|لالا|lala)$/;
@@ -829,7 +835,7 @@ function parseEntry(raw){
   let nm=hit?name:cap(name);const ex=hit?hit.c:findByName(nm);
   if(ex){nm=ex.name;if(ex.type==='supplier'){if(type==='credit')type='goods';if(type==='payment')type='paid';}if(ex.type==='customer'&&type==='paid')type='credit';if(ex.type==='customer'&&type==='goods')type='credit';}
   const note=[items.join(/[؀-ۿ]/.test(s)?'، ':', '),via].filter(Boolean).join(' · ');
-  return{name:nm,amount,type,date:todayISO(),note};
+  return{name:nm,said:said?cap(said):'',amount,type,date:dayOf(s),note};
 }
 
 /* ================= navigation ================= */
@@ -940,7 +946,7 @@ function customerView(){
   const rows=es.map((e,i)=>{const sg=SIGN[e.type];run+=sg*e.amount;if(sg>0)tc+=e.amount;else tr+=e.amount;
     return `<tr class="tap" data-act="rowMenu" data-id="${e.id}" tabindex="0" role="button" aria-label="${esc(t(e.type+'S'))} ${num(e.amount)}"><td class="no num">${i+1}</td><td class="num dt">${dmy(e.date).slice(0,5)}</td><td class="det">${esc(t(e.type+'S'))}${e.type==='payment'?' '+ICON.rcpt:''}${e.note?`<small dir="auto">${esc(e.note)}</small>`:''}</td><td class="num u">${sg>0?num(e.amount):''}</td><td class="num w">${sg<0?num(e.amount):''}</td><td class="num" style="font-weight:700">${num(run)}${run<0?' ↓':''}</td></tr>`;}).join('');
   return `<div class="stack"><button class="btn ghost sm" data-act="home" style="align-self:flex-start">${esc(t('back'))}</button>
-   <div class="page"><div class="shopname"><div><h1>${esc(c.name)}</h1><p class="soft small">${esc(c.type==='supplier'?t('supplier'):t('customer'))}${c.phone?` · <span class="num">${esc(c.phone)}</span>`:''}</p></div><button class="btn ghost sm" data-act="editCust">${esc(t('edit'))}</button></div>
+   <div class="page"><div class="shopname"><div><h1>${esc(c.name)}</h1><p class="soft small">${esc(c.type==='supplier'?t('supplier'):t('customer'))}${c.tag?` · <span dir="auto">${esc(c.tag)}</span>`:''}${c.phone?` · <span class="num">${esc(c.phone)}</span>`:''}</p></div><button class="btn ghost sm" data-act="editCust">${esc(t('edit'))}</button></div>
     <div class="row" style="justify-content:space-between;align-items:flex-end"><div>${c.type==='sales'?`<small class="soft">${esc(t('saleS'))}</small><div class="num w" style="font-size:30px;font-weight:700;line-height:1.3">${rs(es.filter(e=>e.date>=monthStart()).reduce((s2,e)=>s2+e.amount,0))}</div>`:c.type==='expense'?`<small class="soft">${esc(t('expenseS'))} · ${esc(t('spent'))}</small><div class="num" style="font-size:30px;font-weight:700;line-height:1.3;color:var(--amber)">${rs(es.filter(e=>e.date>=todayISO().slice(0,8)+'01').reduce((s2,e)=>s2+e.amount,0))}</div>`:`<small class="soft">${b>0?esc(t('owesMe')):b<0?esc(t('iOwe')):esc(t('settled'))}</small><div class="num ${b>0?'w':b<0?'u':''}" style="font-size:30px;font-weight:700;line-height:1.3">${rs(b)}</div>`}</div>${b>0&&od?`<span class="tag ${od>7?'late':''}"><span class="num">${od}</span> ${esc(t('days'))}</span>`:''}</div>
     <div class="row" style="margin-top:12px">${b>0&&c.type==='customer'?`<button class="btn wa" data-act="remind" style="flex:1">${esc(t('remind'))}</button>`:''}<button class="btn" data-act="addFor" style="flex:1">${esc(t('addEntry'))}</button></div>
     <div class="row" style="margin-top:8px"><button class="btn ghost sm" data-act="statement" style="flex:1">${ICON.rcpt} ${esc(t('pdfS'))}</button></div>
@@ -978,7 +984,7 @@ function settingsView(){
     <label for="importFile" class="btn ghost full" style="margin:0;color:var(--ink)">${esc(t('bkRestoreF'))}</label><input id="importFile" type="file" accept=".json,application/json,text/plain" hidden>
     <button class="btn ghost full" data-act="pasteRestore">${esc(t('bkRestoreP'))}</button></div>
    ${fbCardHTML()}
-   <div class="page stack"><h2 style="margin-top:0">${esc(t('danger'))}</h2><button class="btn danger full" data-act="wipe">${esc(t('wipe'))}</button><p class="note">Jugnu Munshi · ConceptAI · v0.14.2</p></div></div>`;
+   <div class="page stack"><h2 style="margin-top:0">${esc(t('danger'))}</h2><button class="btn danger full" data-act="wipe">${esc(t('wipe'))}</button><p class="note">Jugnu Munshi · ConceptAI · v0.15.0</p></div></div>`;
 }
 function pilotView(){
   const now=Date.now(),wk=7*86400000;
@@ -1036,9 +1042,9 @@ function jugnuMount(){
 }
 function cardHTML(d,id,l){
   const r=(k,v,n)=>`<div class="jr"><span>${esc(tL(k,l))}</span><b class="${n?'num':''}" dir="auto">${esc(v)}</b></div>`;
-  const amb=d.amb&&!d.cid&&!d.status;const ex=d.cid?cust(d.cid):(amb?null:findByName(d.name));
-  return `<div class="jcard">${r('name',ex?nameFor(ex,l):(d.name||'—'))}${r('type',tL(d.type+'S',l))}${r('amount',rs(d.amount),1)}${r('date',dmy(d.date),1)}${d.note?r('noteL',d.note):''}
-   ${!d.status&&!ex&&!amb?`<p class="jnew">${esc(tL('newName',l))}</p>`:''}${amb?ambPickerHTML(d,id,l):''}
+  const amb=d.amb&&!d.cid&&!d.status;const acc=d.type==='expense'||d.type==='sale';const ex=d.cid?cust(d.cid):(acc?findByName(d.name):amb?null:sureMatch(d.name));const dup=!d.status&&ex&&dupOf(Object.assign({},d,{cid:ex.id}));
+  return `<div class="jcard">${r('name',ex?nameFor(ex,l):amb?(d.said||d.name):(d.name||'—'))}${ex&&isPerson(ex)&&!d.status?`<p class="jid num" dir="auto">${esc(idBits(ex,l))}</p>`:''}${r('type',tL(d.type+'S',l))}${r('amount',rs(d.amount),1)}${r('date',dmy(d.date),1)}${d.note?r('noteL',d.note):''}
+   ${!d.status&&!ex&&!amb?`<p class="jnew">${esc(tL('newName',l))}</p>`:''}${dup?`<p class="jover">⚠ ${esc(jt('dupWarn',l))}</p>`:''}${!d.status&&d.amount>=1000000?`<p class="jover">⚠ ${esc(jt('bigWarn',l))}</p>`:''}${amb?ambPickerHTML(d,id,l):''}
    ${(()=>{if(d.status||d.type!=='credit')return'';const c=ex;if(!c||!c.limit)return'';const nb=balance(c.id)+d.amount;return nb>c.limit?`<p class="jover">⚠ ${esc(fill(jt('overLimit',l),{n:nameFor(c,l),l:rs(c.limit),b:rs(nb)}))}</p>`:'';})()}
    ${d.status?`<p class="jdone ${d.status==='no'?'no':''}">${d.status==='yes'?'✓':'✕'}</p>`:`<div class="jbtns">${amb?'':`<button class="jchip jyes" data-act="jYes" data-id="${id}">${esc(jt('yes',l))}</button>`}<button class="jchip" data-act="jEdit" data-id="${id}">${esc(jt('editB',l))}</button><button class="jchip" data-act="jNo" data-id="${id}">${esc(jt('noB',l))}</button></div>`}</div>`;
 }
@@ -1053,7 +1059,7 @@ function renderChat(){const c=$('jChat');if(!c)return;c.innerHTML=S.chat.map(msg
 function jPush(m){S.chat.push(m);if(S.chat.length>80)S.chat.splice(0,S.chat.length-80);renderChat();}
 
 /* v0.10 story reader: understands a whole voice note or long message */
-const STORY_PROMPT="You are the munshi (bookkeeper) of a Pakistani shop. The shopkeeper told you what happened, usually as a voice note turned into text. The text may be Urdu, Pashto, Roman Urdu, Roman Pashto or English. Pashto speech is often written by speech-to-text phonetically in Urdu letters (e.g. \"راکڑل\", \"یوڑہ\", \"زرہ\", \"روپئی\"), and Urdu speech sometimes in Hindi (Devanagari) script; read the meaning either way. Pashto money words: پور/por = udhaar, راکړل/rakral = gave to me (the shop), ورکړل/warkral = I (the shop) gave, یوړل/yawral = took away, اخیستل/akhistal = bought or took, سودا = goods, زره/zara = thousand, سوه/sawa = hundred, لک = lakh, نیم = half. Speech-to-text may misspell words; guess the intended word from context.\nExisting accounts: {{ACCTS}}\nText: <<{{TEXT}}>>\nTask: understand the whole story and list EVERY money movement in it, one entry each.\n- \"name\": only the person or business the money is with. If it matches an existing account (even spelled differently or in another script), copy that exact account name. Otherwise write the name in {{LANG}}. Never use words like aaj, kal, maine, banda, larka, gaahak as a name; for \"Haji sahib ka banda\" the name is the Haji sahib account.\n- \"type\": credit = customer took goods or cash on udhaar and now owes the shop; payment = customer paid money to the shop or returned udhaar; goods = supplier delivered stock to the shop on credit; paid = shop paid money to a supplier; expense = shop cost with no person (bijli, gas, bill, kiraya, rent, salary, petrol), name = \"Kharcha\"; sale = total cash sales of the day, name = \"Sale\".\n- Direction help: \"maine X ko diye\" / \"X ta me warkral\" means the shop gave X money (credit for a customer, paid for a supplier); \"X se liye / X ne diye / X ne bheje / X rakral\" means X gave the shop money (payment for a customer); \"X maal de gaya / maal rawor\" from a supplier is goods.\n- \"amount\": rupees as a plain integer. Convert number words: sau=100, hazar/hazaar=1000, lakh=100000, dedh=1.5, dhai=2.5, sawa=1.25, saarhe=+0.5; Urdu script and Hindi number words the same way (pandrah sau = 1500, do hazar = 2000, paintalis hazar = 45000; Pashto: dwa zara/دوه زره = 2000, pinzalas sawa/پنځلس سوه = 1500, dray zara = 3000, lass zara = 10000). Quantities like \"3 kilo\" are not amounts.\n- \"note\": short reason or items in {{LANG}} (e.g. \"3 kilo cheeni, ghee ka dabba\", \"dawai ke liye\", \"pichla udhaar wapis\"), plus JazzCash/Easypaisa/bank if said, else \"\".\n- Pashto help (speech-to-text writes Pashto phonetically, often with Urdu letters and spelling mistakes): number words yaw/یو=1, dwa/دوه=2, dre/درې=3, tsalor/څلور=4, pinza/پنځه=5, shpag/شپږ=6, owa/اووه=7, ata/اته=8, naha/نهه=9, las/لس=10, shel/شل=20, dersh/دېرش=30, tsalwekht/څلوېښت=40, panzos/پنځوس=50, sal/sawa/سل/سوه=100, zar/zara/زر/زره=1000, lakh/لک=100000; pinzalas sawa/پنځلس سوه=1500, dwa zara/دوه زره=2000. Words: rakral/راکړل/راکړې = gave to the shop (payment); warkral/ورکړل = the shop gave to someone (credit for a customer, paid for a supplier); yowral/یوړل/وړل = took away (on udhaar = credit); por/پور = udhaar; pa por = on credit; bira/بېرته = back/returned; rawral/راوړل = brought (supplier goods); kharts/خرڅ = spent or sold; nan/نن = today, parun/پرون = yesterday; roopai/روپۍ = rupees.\n- Do not invent entries. Promises about the future (\"baqi agle hafte dega\") and things that did NOT happen (\"wapis nahi kiye\") are not entries.\n- If the text is only a question or chat with no money movement, return an empty list.\n- \"summary\": one short sentence in {{LANG}} retelling what happened, for the shopkeeper to confirm.\nReply with only JSON: {\"entries\":[{\"name\":\"\",\"type\":\"\",\"amount\":0,\"note\":\"\"}],\"summary\":\"\"}";
+const STORY_PROMPT="You are the munshi (bookkeeper) of a Pakistani shop. The shopkeeper told you what happened, usually as a voice note turned into text. The text may be Urdu, Pashto, Roman Urdu, Roman Pashto or English. Pashto speech is often written by speech-to-text phonetically in Urdu letters (e.g. \"راکڑل\", \"یوڑہ\", \"زرہ\", \"روپئی\"), and Urdu speech sometimes in Hindi (Devanagari) script; read the meaning either way. Pashto money words: پور/por = udhaar, راکړل/rakral = gave to me (the shop), ورکړل/warkral = I (the shop) gave, یوړل/yawral = took away, اخیستل/akhistal = bought or took, سودا = goods, زره/zara = thousand, سوه/sawa = hundred, لک = lakh, نیم = half. Speech-to-text may misspell words; guess the intended word from context.\nExisting accounts: {{ACCTS}}\nText: <<{{TEXT}}>>\nTask: understand the whole story and list EVERY money movement in it, one entry each.\n- \"name\": only the person or business the money is with. If it matches an existing account (even spelled differently or in another script), copy that exact account name. Otherwise write the name in {{LANG}}. Never use words like aaj, kal, maine, banda, larka, gaahak as a name; for \"Haji sahib ka banda\" the name is the Haji sahib account.\n- \"type\": credit = customer took goods or cash on udhaar and now owes the shop; payment = customer paid money to the shop or returned udhaar; goods = supplier delivered stock to the shop on credit; paid = shop paid money to a supplier; expense = shop cost with no person (bijli, gas, bill, kiraya, rent, salary, petrol), name = \"Kharcha\"; sale = total cash sales of the day, name = \"Sale\".\n- Direction help: \"maine X ko diye\" / \"X ta me warkral\" means the shop gave X money (credit for a customer, paid for a supplier); \"X se liye / X ne diye / X ne bheje / X rakral\" means X gave the shop money (payment for a customer); \"X maal de gaya / maal rawor\" from a supplier is goods.\n- \"amount\": rupees as a plain integer. Convert number words: sau=100, hazar/hazaar=1000, lakh=100000, dedh=1.5, dhai=2.5, sawa=1.25, saarhe=+0.5; Urdu script and Hindi number words the same way (pandrah sau = 1500, do hazar = 2000, paintalis hazar = 45000; Pashto: dwa zara/دوه زره = 2000, pinzalas sawa/پنځلس سوه = 1500, dray zara = 3000, lass zara = 10000). Quantities like \"3 kilo\" are not amounts.\n- \"note\": short reason or items in {{LANG}} (e.g. \"3 kilo cheeni, ghee ka dabba\", \"dawai ke liye\", \"pichla udhaar wapis\"), plus JazzCash/Easypaisa/bank if said, else \"\".\n- Pashto help (speech-to-text writes Pashto phonetically, often with Urdu letters and spelling mistakes): number words yaw/یو=1, dwa/دوه=2, dre/درې=3, tsalor/څلور=4, pinza/پنځه=5, shpag/شپږ=6, owa/اووه=7, ata/اته=8, naha/نهه=9, las/لس=10, shel/شل=20, dersh/دېرش=30, tsalwekht/څلوېښت=40, panzos/پنځوس=50, sal/sawa/سل/سوه=100, zar/zara/زر/زره=1000, lakh/لک=100000; pinzalas sawa/پنځلس سوه=1500, dwa zara/دوه زره=2000. Words: rakral/راکړل/راکړې = gave to the shop (payment); warkral/ورکړل = the shop gave to someone (credit for a customer, paid for a supplier); yowral/یوړل/وړل = took away (on udhaar = credit); por/پور = udhaar; pa por = on credit; bira/بېرته = back/returned; rawral/راوړل = brought (supplier goods); kharts/خرڅ = spent or sold; nan/نن = today, parun/پرون = yesterday; roopai/روپۍ = rupees.\n- Do not invent entries. Promises about the future (\"baqi agle hafte dega\") and things that did NOT happen (\"wapis nahi kiye\") are not entries.\n- If the text is only a question or chat with no money movement, return an empty list.\n- \"summary\": one short sentence in {{LANG}} retelling what happened, for the shopkeeper to confirm.\n- \"said\": the person's name exactly as it appears in the text (before matching to an account).\n- \"day\": 0 if it happened today, -1 if yesterday (kal / parun / پرون / گزشتہ روز), -2 if the day before yesterday (parson); default 0.\nReply with only JSON: {\"entries\":[{\"name\":\"\",\"said\":\"\",\"type\":\"\",\"amount\":0,\"day\":0,\"note\":\"\"}],\"summary\":\"\"}";
 const STORY_LANG={ur:'Urdu script',ps:'Pashto script',en:'English',roman:'Roman Urdu'};
 function looksStory(q){const w=String(q).trim().split(/\s+/).length;return /[ऀ-ॿ]/.test(q)||w>=9||(String(q).match(/\d+/g)||[]).length>=2||/(\bsau\b|hazar|hazaar|\blakh|سو|ہزار|لاکھ|زره|سل)/i.test(q);}
 async function readStory(q,l){
@@ -1069,7 +1075,8 @@ async function readStory(q,l){
       else if(ty==='expense')name=EXP_ACC[l]||EXP_ACC.roman;
       else{if(!name)continue;const ex=findByName(name);name=ex?ex.name:cap(name);}
       let t2=ty;const ex2=findByName(name);if(ex2&&ex2.type==='supplier'){if(t2==='credit')t2='goods';if(t2==='payment')t2='paid';}
-      out.push({name,amount:amt,type:t2,date:todayISO(),note});}
+      const dy=[0,-1,-2].includes(Number(e.day))?Number(e.day):0;const said=String(e.said||'').trim().slice(0,40);
+      out.push({name,said:(ty==='sale'||ty==='expense')?'':(said?cap(said):''),amount:amt,type:t2,date:addDays(todayISO(),dy),note});}
     return{entries:out,summary:String(r.summary||'').trim().slice(0,300)};
   }catch(e){return null;}
 }
@@ -1117,7 +1124,7 @@ function jHandle(a,q,l){
   jState(a.text===jt('dont',l)?'idle':'happy');setTimeout(()=>{if(!jBusy)jState('idle');},1400);
 }
 function commitEntry(d){
-  let c=(d.cid&&cust(d.cid))||findByName(d.name);if(!c){c={id:uid(),name:cap(d.name),phone:'',type:d.type==='expense'?'expense':d.type==='sale'?'sales':(d.type==='goods'||d.type==='paid')?'supplier':'customer',created:Date.now()};D.customers.push(c);}
+  let c=(d.cid&&cust(d.cid))||((d.type==='expense'||d.type==='sale')?findByName(d.name):sureMatch(d.name));if(!c){c={id:uid(),name:cap(d.name),phone:'',type:d.type==='expense'?'expense':d.type==='sale'?'sales':(d.type==='goods'||d.type==='paid')?'supplier':'customer',created:Date.now()};D.customers.push(c);}
   let saved;
   if(d.id){saved=D.entries.find(x=>x.id===d.id);if(saved)Object.assign(saved,{cid:c.id,amount:d.amount,type:d.type,date:d.date,note:d.note||''});if(saved&&d.type==='payment'&&!saved.rno)saved.rno=D.seq++;}
   else{saved={id:uid(),cid:c.id,amount:d.amount,type:d.type,date:d.date||todayISO(),note:d.note||'',created:Date.now()};if(d.type==='payment')saved.rno=D.seq++;D.entries.push(saved);}
@@ -1144,7 +1151,7 @@ Rules: "name" is ONLY the person or business the money is with (never words like
 Reply with only JSON like {"name":"","amount":0,"type":"","note":""}`;
     const r=await aiJSON(prompt);if(!r||typeof r!=='object')return d;
     const ty=['credit','payment','goods','paid','expense','sale'].includes(r.type)?r.type:d.type;
-    const nd=Object.assign({},d,{type:ty});
+    const nd=Object.assign({},d,{type:ty});if(!nd.said&&d.name&&d.type!=='expense'&&d.type!=='sale')nd.said=d.name;
     const amt=Math.round(Number(r.amount));if(!d.amount&&amt>0)nd.amount=amt;
     const note=String(r.note||'').trim().slice(0,60);if(note&&note.length>=2)nd.note=note;
     if(ty==='sale'){nd.name=SALE_ACC[l]||SALE_ACC.roman;return nd;}
@@ -1366,21 +1373,24 @@ function profChip(){const p=activeP();return `<button class="pchip" data-act="pr
 /* v0.13 Ustad syllabus: class, board, medium, group, exam board; teaches from that exact syllabus */
 Object.assign(SUBJ,{urdu:{roman:'Urdu',ur:'اردو',ps:'اردو',en:'Urdu'},pashto:{roman:'Pashto',ur:'پشتو',ps:'پښتو',en:'Pashto'},islamiat:{roman:'Islamiat',ur:'اسلامیات',ps:'اسلامیات',en:'Islamiat'},pakst:{roman:'Pak Studies',ur:'مطالعہ پاکستان',ps:'د پاکستان پېژندنه',en:'Pakistan Studies'},cs:{roman:'Computer',ur:'کمپیوٹر',ps:'کمپیوټر',en:'Computer Science'},gsci:{roman:'General Science',ur:'جنرل سائنس',ps:'عمومي ساینس',en:'General Science'}});
 const SYL_T={
- roman:{sylT:'Syllabus / Board',clsL:'Class',boardL:'Syllabus',bkp:'KP Textbook Board (sarkari aur zyada tar private schools)',bfed:'Federal Board (FBISE)',bcam:'Cambridge (O / A Level)',baku:'Aga Khan Board (AKU-EB)',bown:'School ki apni kitabein',bookL:'Kitab ya series ka naam',medL:'Medium',men:'English',mur:'Urdu',grpL:'Group',gbio:'Science (Biology)',gcs:'Science (Computer)',garts:'Arts / General',examL:'Exam board',sylBtn:'Syllabus chunein',sylAsk:'Pehle apna syllabus chun lein, taake main bilkul aap ki kitabon ke mutabiq parhaun.',sylSaved:'Syllabus save ho gaya.',sylChange:'Syllabus badlein',newBooks:'Naye curriculum (NCP 2026) ki kitabein March 2027 se',oLev:'O Level',aLev:'A Level'},
- ur:{sylT:'نصاب / بورڈ',clsL:'جماعت',boardL:'نصاب',bkp:'کے پی ٹیکسٹ بک بورڈ (سرکاری اور زیادہ تر پرائیویٹ اسکول)',bfed:'فیڈرل بورڈ (ایف بی آئی ایس ای)',bcam:'کیمبرج (او / اے لیول)',baku:'آغا خان بورڈ',bown:'اسکول کی اپنی کتابیں',bookL:'کتاب یا سیریز کا نام',medL:'میڈیم',men:'انگلش',mur:'اردو',grpL:'گروپ',gbio:'سائنس (بیالوجی)',gcs:'سائنس (کمپیوٹر)',garts:'آرٹس / جنرل',examL:'امتحانی بورڈ',sylBtn:'نصاب چنیں',sylAsk:'پہلے اپنا نصاب چن لیں، تاکہ میں بالکل آپ کی کتابوں کے مطابق پڑھاؤں۔',sylSaved:'نصاب محفوظ ہو گیا۔',sylChange:'نصاب بدلیں',newBooks:'نئے نصاب (این سی پی 2026) کی کتابیں مارچ 2027 سے',oLev:'او لیول',aLev:'اے لیول'},
- ps:{sylT:'نصاب / بورډ',clsL:'ټولګی',boardL:'نصاب',bkp:'د خیبر پښتونخوا درسي کتابونو بورډ (دولتي او ډېری خصوصي)',bfed:'فیډرل بورډ',bcam:'کېمبرج (او / اې لیول)',baku:'آغا خان بورډ',bown:'د ښوونځي خپل کتابونه',bookL:'د کتاب یا سلسلې نوم',medL:'ژبه (میډیم)',men:'انګلیسي',mur:'اردو',grpL:'ګروپ',gbio:'ساینس (بیولوژي)',gcs:'ساینس (کمپیوټر)',garts:'آرټس / عمومي',examL:'د ازموینې بورډ',sylBtn:'نصاب وټاکئ',sylAsk:'لومړی خپل نصاب وټاکئ، چې ستاسو د کتابونو سره سم درس درکړم.',sylSaved:'نصاب خوندي شو.',sylChange:'نصاب بدل کړئ',newBooks:'د نوي نصاب (NCP 2026) کتابونه له مارچ 2027 نه',oLev:'او لیول',aLev:'اې لیول'},
- en:{sylT:'Syllabus / board',clsL:'Class',boardL:'Syllabus',bkp:'KP Textbook Board (government and most private schools)',bfed:'Federal Board (FBISE)',bcam:'Cambridge (O / A Level)',baku:'Aga Khan Board (AKU-EB)',bown:"My school's own books",bookL:'Book or series name',medL:'Medium',men:'English',mur:'Urdu',grpL:'Group',gbio:'Science (Biology)',gcs:'Science (Computer)',garts:'Arts / General',examL:'Exam board',sylBtn:'Choose syllabus',sylAsk:'First choose your syllabus, so I teach exactly from your books.',sylSaved:'Syllabus saved.',sylChange:'Change syllabus',newBooks:'New curriculum (NCP 2026) books from March 2027',oLev:'O Level',aLev:'A Level'}};
+ roman:{sylT:'Syllabus / Board',clsL:'Class',boardL:'Syllabus',bkp:'KP Textbook Board (sarkari aur zyada tar private schools)',bfed:'Federal Board (FBISE)',bcam:'Cambridge (O / A Level)',baku:'Aga Khan Board (AKU-EB)',bown:'School ki apni kitabein',bookL:'Kitab ya series ka naam',medL:'Medium',men:'English',mur:'Urdu',grpL:'Group',gbio:'Science (Biology)',gcs:'Science (Computer)',garts:'Arts / General',examL:'Exam board',sylBtn:'Syllabus chunein',sylAsk:'Pehle apna syllabus chun lein, taake main bilkul aap ki kitabon ke mutabiq parhaun.',sylSaved:'Syllabus save ho gaya.',sylChange:'Syllabus badlein',newBooks:'Class 9 aur 10: 8 mazameen (English, Urdu, Maths, Computer, Chemistry, Biology, Physics, General Science) ki nayi NCP 2026 kitabein March 2027 se',oLev:'O Level',aLev:'A Level'},
+ ur:{sylT:'نصاب / بورڈ',clsL:'جماعت',boardL:'نصاب',bkp:'کے پی ٹیکسٹ بک بورڈ (سرکاری اور زیادہ تر پرائیویٹ اسکول)',bfed:'فیڈرل بورڈ (ایف بی آئی ایس ای)',bcam:'کیمبرج (او / اے لیول)',baku:'آغا خان بورڈ',bown:'اسکول کی اپنی کتابیں',bookL:'کتاب یا سیریز کا نام',medL:'میڈیم',men:'انگلش',mur:'اردو',grpL:'گروپ',gbio:'سائنس (بیالوجی)',gcs:'سائنس (کمپیوٹر)',garts:'آرٹس / جنرل',examL:'امتحانی بورڈ',sylBtn:'نصاب چنیں',sylAsk:'پہلے اپنا نصاب چن لیں، تاکہ میں بالکل آپ کی کتابوں کے مطابق پڑھاؤں۔',sylSaved:'نصاب محفوظ ہو گیا۔',sylChange:'نصاب بدلیں',newBooks:'جماعت 9 اور 10: آٹھ مضامین (انگلش، اردو، ریاضی، کمپیوٹر، کیمسٹری، بیالوجی، فزکس، جنرل سائنس) کی نئی این سی پی 2026 کتابیں مارچ 2027 سے',oLev:'او لیول',aLev:'اے لیول'},
+ ps:{sylT:'نصاب / بورډ',clsL:'ټولګی',boardL:'نصاب',bkp:'د خیبر پښتونخوا درسي کتابونو بورډ (دولتي او ډېری خصوصي)',bfed:'فیډرل بورډ',bcam:'کېمبرج (او / اې لیول)',baku:'آغا خان بورډ',bown:'د ښوونځي خپل کتابونه',bookL:'د کتاب یا سلسلې نوم',medL:'ژبه (میډیم)',men:'انګلیسي',mur:'اردو',grpL:'ګروپ',gbio:'ساینس (بیولوژي)',gcs:'ساینس (کمپیوټر)',garts:'آرټس / عمومي',examL:'د ازموینې بورډ',sylBtn:'نصاب وټاکئ',sylAsk:'لومړی خپل نصاب وټاکئ، چې ستاسو د کتابونو سره سم درس درکړم.',sylSaved:'نصاب خوندي شو.',sylChange:'نصاب بدل کړئ',newBooks:'ټولګی 9 او 10: د اتو مضمونونو (انګلیسي، اردو، ریاضي، کمپیوټر، کیمیا، بیولوژي، فزیک، عمومي ساینس) نوي NCP 2026 کتابونه له مارچ 2027 نه',oLev:'او لیول',aLev:'اې لیول'},
+ en:{sylT:'Syllabus / board',clsL:'Class',boardL:'Syllabus',bkp:'KP Textbook Board (government and most private schools)',bfed:'Federal Board (FBISE)',bcam:'Cambridge (O / A Level)',baku:'Aga Khan Board (AKU-EB)',bown:"My school's own books",bookL:'Book or series name',medL:'Medium',men:'English',mur:'Urdu',grpL:'Group',gbio:'Science (Biology)',gcs:'Science (Computer)',garts:'Arts / General',examL:'Exam board',sylBtn:'Choose syllabus',sylAsk:'First choose your syllabus, so I teach exactly from your books.',sylSaved:'Syllabus saved.',sylChange:'Change syllabus',newBooks:'Classes 9 and 10: new NCP 2026 books for 8 subjects (English, Urdu, Maths, Computer Science, Chemistry, Biology, Physics, General Science) from March 2027',oLev:'O Level',aLev:'A Level'}};
 function st(k,l){l=l||D.lang||'roman';return (SYL_T[l]&&SYL_T[l][k])||SYL_T.roman[k]||k;}
 const EXAMB=['Peshawar','Mardan','Swat','Malakand','Abbottabad','Bannu','Kohat','D.I. Khan'];
 const NCP_START='2027-03-01';
+const NCP_CLS=['9','10'];
+const NCP_SUBJ='English, Urdu, Mathematics, Computer Science, Chemistry, Biology, Physics and General Science';
 function hiCls(c){return ['9','10','11','12'].includes(String(c));}
-function sylOf(p){const s=Object.assign({board:'kp',medium:'en',group:'',exam:'',book:''},p.syl||{});s.cls=String((p.syl&&p.syl.cls)||p.cls||'9');return s;}
+function sylOf(p){const s=Object.assign({board:'kp',medium:'en',group:'',exam:'',book:'',school:''},p.syl||{});s.cls=String((p.syl&&p.syl.cls)||p.cls||'9');return s;}
 function clsLabel(c,l){return c==='O'?st('oLev',l):c==='A'?st('aLev',l):c;}
 function sylShort(p,l){if(!p.syl)return '';const s=sylOf(p);const b={kp:'KP Board',fed:'Federal',cam:'Cambridge',aku:'AKU-EB',own:s.book||st('bown',l)}[s.board];
   return [st('clsL',l)+' '+clsLabel(s.cls,l),b,s.board!=='cam'?st('m'+s.medium,l):'',hiCls(s.cls)&&s.group?st('g'+s.group,l):'',s.board==='kp'&&hiCls(s.cls)&&s.exam?s.exam:''].filter(Boolean).join(' · ');}
 function sylPrompt(p){const s=sylOf(p);const td=todayISO();const c=s.cls;
   let cur;
-  if(s.board==='kp'){cur=hiCls(c)?(td>=NCP_START?'the Khyber Pakhtunkhwa (KP) Textbook Board books for the new National Curriculum of Pakistan (NCP) 2026, which KP adopted for classes 9 to 12 from March 2027':'the current Khyber Pakhtunkhwa (KP) Textbook Board books (the new NCP 2026 books start in March 2027; do not teach chapters only found in the new books)'):'the Khyber Pakhtunkhwa (KP) Textbook Board books';}
+  if(s.board==='kp'){if(NCP_CLS.includes(c))cur=td>=NCP_START?'the Khyber Pakhtunkhwa (KP) Textbook Board books. KP adopted the new National Curriculum of Pakistan (NCP) 2026 for classes 9 and 10 from March 2027 in 8 subjects only ('+NCP_SUBJ+'): for those subjects use the new NCP 2026 books; for every other subject (Islamiat, Pakistan Studies, Pashto, Tarjuma tul Quran and others) keep using the existing KP Textbook Board books':'the current Khyber Pakhtunkhwa (KP) Textbook Board books (new NCP 2026 books for classes 9 and 10 in 8 subjects start only in March 2027; do not teach chapters found only in the new books)';
+   else cur='the current Khyber Pakhtunkhwa (KP) Textbook Board books'+(hiCls(c)?' (KP has not yet adopted the new NCP books for classes 11 and 12, so use the existing books)':'');}
   else if(s.board==='fed')cur='the Federal Board (FBISE, Islamabad) syllabus and National Curriculum textbooks';
   else if(s.board==='cam')cur=(c==='A'?'the Cambridge International A Level':c==='O'?'the Cambridge O Level':'the Cambridge (CAIE) lower secondary')+' syllabus; use Cambridge exam style and command words (state, explain, describe, calculate)';
   else if(s.board==='aku')cur='the Aga Khan University Examination Board (AKU-EB) SSC/HSSC syllabus; prefer understanding over memorising, as AKU-EB papers test concepts';
@@ -1402,16 +1412,19 @@ function sylModal(pid,afterNew){const p=D.profiles.find(x=>x.id===pid);if(!p)ret
      <div id="syMW"><label for="syM">${esc(st('medL'))}</label><select id="syM"><option value="en" ${s.medium==='en'?'selected':''}>${esc(st('men'))}</option><option value="ur" ${s.medium==='ur'?'selected':''}>${esc(st('mur'))}</option></select></div></div>
     <div id="syHi" class="grid2"><div><label for="syG">${esc(st('grpL'))}</label><select id="syG">${['bio','cs','arts'].map(g=>`<option value="${g}" ${s.group===g?'selected':''}>${esc(st('g'+g))}</option>`).join('')}</select></div>
      <div id="syEW"><label for="syE">${esc(st('examL'))}</label><select id="syE">${EXAMB.map(e=>`<option ${s.exam===e?'selected':''}>${e}</option>`).join('')}</select></div></div>
+    <div><label for="sySch">${esc(ft('schoolL'))}</label><input id="sySch" dir="auto" maxlength="60" value="${esc(s.school||'')}"></div>
     <p class="note" id="syNote"></p>
+    <div id="sySrc" class="small soft"></div>
     <div class="row"><button class="btn" type="submit" style="flex:1">${esc(ft('save'))}</button>${afterNew?'':`<button class="btn ghost" type="button" data-act="closeModal">${esc(t('cancel'))}</button>`}</div>
    </form>`);
   const sync=()=>{const b=$('syB').value,c=$('syC').value;$('syBookW').hidden=b!=='own';$('syMW').style.visibility=b==='cam'?'hidden':'visible';
     $('syHi').hidden=!hiCls(c);$('syEW').style.visibility=b==='kp'?'visible':'hidden';
-    $('syNote').textContent=(b==='kp'&&hiCls(c)&&todayISO()<NCP_START)?st('newBooks'):'';
+    $('syNote').textContent=(b==='kp'&&NCP_CLS.includes(c)&&todayISO()<NCP_START)?st('newBooks'):'';
+    $('sySrc').innerHTML=(SRC[b]||[]).length?`<b>${esc(ft('srcT'))}:</b> `+SRC[b].map(([n,u])=>`<a href="${u}" target="_blank" rel="noopener">${esc(n)}</a>`).join(' · '):'';
     if(b==='cam'&&!['O','A'].includes(c)&&+c>=9)$('syC').value=+c>=11?'A':'O';};
   ['syB','syC'].forEach(id=>$(id).onchange=sync);sync();
   $('sylForm').onsubmit=e=>{e.preventDefault();const b=$('syB').value,c=$('syC').value;
-    p.syl={board:b,cls:c,medium:b==='cam'?'en':$('syM').value,group:hiCls(c)?$('syG').value:'',exam:b==='kp'&&hiCls(c)?$('syE').value:'',book:b==='own'?$('syBook').value.trim().slice(0,60):''};
+    p.syl={board:b,cls:c,medium:b==='cam'?'en':$('syM').value,group:hiCls(c)?$('syG').value:'',exam:b==='kp'&&hiCls(c)?$('syE').value:'',book:b==='own'?$('syBook').value.trim().slice(0,60):'',school:$('sySch').value.trim().slice(0,60)};
     p.cls=c;save();closeModal();toast(st('sylSaved'),true);render();if(afterNew&&typeof afterNew==='function')afterNew();};}
 
 /* v0.13 Exam tayyari: board-style practice tests (AI written, clearly labelled), answer marking, link to real past papers */
@@ -1435,7 +1448,7 @@ function examModal(){const p=activeP();const subs=examSubjects(p);const l=D.lang
    <div class="row"><button class="btn" type="submit" style="flex:1">${esc(et('go'))}</button><button class="btn ghost" type="button" data-act="closeModal">${esc(t('cancel'))}</button></div></form>
    <div class="page stack" style="box-shadow:none;margin-top:4px"><h2 style="margin:0">🔎 ${esc(et('ppT'))}</h2><p class="note">${esc(et('ppNote'))}</p>
     <div class="row"><select id="ppY" style="flex:1">${Array.from({length:10},(_,i)=>new Date().getFullYear()-i).map(y=>`<option>${y}</option>`).join('')}</select><button class="btn ghost" type="button" id="ppGo">${esc(et('ppGo'))}</button></div></div>`);
-  $('ppGo').onclick=()=>examPapers($('exS').value,$('ppY').value);
+  $('ppGo').onclick=()=>{const a=$('exS').value,y=$('ppY').value;closeModal();if(S.screen!=='ustad')go('ustad');examPapers(a,y);};
   let mode='mcq';document.querySelectorAll('[data-exm]').forEach(b=>b.onclick=()=>{mode=b.dataset.exm;document.querySelectorAll('[data-exm]').forEach(x=>x.setAttribute('aria-pressed',String(x===b)));});
   $('exForm').onsubmit=e=>{e.preventDefault();const sub=$('exS').value,tp=$('exTp').value.trim().slice(0,80);closeModal();mode==='mcq'?examMcq(sub,tp):mode==='short'?examShort(sub,tp):examSolveStart(sub);};}
 function examGate(l){if(!aiOn()){uPush({who:'ai',text:ft('uNeedNet',l),l});return false;}const qa=aiQuota();if(D.plan!=='family'&&qa.n>=STU_CAP){uPush({who:'ai',text:fill(ft('cap',l),{c:STU_CAP}),l});return false;}return true;}
@@ -1454,9 +1467,10 @@ Reply with only JSON: {"answers":[{"i":0,"work":"","answer":0}]}`;
   const r=await exAI(pr,'low');if(!r||!Array.isArray(r.answers))return null;
   const m={};r.answers.forEach(x=>{if(x&&Number.isInteger(+x.i))m[+x.i]=+x.answer;});
   return list.filter((x,i)=>m[i]===x.a);}
-async function examMcq(sub,tp){const p=activeP(),l=D.lang;if(jBusy||!examGate(l))return;jBusy=true;jState('thinking');
+async function examMcq(sub,tp,docRows){const p=activeP(),l=D.lang;if(jBusy||!examGate(l))return;jBusy=true;jState('thinking');
   uPush({who:'me',text:'📝 '+subName(sub,l)+(tp?' · '+tp:''),l});uPush({who:'ai',text:et('making'),l});
-  const prompt=`You are an experienced Pakistani board examiner. The student: ${sylPrompt(p)}
+  const lib=docRows||await libFind((tp||'')+' '+(SUBJ[sub]?SUBJ[sub].en:sub)+' '+(tp?'':'important definitions laws'),p,sub,4);
+  const prompt=`You are an experienced Pakistani board examiner. The student: ${sylPrompt(p)}${lib.length?libBlock(lib)+'Base most questions on this textbook material.\n':''}
 Write 12 ORIGINAL multiple choice questions for the subject "${SUBJ[sub]?SUBJ[sub].en:sub}"${tp?` on this chapter or topic: "${tp}"`:' covering the important chapters of this class'}, exactly in the style and difficulty of this student's board exam MCQ section. Mix easy, medium and hard. Each question has 4 options and exactly one correct option. Keep each question under 30 words. ${levelRule(p)}
 Language of questions and options: ${subLang(sub,p)}. Write the "why" explanation in ${LNAME[l]}, one short line.
 Accuracy matters most: for every question, first solve it yourself and write the short working in "work", then set "answer" to the index (0 to 3) of the option that matches your working. Exactly one option must be correct and the numbers must work out exactly. For physics use g = 10 m/s² unless the question gives another value. Do not copy real past papers word for word. No dashes. Reply with only JSON: {"questions":[{"q":"","options":["","","",""],"work":"","answer":0,"why":""}]}`;
@@ -1518,11 +1532,42 @@ Reply with only JSON: {"answer":"","tip":""}`;
   if(!r||!r.answer){jState('idle');uPush({who:'ai',text:et('fail'),l});return true;}
   const qa=aiQuota();qa.n++;save();
   uPush({who:'ai',text:String(r.answer).slice(0,2500)+(r.tip?'\n\n💡 '+String(r.tip).slice(0,300):''),btns:[{act:'eStop',id:'',label:et('stop')}],l});jState('happy');return true;}
-function examPapers(sub,year){const p=activeP();const s=sylOf(p);
+async function examPapers(sub,year){const p=activeP();const l=D.lang;window.__libSub=sub;const lp=await libPapers(p,sub);
+  if(lp.length){uPush({who:'ai',text:ft('libPapers',l)+'\n'+lp.map(x=>'• '+x.title+(x.year?' ('+x.year+')':'')).join('\n'),btns:lp.slice(0,4).map(x=>({act:'libRead',id:x.id,label:'📄 '+(x.year||'')+' '+String(x.title).slice(0,28)})),l});return;}
+  uPush({who:'ai',text:ft('libNone',l),btns:[{act:'webPapers',id:sub+'|'+(year||''),label:'🔎 Google'}],l});}
+function examPapersWeb(sub,year){const p=activeP();const s=sylOf(p);
   const b={kp:'BISE '+(s.exam||'KPK'),fed:'FBISE',cam:'Cambridge '+(s.cls==='A'?'A Level':'O Level'),aku:'AKU-EB',own:''}[s.board]||'';
   const q=[b,s.cls==='O'||s.cls==='A'?'':'class '+s.cls,SUBJ[sub]?SUBJ[sub].en:sub,'past paper',year||''].filter(Boolean).join(' ');
   try{window.open('https://www.google.com/search?q='+encodeURIComponent(q),'_blank','noopener');}catch(e){}}
 
+/* v0.15 Jugnu library: material uploaded in the control room for a board, school, class and subject.
+   Ustad answers from it first and names the source; without it, Ustad must not invent chapters or pages. */
+const LIB_STOP=new Set('detail example saath sath what which when where why how does explain describe define tell please about with from that this have give kya kia hai hain kaise kaisay kyun kyon batao btao samjhao samjha mujhe mein main ka ki ke ko se aur the and for are can you your yeh ye wo woh کیا ہے ہیں کیسے کیوں بتاؤ سمجھاؤ مجھے میں کا کی کے کو سے اور څه ده دي ولې'.split(' '));
+function libQuery(q){return [...new Set(words(q).filter(w=>w.length>=3&&!LIB_STOP.has(w)))].slice(0,16).join(' ');}
+function guessSub(q){const s=String(q).toLowerCase();
+  const M=[['physics',/physics|force|motion|velocity|newton|energy|current|voltage|ohm|wave|فزکس|قوت|حرکت/],['chemistry',/chemi|atom|acid|base|bond|molecule|element|periodic|کیمسٹری|ایٹم/],['biology',/biolog|cell|photosynth|heart|plant|tissue|enzyme|بیالوجی|خلیہ/],['maths',/math|equation|algebra|triangle|theorem|matrix|fraction|geometry|ریاضی|مساوات/],['english',/english|grammar|tense|essay|letter|poem|noun|verb/],['urdu',/\burdu\b|اردو/],['pashto',/pashto|پشتو|پښتو/],['islamiat',/islam|quran|hadith|اسلامیات|قرآن/],['pakst',/pakistan studies|pak ?st|quaid|مطالعہ پاکستان/],['cs',/computer|program|algorithm|coding/]];
+  for(const [k,r] of M)if(r.test(s))return k;return 'any';}
+async function libFind(q,p,sub,n){if(!online()||!p)return[];const s=sylOf(p);const qq=libQuery(q);if(!qq)return[];
+  try{const r=await sbFetch(SB_URL+'/rest/v1/rpc/lib_search',{method:'POST',headers:{apikey:SB_KEY,'content-type':'application/json'},body:JSON.stringify({q:qq,p_board:s.board||'any',p_cls:String(s.cls||'any'),p_subject:sub||'any',p_school:(s.school||'').trim()||null,n:n||3})},6000);
+    if(!r.ok)return[];const rows=await r.json();return Array.isArray(rows)?rows:[];}catch(e){return[];}}
+function libBlock(rows){if(!rows||!rows.length)return '';
+  return '\nTextbook material from the Jugnu library (official material uploaded for this student\'s board and class). Use it as the main source. If it covers the question, base your answer on it and never contradict it:\n'+rows.map((x,i)=>`[${i+1}] ${x.title}${x.page?' (page '+x.page+')':''}: ${String(x.content).slice(0,1400)}`).join('\n')+'\n';}
+function libCite(rows,used,l){if(!rows||!rows.length)return '';const u=(Array.isArray(used)?used:[]).map(Number).filter(i=>i>=1&&i<=rows.length);if(!u.length)return '';
+  const t=[...new Set(u.map(i=>rows[i-1].title+(rows[i-1].page?', '+ft('pg',l)+' '+rows[i-1].page:'')))];return '\n📚 '+ft('srcL',l)+': '+t.join('; ');}
+async function libPapers(p,sub){if(!online()||!p)return[];const s=sylOf(p);
+  try{const f=`library_docs?select=id,title,year,kind,board,cls,subject,school&active=is.true&kind=in.(past_paper,model_paper)&board=in.(any,${encodeURIComponent(s.board)})&cls=in.(any,${encodeURIComponent(s.cls)})&subject=in.(any,${encodeURIComponent(sub)})&order=year.desc.nullslast&limit=12`;
+    const r=await sbFetch(SB_URL+'/rest/v1/'+f,{headers:{apikey:SB_KEY}},6000);if(!r.ok)return[];const rows=await r.json();
+    return (rows||[]).filter(x=>!x.school||(s.school&&x.school.toLowerCase()===s.school.trim().toLowerCase()));}catch(e){return[];}}
+async function libDocText(id){try{const r=await sbFetch(SB_URL+'/rest/v1/library_chunks?select=idx,page,content&doc_id=eq.'+encodeURIComponent(id)+'&order=idx.asc&limit=60',{headers:{apikey:SB_KEY}},8000);if(!r.ok)return '';const rows=await r.json();return (rows||[]).map(x=>x.content).join('\n');}catch(e){return '';}}
+/* official places to check: shown in the syllabus screen */
+const SRC={kp:[['KP Textbook Board','https://kpese.gov.pk/textbook-board-tbb/'],['KP curriculum (DCTE)','https://dcte.kpese.gov.pk/'],['BISE Peshawar','https://www.bisep.edu.pk/'],['All KP boards','https://kpese.gov.pk/bise-peshawar/']],
+ fed:[['FBISE','https://www.fbise.edu.pk/'],['National Curriculum Council','https://ncc.gov.pk/']],
+ cam:[['Cambridge International','https://www.cambridgeinternational.org/programmes-and-qualifications/']],
+ aku:[['AKU Examination Board','https://examinationboard.aku.edu/']],own:[]};
+Object.assign(FS.roman,{pg:'safha',srcL:'Hawala',srcT:'Sarkari / asal hawale',schoolL:'School ka naam (agar school ki apni kitabein ya notes hain)',libPapers:'Jugnu library ke asal papers:',libOpen:'Paper parhein',libQuiz:'Is paper se test lo',libNone:'Library mein abhi is ka paper nahi. Google par dhoondte hain.',libRead:'Paper:'});
+Object.assign(FS.ur,{pg:'صفحہ',srcL:'حوالہ',srcT:'سرکاری / اصل حوالے',schoolL:'اسکول کا نام (اگر اسکول کی اپنی کتابیں یا نوٹس ہیں)',libPapers:'جگنو لائبریری کے اصل پرچے:',libOpen:'پرچہ پڑھیں',libQuiz:'اس پرچے سے ٹیسٹ لو',libNone:'لائبریری میں ابھی اس کا پرچہ نہیں۔ گوگل پر ڈھونڈتے ہیں۔',libRead:'پرچہ:'});
+Object.assign(FS.ps,{pg:'مخ',srcL:'سرچینه',srcT:'رسمي / اصلي سرچینې',schoolL:'د ښوونځي نوم (که د ښوونځي خپل کتابونه یا نوټونه وي)',libPapers:'د جګنو کتابتون اصلي پرچې:',libOpen:'پرچه ولولئ',libQuiz:'له دې پرچې ازموینه واخله',libNone:'په کتابتون کې لا دا پرچه نشته. په ګوګل کې یې لټوو.',libRead:'پرچه:'});
+Object.assign(FS.en,{pg:'page',srcL:'Source',srcT:'Official sources',schoolL:'School name (if your school uses its own books or notes)',libPapers:'Real papers in the Jugnu library:',libOpen:'Read paper',libQuiz:'Test me from this paper',libNone:'No paper for this in the library yet. Searching Google.',libRead:'Paper:'});
 function ustadView(){const p=activeP();
   return `<div class="jhome ustadT">
    <div class="jhero"><span class="ffw listening" id="jFF">${ffSVG()}</span><div><div class="jname">Ustad<small>jugnu</small></div><div class="jstat" id="jStat" aria-live="polite">${esc(jt('listening'))}</div><span class="jmode" id="jMode"></span><button class="jtheme" data-act="jTheme" aria-label="Light / dark">${jLight()?'☾':'☀'}</button></div>${profChip()}</div>
@@ -1573,9 +1618,10 @@ async function uSend(q){q=String(q||'').trim();if(!q||jBusy)return;hbNote(q,'u')
   const r=await askTutor(q,l,p);if(r){qa.n++;if(q.length>8&&!/^(Revise|Ye dobara)/.test(q))p.lastQ=q.slice(0,120);save();}
   uPush({who:'ai',text:r||ft('uNeedNet',l),l});jState(r?'happy':'idle');setTimeout(()=>{if(!jBusy)jState('idle');},1300);jBusy=false;}
 async function askTutor(q,l,p){
-  try{const hist=uChat().filter(m=>m.text).slice(-7,-1).map(m=>(m.who==='me'?'Student: ':'Ustad: ')+m.text).join('\n');
-    const prompt=`You are Ustad Jugnu, a kind, patient tutor for a Pakistani school student named ${p.name}. ${sylPrompt(p)}
+  try{const lib=await libFind(q,p,guessSub(q));const hist=uChat().filter(m=>m.text).slice(-7,-1).map(m=>(m.who==='me'?'Student: ':'Ustad: ')+m.text).join('\n');
+    const prompt=`You are Ustad Jugnu, a kind, patient tutor for a Pakistani school student named ${p.name}. ${sylPrompt(p)}${libBlock(lib)}
 Rules:
+- Be accurate. Never invent chapter numbers, page numbers, exercise numbers, dates or exam statistics. If you are not sure something is in this student's book, say so and ask them to check the book.
 - Reply ONLY in ${LNAME[l]}, the same language and script the student used. Technical terms and formulas may stay in English as in the textbook.
 - Teach, do not just hand over answers: explain step by step in simple words, give one small example, and for homework give a hint first and ask the student to try.
 - Keep it short: at most 6 short lines. No emojis. No dashes.
@@ -1585,10 +1631,10 @@ Rules:
 Recent chat:
 ${hist||'(none)'}
 Student's new message: """${q}"""
-Reply with only JSON like {"reply":"..."}`;
+Reply with only JSON like {"reply":"...","used":[]} where "used" lists the numbers of the library passages you used (empty if none).`;
     let r=null;try{r=await aiJSON(prompt,'@cf/openai/gpt-oss-120b');}catch(e1){if(e1&&['not_granted','unavailable','capability_disabled','capability_removed'].includes(e1.code))throw e1;r=null;}
     if(!r||typeof r.reply!=='string'||!r.reply.trim())r=await aiJSON(prompt);
-    return r&&typeof r.reply==='string'&&r.reply.trim()?r.reply.trim().slice(0,1200):null;
+    return r&&typeof r.reply==='string'&&r.reply.trim()?r.reply.trim().slice(0,1200)+libCite(lib,r.used,l):null;
   }catch(err){if(err&&['not_granted','unavailable','capability_disabled','capability_removed'].includes(err.code)){SAMPLE=null;updMode();}return null;}
 }
 function progressView(){const p=activeP();const w=weekSummary(p);const l=D.lang;
@@ -1905,7 +1951,7 @@ function bindAfter(){
       const type=ty.value,date=$('eDate').value||todayISO(),note=$('eNote').value.trim();
       const d=S.draft||{};const same=x=>x&&cust(x)&&norm(cust(x).name)===norm(name);
       let cid=same(d.cid)?d.cid:(same(S.cid)?S.cid:null);
-      if(!cid&&!d.id){const cs=nameCands(name);if(cs.length>1){window.__efPend={name,amount,type,date,note};modal(`<h1>${esc(fill(jt('whichQ',D.lang),{n:name.trim().split(/\s+/)[0]||name,k:cs.length}))}</h1><div class="plist">${cs.map(x=>`<button class="btn ghost full" data-act="efPick" data-id="${x.id}" style="justify-content:space-between"><b dir="auto">${esc(nameFor(x,D.lang))}</b><span class="num">${esc(phoneTail(x))} · ${esc(rs(Math.abs(balance(x.id))))}</span></button>`).join('')}</div><p class="note">${esc(fill(jt('newHint',D.lang),{n:name.trim().split(/\s+/)[0]||name}))}</p>`);return;}}
+      if(!cid&&!['expense','sale'].includes(type)){const sm=sureMatch(name);if(sm)cid=sm.id;else{const cs=looseMatches(name);if(cs.length){window.__efPend={id:d.id,name,amount,type,date,note};const one=cs.length===1;modal(`<h1 dir="auto">${esc(one?fill(jt('sameQ',D.lang),{n:name,m:nameFor(cs[0],D.lang)}):fill(jt('whichQ',D.lang),{n:words(name)[0]||name,k:cs.length}))}</h1><div class="plist">${cs.map(x=>`<button class="btn ghost full" data-act="efPick" data-id="${x.id}" style="flex-direction:column;align-items:flex-start"><b dir="auto">${one?'✓ ':''}${esc(nameFor(x,D.lang))}</b><small class="soft num" dir="auto">${esc(idBits(x,D.lang))}</small></button>`).join('')}<button class="btn ghost full" data-act="efNew">＋ ${esc(fill(jt('newPerson',D.lang),{n:words(name)[0]||name}))}</button></div>`);return;}}}
       const {c,saved}=commitEntry({id:d.id,cid,name,amount,type,date,note});
       if(d.fromJugnu){const dr=S.drafts[d.fromJugnu];if(dr)Object.assign(dr,{status:'yes',name:c.name,amount,type,date,note});go('jugnu',{draft:null});jSaved(c,saved,dr?dr.l:D.lang);return;}
       go('customer',{cid:c.id,draft:null});toast(t('saved'),true);
@@ -1917,8 +1963,8 @@ function bindAfter(){
 function restoreFrom(txt){try{const d=JSON.parse(txt);if(!d||!Array.isArray(d.customers)||!Array.isArray(d.entries))throw 0;window.__restore=d;
   modal(`<h1>${esc(t('backup'))}</h1><p class="soft"><span class="num">${d.customers.length}</span> · <span class="num">${d.entries.length}</span> ${esc(t('entries'))}</p><div class="row"><button class="btn" data-act="doRestore" style="flex:1">OK</button><button class="btn ghost" data-act="closeModal">${esc(t('cancel'))}</button></div>`);}catch(e){toast('Invalid backup');}}
 function editCustModal(){const c=cust(S.cid);if(!c)return;
-  modal(`<h1>${esc(c.name)}</h1><form id="custForm" class="stack"><div><label for="cName">${esc(t('name'))}</label><input id="cName" dir="auto" required value="${esc(c.name)}"></div><div><label for="cPhone">${esc(t('phone'))}</label><input id="cPhone" inputmode="tel" dir="ltr" value="${esc(c.phone||'')}" placeholder="0300 1234567"></div><div><label for="cLimit">${esc(t('limitL'))}</label><input id="cLimit" inputmode="numeric" dir="ltr" value="${esc(c.limit||'')}"></div><div ${['expense','sales'].includes(c.type)?'hidden':''}><label for="cType">${esc(t('kind'))}</label><select id="cType"><option value="customer" ${c.type==='customer'?'selected':''}>${esc(t('customer'))}</option><option value="supplier" ${c.type==='supplier'?'selected':''}>${esc(t('supplier'))}</option></select></div><div class="row"><button class="btn" type="submit" style="flex:1">${esc(t('saveCust'))}</button><button class="btn ghost" type="button" data-act="closeModal">${esc(t('cancel'))}</button></div></form>`);
-  $('custForm').onsubmit=e=>{e.preventDefault();{const nn=cap($('cName').value);if(nn&&D.customers.some(x=>x.id!==c.id&&norm(x.name)===norm(nn))){toast(jt('dupName',D.lang));return;}}c.name=cap($('cName').value)||c.name;c.phone=$('cPhone').value.trim();if(!['expense','sales'].includes(c.type))c.type=$('cType').value;{const lv=Math.round(parseFloat(toAsciiDigits($('cLimit').value).replace(/[^\d.]/g,'')));c.limit=lv>0?lv:0;}save();closeModal();render();};}
+  modal(`<h1>${esc(c.name)}</h1><form id="custForm" class="stack"><div><label for="cName">${esc(t('name'))}</label><input id="cName" dir="auto" required value="${esc(c.name)}"></div><div><label for="cPhone">${esc(t('phone'))}</label><input id="cPhone" inputmode="tel" dir="ltr" value="${esc(c.phone||'')}" placeholder="0300 1234567"></div>${['expense','sales'].includes(c.type)?'':`<div><label for="cTag">${esc(jt('tagL',D.lang))}</label><input id="cTag" dir="auto" maxlength="30" value="${esc(c.tag||'')}" placeholder="${esc(jt('tagPh',D.lang))}"></div>`}<div><label for="cLimit">${esc(t('limitL'))}</label><input id="cLimit" inputmode="numeric" dir="ltr" value="${esc(c.limit||'')}"></div><div ${['expense','sales'].includes(c.type)?'hidden':''}><label for="cType">${esc(t('kind'))}</label><select id="cType"><option value="customer" ${c.type==='customer'?'selected':''}>${esc(t('customer'))}</option><option value="supplier" ${c.type==='supplier'?'selected':''}>${esc(t('supplier'))}</option></select></div><div class="row"><button class="btn" type="submit" style="flex:1">${esc(t('saveCust'))}</button><button class="btn ghost" type="button" data-act="closeModal">${esc(t('cancel'))}</button></div></form>`);
+  $('custForm').onsubmit=e=>{e.preventDefault();{const nn=cap($('cName').value);if(nn&&D.customers.some(x=>x.id!==c.id&&norm(x.name)===norm(nn))){toast(jt('dupName',D.lang));return;}}{const pk=normPK($('cPhone').value);const o=pk&&D.customers.find(x=>x.id!==c.id&&normPK(x.phone)===pk);if(o){toast(fill(jt('npPhoneUsed',D.lang),{n:o.name}));return;}}c.name=cap($('cName').value)||c.name;c.phone=$('cPhone').value.trim();if($('cTag'))c.tag=cap($('cTag').value);if(!['expense','sales'].includes(c.type))c.type=$('cType').value;{const lv=Math.round(parseFloat(toAsciiDigits($('cLimit').value).replace(/[^\d.]/g,'')));c.limit=lv>0?lv:0;}save();closeModal();render();};}
 function download(name,text,type){saveBlob(name,new Blob([text],{type}));}
 async function copyText(txt,ok){try{await navigator.clipboard.writeText(txt);toast(ok||'Copied');}catch(e){modal(`<textarea id="cpy" readonly style="min-height:180px" dir="auto">${esc(txt)}</textarea><button class="btn ghost full" data-act="closeModal">OK</button>`);const ta=$('cpy');ta.focus();ta.select();}}
 function loadDemo(){
@@ -1946,6 +1992,9 @@ document.addEventListener('click',async e=>{
   if(act==='eAns'){const [mi,o]=String(id).split(':').map(Number);examPick(mi,o);return;}
   if(act==='eStop'){S.examQ=null;S.exam=null;S.examSolve=null;uPush({who:'ai',text:et('stopped'),l:D.lang});return;}
   if(act==='ePapers'){examPapers(id);return;}
+  if(act==='webPapers'){const [a,y]=String(id).split('|');examPapersWeb(a,y);return;}
+  if(act==='libRead'){(async()=>{const l=D.lang;const tx=await libDocText(id);if(!tx){uPush({who:'ai',text:ft('uNeedNet',l),l});return;}window.__libDoc={id,tx};uPush({who:'ai',text:ft('libRead',l)+'\n'+tx.slice(0,3500)+(tx.length>3500?' …':''),btns:[{act:'libQuiz',id,label:ft('libQuiz',l)}],l});})();return;}
+  if(act==='libQuiz'){const d=window.__libDoc;if(!d||d.id!==id)return;const p=activeP();examMcq(window.__libSub||(guessSub(d.tx)==='any'?examSubjects(p)[0]:guessSub(d.tx)),'',[{title:'Past paper',page:null,content:d.tx.slice(0,5000)}]);return;}
   if(act==='jTheme'){setJTheme(jLight()?'dark':'light');return;}
   if(act==='jThemeSet'){setJTheme(id);return;}
   switch(act){
@@ -1964,10 +2013,12 @@ document.addEventListener('click',async e=>{
     case 'jRemind':{const c=cust(id);if(c)doRemind(c);break;}
     case 'jStmt':{if(!cust(id))break;S.cid=id;toast(t('making'));const cs=await statementCanvases(id);docModal(t('statement'),cs,'statement',210,297,cust(id));break;}
     case 'vPick':{const f=document.querySelector('input[data-voice]');if(f)f.click();break;}
-    case 'jPick':{const [did,cid]=String(id).split('|');const d=S.drafts[did],c=cust(cid);if(!d||!c||d.status)break;d.cid=cid;d.name=c.name;delete d.amb;if(c.type==='supplier'){if(d.type==='credit')d.type='goods';if(d.type==='payment')d.type='paid';}renderChat();break;}
+    case 'jPick':{const [did,cid]=String(id).split('|');const d=S.drafts[did],c=cust(cid);if(!d||!c||d.status)break;if(d.said&&norm(d.said)!==norm(c.name)&&words(d.said).length===words(c.name).length)learnAlias(c,d.said);d.cid=cid;d.name=c.name;d.sure=true;delete d.amb;if(c.type==='supplier'){if(d.type==='credit')d.type='goods';if(d.type==='payment')d.type='paid';}renderChat();break;}
     case 'jYes':{const d=S.drafts[id];if(!d||d.status)break;if(d.amb&&!d.cid){toast(jt('pickFirst',d.l));break;}if(!d.name){S.cid=null;go('entry',{draft:Object.assign({},d,{fromQuick:true,fromJugnu:id})});break;}const r=commitEntry(d);d.status='yes';jSaved(r.c,r.saved,d.l);if(d.sid){const left=storyPending(d.sid).length;if(left)jPush({who:'ai',text:fill(jt('leftOne',d.l),{n:left}),btns:[{act:'jYesAll',id:d.sid,label:jt('yesRest',d.l)}],l:d.l});}break;}
     case 'jYesAll':{storySaveAll(id);break;}
-    case 'efPick':{const pe=window.__efPend;if(!pe)break;closeModal();const d=S.draft||{};const {c,saved}=commitEntry(Object.assign({},pe,{cid:id}));if(d.fromJugnu){const dr=S.drafts[d.fromJugnu];if(dr)Object.assign(dr,{status:'yes',name:c.name,cid:c.id});go('jugnu',{draft:null});jSaved(c,saved,dr?dr.l:D.lang);break;}go('customer',{cid:c.id,draft:null});toast(t('saved'),true);break;}
+    case 'jNew':{const d=S.drafts[id];if(!d||d.status)break;newPersonModal(d.said||d.name,d.type,c=>{d.cid=c.id;d.name=c.name;d.sure=true;delete d.amb;renderChat();});break;}
+    case 'efNew':{const pe=window.__efPend;if(!pe)break;closeModal();setTimeout(()=>newPersonModal(pe.name,pe.type,c=>{const d=S.draft||{};const {saved}=commitEntry(Object.assign({},pe,{cid:c.id}));if(d.fromJugnu){const dr=S.drafts[d.fromJugnu];if(dr)Object.assign(dr,{status:'yes',name:c.name,cid:c.id});go('jugnu',{draft:null});jSaved(c,saved,dr?dr.l:D.lang);return;}go('customer',{cid:c.id,draft:null});toast(t('saved'),true);}),120);break;}
+    case 'efPick':{const pe=window.__efPend;if(!pe)break;closeModal();const d=S.draft||{};const pc=cust(id);if(pc&&pe.name&&norm(pe.name)!==norm(pc.name)&&words(pe.name).length===words(pc.name).length)learnAlias(pc,pe.name);const {c,saved}=commitEntry(Object.assign({},pe,{cid:id}));if(d.fromJugnu){const dr=S.drafts[d.fromJugnu];if(dr)Object.assign(dr,{status:'yes',name:c.name,cid:c.id});go('jugnu',{draft:null});jSaved(c,saved,dr?dr.l:D.lang);break;}go('customer',{cid:c.id,draft:null});toast(t('saved'),true);break;}
     case 'jEdit':{const d=S.drafts[id];if(!d||d.status)break;S.cid=null;go('entry',{draft:Object.assign({},d,{fromQuick:true,fromJugnu:id})});break;}
     case 'comOpen':closeModal();go('committee');break;
     case 'comNew':comNewModal();break;
@@ -2134,6 +2185,65 @@ Object.assign(J.roman,{whichQ:'Kaunsa {n}? Is naam ke {k} khate hain:',newPerson
 Object.assign(J.ur,{whichQ:'کون سا {n}؟ اس نام کے {k} کھاتے ہیں:',newPerson:'نیا {n} (الگ بندہ)',newHint:'نئے بندے کے نام کے ساتھ پہچان لکھیں، جیسے "{n} موچی" یا "{n} مردان"۔',pickFirst:'پہلے چنیں کون سا کھاتہ۔',whichMany:'اس نام کے ایک سے زیادہ کھاتے ہیں:',dupName:'اس نام کا کھاتہ پہلے سے ہے۔ فرق کے لیے پہچان لکھیں: باپ کا نام، کام یا محلہ۔',needPick:'کچھ حساب میں نام دو لوگوں کا ہے۔ اوپر چنیں کون سا۔'});
 Object.assign(J.ps,{whichQ:'کوم {n}؟ د دې نوم {k} حسابونه دي:',newPerson:'نوی {n} (بل سړی)',newHint:'د نوي سړي له نوم سره پېژندنه ولیکئ، لکه "{n} موچي" یا "{n} مردان".',pickFirst:'لومړی وټاکئ کوم حساب.',whichMany:'د دې نوم له یوه زیات حسابونه دي:',dupName:'د دې نوم حساب شته. د توپیر لپاره پېژندنه ولیکئ: د پلار نوم، کار یا کلی.',needPick:'په ځینو حسابونو کې نوم د دوو کسانو دی. پورته وټاکئ.'});
 Object.assign(J.en,{whichQ:'Which {n}? There are {k} accounts with this name:',newPerson:'New {n} (different person)',newHint:'For a new person, add something to tell them apart, like "{n} Mochi" or "{n} Mardan".',pickFirst:'First choose which account.',whichMany:'More than one account has this name:',dupName:'An account with this name already exists. Add something to tell them apart: father\'s name, work or area.',needPick:'Some entries have a name shared by two people. Choose which one above.'});
+/* v0.15 identity safety: never save into an account unless we are sure it is the same person.
+   Sure = the exact name (or a spelling the shopkeeper already confirmed) and nobody else could be meant.
+   Anything less (first name only, other spelling, other script, similar sounding) asks first, showing
+   phone, pehchaan (father/work/area), balance and last entry so the shopkeeper can tell people apart. */
+function addDays(iso,n){if(!n)return iso;const d=new Date(iso+'T12:00:00');d.setDate(d.getDate()+n);return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
+/* "kal diye" = yesterday (past tense); "kal dega" is a promise, not an entry date */
+function dayOf(s){s=' '+s+' ';const fut=/\b(dega|degi|denge|dene|karega|karegi|ayega|aayega|will|tomorrow)\b|دے گا|دیں گے|کرے گا|به ورکړي/.test(s);if(fut)return todayISO();
+  if(/\b(parson|parsun)\b|پرسوں|ورمه ورځ/.test(s))return addDays(todayISO(),-2);
+  if(/\b(kal|kl|yesterday|parun|parroon)\b| کل |پرون|گزشتہ روز/.test(s))return addDays(todayISO(),-1);return todayISO();}
+const isPerson=c=>c&&c.type!=='expense'&&c.type!=='sales';
+function aliasesOf(c){return [c.name,c.ar,c.lat].concat(c.alias||[]).filter(Boolean).map(norm);}
+function exactMatches(name){const n=norm(name||'');return n?D.customers.filter(c=>isPerson(c)&&aliasesOf(c).includes(n)):[];}
+function looseMatches(name){const n=norm(name||'');if(!n)return[];const w=words(n);if(!w.length)return[];const ks=w.map(skel);const fk=ks[0]||'';
+  return D.customers.filter(c=>{if(!isPerson(c))return false;if(aliasesOf(c).includes(n))return true;
+    return aliasesOf(c).some(a=>{const cw=words(a);if(!cw.length)return false;const ck=cw.map(skel);
+      if(ks.join('').length>=2&&ck.join(' ')===ks.join(' '))return true;
+      if(cw[0]===w[0])return true;
+      return fk.length>=2&&ck[0]===fk;});});}
+function sureMatch(name){const ex=exactMatches(name);if(ex.length!==1)return null;
+  if(words(name).length>1)return ex[0];return looseMatches(name).length===1?ex[0]:null;}
+function lastEntryOf(cid){const es=entriesOf(cid);return es.length?es[es.length-1]:null;}
+function idBits(c,l){const b=balance(c.id);const le=lastEntryOf(c.id);
+  return [phoneTail(c),c.tag||'',rs(Math.abs(b))+(b>0?' '+jt('idOwes',l):b<0?' '+jt('idWeOwe',l):''),le?jt('idLast',l)+' '+dmy(le.date).slice(0,5):''].filter(Boolean).join(' · ');}
+markAmb=function(d,raw){if(!d||!d.name||d.type==='expense'||d.type==='sale')return d;if(d.cid&&d.sure)return d;
+  const said=d.said||d.name;const s=sureMatch(said);
+  if(s){d.cid=s.id;d.name=s.name;d.sure=true;delete d.amb;return d;}
+  let cs=looseMatches(said);const named=sureMatch(d.name)||exactMatches(d.name)[0];if(named&&!cs.includes(named))cs.push(named);
+  if(raw&&cs.length>1){const t=' '+norm(raw)+' ';const full=cs.filter(c=>words(c.name).length>1&&aliasesOf(c).some(a=>t.includes(' '+a+' ')));if(full.length===1){d.cid=full[0].id;d.name=full[0].name;d.sure=true;delete d.amb;return d;}if(full.length)cs=full;}
+  d.cid=null;delete d.sure;if(cs.length){d.amb=cs.map(c=>c.id);d.said=said;}else delete d.amb;return d;};
+ambPickerHTML=function(d,id,l){const said=d.said||d.name;const first=cap(words(said)[0]||said);const one=d.amb.length===1;
+  const q=one?fill(jt('sameQ',l),{n:said,m:nameFor(cust(d.amb[0]),l)}):fill(jt('whichQ',l),{n:first,k:d.amb.length});
+  return `<div class="jamb"><p dir="auto">${esc(q)}</p><div class="jbtns jpicks">${d.amb.map(cid=>{const c=cust(cid);if(!c)return'';
+    return `<button class="jchip jpick" data-act="jPick" data-id="${id}|${cid}"><b dir="auto">${one?'✓ ':''}${esc(nameFor(c,l))}</b><small class="num" dir="auto">${esc(idBits(c,l))}</small></button>`;}).join('')}
+    <button class="jchip" data-act="jNew" data-id="${id}">＋ ${esc(fill(jt('newPerson',l),{n:first}))}</button></div></div>`;};
+/* new person whose name clashes: ask for a pehchaan (father's name, work or area) and optional phone */
+function newPersonModal(pre,type,done){const l=D.lang;const clash=looseMatches(pre).length>0;
+  modal(`<h1>${esc(jt('npT',l))}</h1>${clash?`<p class="soft small" dir="auto">${esc(fill(jt('npClash',l),{n:words(pre)[0]||pre}))}</p>`:''}
+   <form id="npForm" class="stack"><div><label for="npName">${esc(t('name'))}</label><input id="npName" dir="auto" required maxlength="40" value="${esc(pre)}"></div>
+   <div><label for="npTag">${esc(jt('tagL',l))}</label><input id="npTag" dir="auto" maxlength="30" placeholder="${esc(jt('tagPh',l))}"></div>
+   <div><label for="npPhone">${esc(t('phone'))}</label><input id="npPhone" inputmode="tel" dir="ltr" placeholder="0300 1234567"></div>
+   <p class="note" id="npErr" role="alert"></p>
+   <div class="row"><button class="btn" type="submit" style="flex:1">${esc(t('saveCust'))}</button><button class="btn ghost" type="button" data-act="closeModal">${esc(t('cancel'))}</button></div></form>`);
+  $('npForm').onsubmit=e=>{e.preventDefault();const err=m=>{$('npErr').textContent=m;};
+    let nm=cap($('npName').value),tag=cap($('npTag').value),ph=$('npPhone').value.trim();if(!nm)return;
+    const pk=normPK(ph);if(ph&&pk){const o=D.customers.find(c=>normPK(c.phone)===pk);if(o){err(fill(jt('npPhoneUsed',l),{n:o.name}));return;}}
+    const lm=looseMatches(nm);
+    if(exactMatches(nm).length){if(!tag){err(jt('npNeed',l));return;}nm=cap(nm+' '+tag);}
+    if(exactMatches(nm).length){err(jt('dupName',l));return;}
+    if(lm.length&&!tag&&!pk){err(jt('npNeed',l));return;}
+    if(lm.length&&tag&&!norm(nm).includes(norm(tag))&&words(tag).length<=2){nm=cap(nm+' '+tag);if(exactMatches(nm).length){err(jt('dupName',l));return;}}
+    const c={id:uid(),name:nm,phone:ph,tag,type:type==='expense'?'expense':type==='sale'?'sales':(type==='goods'||type==='paid')?'supplier':'customer',created:Date.now()};
+    D.customers.push(c);save();closeModal();done(c);};
+  setTimeout(()=>{const t2=$('npTag');if(t2&&clash)t2.focus();},60);}
+/* duplicate guard: the same voice note shared twice, or tapped twice */
+function dupOf(d){if(!d.cid)return null;return D.entries.find(e=>e.cid===d.cid&&e.amount===d.amount&&e.type===d.type&&e.date===(d.date||todayISO()));}
+Object.assign(J.roman,{sameQ:'"{n}" se aap ka matlab {m} hai?',idOwes:'baqaya',idWeOwe:'dena hai',idLast:'aakhri',npT:'Naya khata',npClash:'Is naam ({n}) ka khata pehle se hai. Farq ke liye pehchaan likhein.',tagL:'Pehchaan (baap ka naam, kaam ya mohalla)',tagPh:'Jaise: Mochi, Sher Garh, s/o Gul Khan',npNeed:'Pehchaan ya phone number likhein taake dono alag pehchane jayein.',npPhoneUsed:'Ye number pehle se {n} ke khate mein hai. Shayad yehi banda hai.',dupWarn:'Dhyan: aaj isi khate mein yehi raqam pehle bhi likhi gayi hai. Kahin dobara to nahi?',bigWarn:'Bari raqam hai, ek dafa check kar lein.',ydayNote:'kal'});
+Object.assign(J.ur,{sameQ:'"{n}" سے آپ کا مطلب {m} ہے؟',idOwes:'بقایا',idWeOwe:'دینا ہے',idLast:'آخری',npT:'نیا کھاتہ',npClash:'اس نام ({n}) کا کھاتہ پہلے سے ہے۔ فرق کے لیے پہچان لکھیں۔',tagL:'پہچان (باپ کا نام، کام یا محلہ)',tagPh:'جیسے: موچی، شیر گڑھ، ولد گل خان',npNeed:'پہچان یا فون نمبر لکھیں تاکہ دونوں الگ پہچانے جائیں۔',npPhoneUsed:'یہ نمبر پہلے سے {n} کے کھاتے میں ہے۔ شاید یہی بندہ ہے۔',dupWarn:'دھیان: آج اسی کھاتے میں یہی رقم پہلے بھی لکھی گئی ہے۔ کہیں دوبارہ تو نہیں؟',bigWarn:'بڑی رقم ہے، ایک دفعہ چیک کر لیں۔',ydayNote:'کل'});
+Object.assign(J.ps,{sameQ:'"{n}" نه ستاسو مطلب {m} دی؟',idOwes:'پاتې',idWeOwe:'ورکول دي',idLast:'وروستی',npT:'نوی حساب',npClash:'د دې نوم ({n}) حساب شته. د توپیر لپاره پېژندنه ولیکئ.',tagL:'پېژندنه (د پلار نوم، کار یا کلی)',tagPh:'لکه: موچي، شېر ګړه، د ګل خان زوی',npNeed:'پېژندنه یا د تلیفون شمېره ولیکئ چې دواړه جلا وپېژندل شي.',npPhoneUsed:'دا شمېره دمخه د {n} په حساب کې ده. ښایي همدا سړی وي.',dupWarn:'پام: نن په همدې حساب کې همدا رقم دمخه هم لیکل شوی. بیا خو نه دی؟',bigWarn:'لوی رقم دی، یو ځل یې وګورئ.',ydayNote:'پرون'});
+Object.assign(J.en,{sameQ:'By "{n}", do you mean {m}?',idOwes:'owes',idWeOwe:'we owe',idLast:'last',npT:'New account',npClash:'An account named {n} already exists. Add something to tell them apart.',tagL:'Identifier (father\'s name, work or area)',tagPh:'e.g. Cobbler, Sher Garh, s/o Gul Khan',npNeed:'Add an identifier or phone number so the two can be told apart.',npPhoneUsed:'This number is already on {n}\'s account. It may be the same person.',dupWarn:'Careful: this same amount was already entered in this account today. Is it a repeat?',bigWarn:'Large amount, please double-check.',ydayNote:'yesterday'});
 
 /* ===== v0.12 accounts, cloud backup, usage counts, feedback, owner's brain (Supabase, plain fetch) ===== */
 const SB_URL='https://otctbjuosvefhziuudmy.supabase.co';
