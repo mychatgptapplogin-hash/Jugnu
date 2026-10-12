@@ -984,7 +984,8 @@ function settingsView(){
     <label for="importFile" class="btn ghost full" style="margin:0;color:var(--ink)">${esc(t('bkRestoreF'))}</label><input id="importFile" type="file" accept=".json,application/json,text/plain" hidden>
     <button class="btn ghost full" data-act="pasteRestore">${esc(t('bkRestoreP'))}</button></div>
    ${fbCardHTML()}
-   <div class="page stack"><h2 style="margin-top:0">${esc(t('danger'))}</h2><button class="btn danger full" data-act="wipe">${esc(t('wipe'))}</button><p class="note">Jugnu Munshi · ConceptAI · v0.15.0</p></div></div>`;
+   ${voiceSettingsHTML()}
+   <div class="page stack"><h2 style="margin-top:0">${esc(t('danger'))}</h2><button class="btn danger full" data-act="wipe">${esc(t('wipe'))}</button><p class="note">Jugnu Munshi · ConceptAI · v0.16.0</p></div></div>`;
 }
 function pilotView(){
   const now=Date.now(),wk=7*86400000;
@@ -1063,8 +1064,8 @@ const STORY_PROMPT="You are the munshi (bookkeeper) of a Pakistani shop. The sho
 const STORY_LANG={ur:'Urdu script',ps:'Pashto script',en:'English',roman:'Roman Urdu'};
 function looksStory(q){const w=String(q).trim().split(/\s+/).length;return /[ऀ-ॿ]/.test(q)||w>=9||(String(q).match(/\d+/g)||[]).length>=2||/(\bsau\b|hazar|hazaar|\blakh|سو|ہزار|لاکھ|زره|سل)/i.test(q);}
 async function readStory(q,l){
-  try{const accts=D.customers.filter(c=>c.type!=='expense'&&c.type!=='sales').slice(0,80).map(c=>`${c.name} (${c.type})`).concat(['Kharcha (expense)','Sale (sales)']).join(', ');
-    const prompt=STORY_PROMPT.split('{{ACCTS}}').join(accts).split('{{TEXT}}').join(String(q).slice(0,3000)).split('{{LANG}}').join(STORY_LANG[l]||'Roman Urdu');
+  try{const gloss=(l==='ps'||/[ښږځڅړټډګېۍ]/.test(q))?await psGloss(q):null;const accts=D.customers.filter(c=>c.type!=='expense'&&c.type!=='sales').slice(0,80).map(c=>`${c.name} (${c.type})`).concat(['Kharcha (expense)','Sale (sales)']).join(', ');
+    const prompt=STORY_PROMPT.split('{{ACCTS}}').join(accts).split('{{TEXT}}').join(String(q).slice(0,3000)).split('{{LANG}}').join(STORY_LANG[l]||'Roman Urdu')+(gloss?'\nUrdu meaning of the Pashto text, from a Pashto expert translator (use it to understand; names and amounts must still come from the text): <<'+String(gloss).slice(0,1500)+'>>':'');
     let r=null;try{r=await aiJSON(prompt,'@cf/openai/gpt-oss-120b');}catch(e){r=null;}if(!r||!Array.isArray(r.entries)){try{r=await aiJSON(prompt);}catch(e){r=null;}}if(!r||!Array.isArray(r.entries))return null;
     const out=[];
     for(const e of r.entries.slice(0,8)){if(!e)continue;
@@ -1568,6 +1569,42 @@ Object.assign(FS.roman,{pg:'safha',srcL:'Hawala',srcT:'Sarkari / asal hawale',sc
 Object.assign(FS.ur,{pg:'صفحہ',srcL:'حوالہ',srcT:'سرکاری / اصل حوالے',schoolL:'اسکول کا نام (اگر اسکول کی اپنی کتابیں یا نوٹس ہیں)',libPapers:'جگنو لائبریری کے اصل پرچے:',libOpen:'پرچہ پڑھیں',libQuiz:'اس پرچے سے ٹیسٹ لو',libNone:'لائبریری میں ابھی اس کا پرچہ نہیں۔ گوگل پر ڈھونڈتے ہیں۔',libRead:'پرچہ:'});
 Object.assign(FS.ps,{pg:'مخ',srcL:'سرچینه',srcT:'رسمي / اصلي سرچینې',schoolL:'د ښوونځي نوم (که د ښوونځي خپل کتابونه یا نوټونه وي)',libPapers:'د جګنو کتابتون اصلي پرچې:',libOpen:'پرچه ولولئ',libQuiz:'له دې پرچې ازموینه واخله',libNone:'په کتابتون کې لا دا پرچه نشته. په ګوګل کې یې لټوو.',libRead:'پرچه:'});
 Object.assign(FS.en,{pg:'page',srcL:'Source',srcT:'Official sources',schoolL:'School name (if your school uses its own books or notes)',libPapers:'Real papers in the Jugnu library:',libOpen:'Read paper',libQuiz:'Test me from this paper',libNone:'No paper for this in the library yet. Searching Google.',libRead:'Paper:'});
+/* v0.16 Pashto and Urdu voice: better ears for Jugnu.
+   1. Free GPU Space (Hugging Face ZeroGPU) through our worker: Pashto Whisper and Urdu Whisper, plus Qehwa for Pashto meaning.
+   2. On the phone, offline: a Pashto Whisper model the shopkeeper downloads once (~125 MB).
+   3. Fallback: the existing Cloudflare Whisper. Credits: Qehwa (Junaid Aslam), Pashto Whisper (ihanif), Urdu Whisper (kingabzpro), all Apache 2.0. */
+let HF_DOWN=0;
+async function hfCall(api,body,ct,ms){if(!AI_URL||!online()||Date.now()<HF_DOWN)return null;const ctl=new AbortController();const tm=setTimeout(()=>ctl.abort(),ms||25000);
+  try{const r=await fetch(AI_URL+'hf/'+api,{method:'POST',headers:{'content-type':ct},body,signal:ctl.signal});
+    if(r.status===503||r.status===404){HF_DOWN=Date.now()+30*60000;return null;}if(!r.ok){HF_DOWN=Date.now()+3*60000;return null;}
+    const j=await r.json();return (j.text||'').trim()||null;}catch(e){HF_DOWN=Date.now()+3*60000;return null;}finally{clearTimeout(tm);}}
+const hfAsr=(lang,blob)=>hfCall(lang==='ps'?'pashto_asr':'urdu_asr',blob,blob.type||'audio/ogg',30000);
+/* Qehwa reads Pashto and says plainly what it means, so the munshi and the tutor understand it */
+async function psGloss(text){if(!/[؀-ۿ]/.test(text)&&!/\b(rakral|warkral|zara|sawa|por|yowral|akhistal)\b/i.test(text))return null;
+  return hfCall('qehwa',JSON.stringify({system:'You are a careful Pashto to Urdu translator for a Pakistani shop and school app. Translate faithfully. Keep every name, number and amount exactly as said. Do not add anything.',user:'Translate this Pashto into simple Urdu (Urdu script). Only the translation.\n\n'+String(text).slice(0,1500),max:300}),'application/json',15000);}
+/* ---- on-phone Pashto speech recognition (transformers.js + ONNX, runs offline after one download) ---- */
+const PS_LOCAL_KEY='jugnu_ps_local';const TJS='https://cdn.jsdelivr.net/npm/@huggingface/transformers@3.7.6/dist/transformers.min.js';let PS_PIPE=null,PS_LOADING=null;
+const psLocalOn=()=>{try{return localStorage.getItem(PS_LOCAL_KEY)==='1';}catch(e){return false;}};
+async function psLoad(onProg){if(PS_PIPE)return PS_PIPE;if(PS_LOADING)return PS_LOADING;
+  PS_LOADING=(async()=>{const T=await import(TJS);T.env.allowRemoteModels=false;T.env.allowLocalModels=true;T.env.localModelPath=new URL('./models/',location.href).href;T.env.useBrowserCache=true;
+    PS_PIPE=await T.pipeline('automatic-speech-recognition','ps-whisper-base',{dtype:'q8',device:'wasm',progress_callback:p=>{if(onProg&&p&&p.status==='progress'&&p.total)onProg(Math.round(p.loaded/p.total*100),p.file);}});return PS_PIPE;})();
+  try{return await PS_LOADING;}catch(e){PS_LOADING=null;throw e;}}
+async function pcm16k(blob){const AC=window.AudioContext||window.webkitAudioContext;const ac=new AC();try{const buf=await ac.decodeAudioData(await blob.arrayBuffer());
+  const n=Math.ceil(buf.duration*16000);const off=new OfflineAudioContext(1,n,16000);const src=off.createBufferSource();src.buffer=buf;src.connect(off.destination);src.start();const r=await off.startRendering();return r.getChannelData(0);}finally{try{ac.close();}catch(e){}}}
+async function psLocal(blob){if(!psLocalOn())return null;try{const pipe=await psLoad();const a=await pcm16k(blob);const out=await pipe(a,{language:'pashto',task:'transcribe',chunk_length_s:30,stride_length_s:5});return String(out&&out.text||'').trim()||null;}catch(e){return null;}}
+async function psLocalSetup(btn){const l=D.lang;if(psLocalOn()&&PS_PIPE){toast(jt('psReady',l),true);return;}
+  if(!online()){toast(jt('vNet',l));return;}btn&&(btn.disabled=true);
+  try{await psLoad((p,f)=>{if(btn)btn.textContent=jt('psDl',l)+' '+p+'%';});try{localStorage.setItem(PS_LOCAL_KEY,'1');}catch(e){}toast(jt('psReady',l),true);render();}
+  catch(e){toast(jt('psFail',l));if(btn){btn.disabled=false;btn.textContent=jt('psBtn',l);}}}
+function psLocalOff(){try{localStorage.removeItem(PS_LOCAL_KEY);}catch(e){}PS_PIPE=null;PS_LOADING=null;try{caches.keys().then(ks=>ks.filter(k=>/transformers/.test(k)).forEach(k=>caches.delete(k)));}catch(e){}render();}
+function voiceSettingsHTML(){const l=D.lang;const on=psLocalOn();
+  return `<div class="page stack"><h2 style="margin-top:0">🎙 ${esc(jt('psT',l))}</h2><p class="soft small" dir="auto">${esc(jt('psNote',l))}</p>
+   ${on?`<p class="small" dir="auto">✓ ${esc(jt('psReady',l))}</p><button class="btn ghost" data-act="psOff">${esc(jt('psRemove',l))}</button>`:`<button class="btn" data-act="psSetup">${esc(jt('psBtn',l))}</button>`}
+   <p class="note" dir="auto">${esc(jt('psCredit',l))}</p></div>`;}
+Object.assign(J.roman,{psT:'Pashto awaaz phone par',psNote:'Pashto voice note bina internet ke samajhne ke liye ek dafa model download karein (takreeban 125 MB, WiFi par behtar). Internet ho to Jugnu aur bhi taqatwar model istemal karta hai.',psBtn:'Download karein (125 MB)',psDl:'Download',psReady:'Pashto awaaz phone par tayyar hai, offline bhi.',psFail:'Download nahi ho saka. WiFi par dobara koshish karein.',psRemove:'Phone se hatayein',psCredit:'Shukriya: Pashto Whisper (ihanif), Qehwa Pashto LLM (Junaid Aslam), Urdu Whisper (kingabzpro). Apache 2.0.'});
+Object.assign(J.ur,{psT:'پشتو آواز فون پر',psNote:'پشتو وائس نوٹ بغیر انٹرنیٹ کے سمجھنے کے لیے ایک دفعہ ماڈل ڈاؤن لوڈ کریں (تقریباً 125 ایم بی، وائی فائی پر بہتر)۔ انٹرنیٹ ہو تو جگنو اور بھی طاقتور ماڈل استعمال کرتا ہے۔',psBtn:'ڈاؤن لوڈ کریں (125 ایم بی)',psDl:'ڈاؤن لوڈ',psReady:'پشتو آواز فون پر تیار ہے، آف لائن بھی۔',psFail:'ڈاؤن لوڈ نہیں ہو سکا۔ وائی فائی پر دوبارہ کوشش کریں۔',psRemove:'فون سے ہٹائیں',psCredit:'شکریہ: پشتو وسپر (ihanif)، قہوہ پشتو ایل ایل ایم (جنید اسلم)، اردو وسپر (kingabzpro)۔ اپاچی 2.0۔'});
+Object.assign(J.ps,{psT:'پښتو غږ په ټیلیفون',psNote:'د دې لپاره چې پښتو غږیز پیغامونه بې انټرنېټه پوه شي، یو ځل ماډل ښکته کړئ (شاوخوا 125 MB، په وای فای ښه). که انټرنېټ وي جګنو لا قوي ماډل کاروي.',psBtn:'ښکته کړئ (125 MB)',psDl:'ښکته کول',psReady:'پښتو غږ په ټیلیفون چمتو دی، بې انټرنېټه هم.',psFail:'ښکته نه شو. په وای فای بیا هڅه وکړئ.',psRemove:'له ټیلیفون لرې کړئ',psCredit:'مننه: پښتو وسپر (ihanif)، قهوه پښتو ماډل (جنید اسلم)، اردو وسپر (kingabzpro). اپاچي 2.0.'});
+Object.assign(J.en,{psT:'Pashto voice on the phone',psNote:'Download the model once (about 125 MB, best on WiFi) so Jugnu understands Pashto voice notes without internet. When online, Jugnu uses an even stronger model.',psBtn:'Download (125 MB)',psDl:'Downloading',psReady:'Pashto voice is ready on this phone, offline too.',psFail:'Download failed. Try again on WiFi.',psRemove:'Remove from phone',psCredit:'Thanks: Pashto Whisper (ihanif), Qehwa Pashto LLM (Junaid Aslam), Urdu Whisper (kingabzpro). Apache 2.0.'});
 function ustadView(){const p=activeP();
   return `<div class="jhome ustadT">
    <div class="jhero"><span class="ffw listening" id="jFF">${ffSVG()}</span><div><div class="jname">Ustad<small>jugnu</small></div><div class="jstat" id="jStat" aria-live="polite">${esc(jt('listening'))}</div><span class="jmode" id="jMode"></span><button class="jtheme" data-act="jTheme" aria-label="Light / dark">${jLight()?'☾':'☀'}</button></div>${profChip()}</div>
@@ -1618,7 +1655,7 @@ async function uSend(q){q=String(q||'').trim();if(!q||jBusy)return;hbNote(q,'u')
   const r=await askTutor(q,l,p);if(r){qa.n++;if(q.length>8&&!/^(Revise|Ye dobara)/.test(q))p.lastQ=q.slice(0,120);save();}
   uPush({who:'ai',text:r||ft('uNeedNet',l),l});jState(r?'happy':'idle');setTimeout(()=>{if(!jBusy)jState('idle');},1300);jBusy=false;}
 async function askTutor(q,l,p){
-  try{const lib=await libFind(q,p,guessSub(q));const hist=uChat().filter(m=>m.text).slice(-7,-1).map(m=>(m.who==='me'?'Student: ':'Ustad: ')+m.text).join('\n');
+  try{const gloss=(l==='ps'||/[ښږځڅړټډګېۍ]/.test(q))?await psGloss(q):null;const lib=await libFind(q,p,guessSub(q));const hist=uChat().filter(m=>m.text).slice(-7,-1).map(m=>(m.who==='me'?'Student: ':'Ustad: ')+m.text).join('\n');
     const prompt=`You are Ustad Jugnu, a kind, patient tutor for a Pakistani school student named ${p.name}. ${sylPrompt(p)}${libBlock(lib)}
 Rules:
 - Be accurate. Never invent chapter numbers, page numbers, exercise numbers, dates or exam statistics. If you are not sure something is in this student's book, say so and ask them to check the book.
@@ -1630,7 +1667,8 @@ Rules:
 - If the student sounds upset or unsafe, gently tell them to talk to their parents or a trusted teacher now.
 Recent chat:
 ${hist||'(none)'}
-Student's new message: """${q}"""
+Student's new message: """${q}"""${gloss?`
+Urdu meaning of the student's Pashto (from a Pashto translator, to help you understand): """${gloss}"""`:''}
 Reply with only JSON like {"reply":"...","used":[]} where "used" lists the numbers of the library passages you used (empty if none).`;
     let r=null;try{r=await aiJSON(prompt,'@cf/openai/gpt-oss-120b');}catch(e1){if(e1&&['not_granted','unavailable','capability_disabled','capability_removed'].includes(e1.code))throw e1;r=null;}
     if(!r||typeof r.reply!=='string'||!r.reply.trim())r=await aiJSON(prompt);
@@ -1745,13 +1783,20 @@ Object.assign(J.roman,{vInApp:'Is screen ke andar (Claude ya kisi app ke andar) 
 Object.assign(J.ur,{vInApp:'اس اسکرین کے اندر (کلاڈ یا کسی ایپ کے اندر) مائیک ریکارڈ نہیں کر سکتا۔ جگنو کو سفاری/کروم میں یا ہوم اسکرین آئیکن سے کھولیں، وہاں مائیک سیدھا ریکارڈ کرے گا:',vNoRec:'یہ براؤزر آواز ریکارڈ نہیں کر رہا۔ جگنو کو سفاری (آئی فون) یا کروم (اینڈرائیڈ) میں کھولیں:',vPickB:'وائس فائل چنیں',vNoMic:'مائیک استعمال میں ہے یا نہیں ملا۔ کال یا دوسری ایپ بند کر کے دوبارہ دبائیں۔',vBlocked:'فون نے مائیک روک دیا ہے، اجازت کا سوال ہی نہیں آیا۔ آئی فون: Settings > Apps > Safari > Microphone میں "Ask" یا "Allow" کریں، پھر جگنو دوبارہ کھولیں۔ اینڈرائیڈ: Chrome > Site settings > Microphone۔ تب تک لکھ کر بتا دیں۔',vStop:'روکنے کے لیے دبائیں',vPerm:'مائیک کی اجازت نہیں ملی۔ سیٹنگز میں مائیکروفون کی اجازت دیں، یا لکھ کر بتا دیں۔'});
 Object.assign(J.ps,{vInApp:'د دې سکرین دننه (کلاډ یا بله اپ) مایک ثبت نشي کولی. جګنو په سفاري/کروم کې یا د کور سکرین له آیکن پرانیزئ:',vNoRec:'دا براوزر غږ نه ثبتوي. جګنو په سفاري یا کروم کې پرانیزئ:',vPickB:'غږیز فایل وټاکئ',vNoMic:'مایک بوخت دی یا ونه موندل شو. کال یا بله اپ بنده کړئ او بیا یې کېکاږئ.',vBlocked:'تلیفون مایک بند کړی، د اجازې پوښتنه رانغله. آیفون: Settings > Apps > Safari > Microphone کې "Ask" یا "Allow" کړئ، بیا جګنو بیا خلاص کړئ. اندروید: Chrome > Site settings > Microphone.',vStop:'د درولو لپاره کېکاږئ',vPerm:'د مایک اجازه ونه موندل شوه. په سیټنګ کې د مایکروفون اجازه ورکړئ، یا یې ولیکئ.'});
 Object.assign(J.en,{vInApp:'The mic cannot record inside this screen (inside Claude or another app). Open Jugnu in Safari/Chrome or from the home screen icon, where the mic records directly:',vNoRec:'This browser cannot record audio. Open Jugnu in Safari (iPhone) or Chrome (Android):',vPickB:'Choose a voice file',vNoMic:'The microphone is busy or missing. End any call or other recording app and tap again.',vBlocked:'Your phone blocked the microphone before asking you. iPhone: Settings > Apps > Safari > Microphone, set it to "Ask" or "Allow", then reopen Jugnu. Android: Chrome > Site settings > Microphone. Until then, type it.',vStop:'Tap to stop',vPerm:'Microphone permission was denied. Allow the microphone in Settings, or type it instead.'});
+const PS_LET=/[ښږځڅړټډګېۍ]/;
 async function transcribe(blob,l){
+  if(l==='ps'){const a=await hfAsr('ps',blob);if(a)return a;const b=await psLocal(blob);if(b)return b;}
+  else if(l==='ur'||l==='roman'){const a=await hfAsr('ur',blob);if(a)return a;}
+  const c=await transcribeCF(blob,l);
+  if(c&&l!=='ps'&&PS_LET.test(c)){const p=(await hfAsr('ps',blob))||(await psLocal(blob));if(p)return p;}
+  return c;}
+async function transcribeCF(blob,l){
   const lang=l==='en'?'en':'ur';const ctl=new AbortController();const tm=setTimeout(()=>ctl.abort(),45000);
   try{const r=await fetch(AI_URL+'transcribe',{method:'POST',headers:{'content-type':blob.type||'audio/ogg','x-lang':lang},body:blob,signal:ctl.signal});
     if(!r.ok)return null;const j=await r.json();return (j.text||'').trim()||null;}catch(e){return null;}finally{clearTimeout(tm);}}
 async function handleVoice(blob){
   const l=D.lang;const stu=isStudent();const push=stu?uPush:jPush;
-  if(!AI_URL||navigator.onLine===false){push({who:'ai',text:jt('vNet',l),l});return;}
+  if(!AI_URL||navigator.onLine===false){if(!(l==='ps'&&psLocalOn())){push({who:'ai',text:jt('vNet',l),l});return;}}
   push({who:'ai',text:jt('vHear',l),l});jState('listening');
   let tx=await transcribe(blob,l);
   if(!tx){push({who:'ai',text:jt('vFail',l),l});jState('idle');return;}
@@ -1992,6 +2037,8 @@ document.addEventListener('click',async e=>{
   if(act==='eAns'){const [mi,o]=String(id).split(':').map(Number);examPick(mi,o);return;}
   if(act==='eStop'){S.examQ=null;S.exam=null;S.examSolve=null;uPush({who:'ai',text:et('stopped'),l:D.lang});return;}
   if(act==='ePapers'){examPapers(id);return;}
+  if(act==='psSetup'){psLocalSetup(el);return;}
+  if(act==='psOff'){psLocalOff();return;}
   if(act==='webPapers'){const [a,y]=String(id).split('|');examPapersWeb(a,y);return;}
   if(act==='libRead'){(async()=>{const l=D.lang;const tx=await libDocText(id);if(!tx){uPush({who:'ai',text:ft('uNeedNet',l),l});return;}window.__libDoc={id,tx};uPush({who:'ai',text:ft('libRead',l)+'\n'+tx.slice(0,3500)+(tx.length>3500?' …':''),btns:[{act:'libQuiz',id,label:ft('libQuiz',l)}],l});})();return;}
   if(act==='libQuiz'){const d=window.__libDoc;if(!d||d.id!==id)return;const p=activeP();examMcq(window.__libSub||(guessSub(d.tx)==='any'?examSubjects(p)[0]:guessSub(d.tx)),'',[{title:'Past paper',page:null,content:d.tx.slice(0,5000)}]);return;}
