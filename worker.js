@@ -16,6 +16,12 @@ try{const r=await fetch(base,{method:'POST',headers:h,body:JSON.stringify({data}
 const s=await fetch(base+'/'+ev,{headers:h});const t=await s.text();const lines=t.split('\n');let kind='',out=null;
 for(const ln of lines){if(ln.indexOf('event:')===0){kind=ln.slice(6).trim();}else if(ln.indexOf('data:')===0&&kind==='complete'){try{const d=JSON.parse(ln.slice(5).trim());out=Array.isArray(d)?d[0]:d;}catch(e){}}else if(kind==='error'){return json({error:'hf_error',detail:ln.slice(0,200)},502,cors);}}
 if(out===null){return json({error:'hf_empty'},502,cors);}return json({text:String(out).trim(),via:'hf'},200,cors);}catch(e){return json({error:'hf_failed',detail:String(e).slice(0,200)},502,cors);}}
+if(path.endsWith('/vision')){let vb;try{vb=await req.json();}catch(e){return json({error:'bad_json'},400,cors);}
+const img=String(vb.image||'');if(!/^data:image\/(jpeg|png|webp);base64,/.test(img)||img.length>6000000){return json({error:'bad_image'},400,cors);}
+const vp=String(vb.prompt||'').slice(0,8000);const msgs=[{role:'system',content:SYS},{role:'user',content:[{type:'text',text:vp},{type:'image_url',image_url:{url:img}}]}];
+const VM=['@cf/meta/llama-4-scout-17b-16e-instruct','@cf/google/gemma-3-12b-it','@cf/mistralai/mistral-small-3.1-24b-instruct'];const verr=[];
+for(const m of VM){try{const out=await env.AI.run(m,{messages:msgs,max_tokens:1500,temperature:0.1});const tx=pick(out);if(tx&&tx.length>2){return json({text:tx,model:m},200,cors);}verr.push(m+': empty');}catch(e){verr.push(m+': '+String(e).slice(0,160));}}
+return json({error:'vision_failed',detail:verr.join(' | ')},502,cors);}
 if(path.endsWith('/transcribe')){const buf=await req.arrayBuffer();if(!buf.byteLength||buf.byteLength>15000000){return json({error:'bad_audio'},400,cors);}const lang=(req.headers.get('x-lang')||'').slice(0,2);try{const input={audio:b64(buf)};if(['ur','ps','en'].includes(lang)){input.language=lang;}const out=await env.AI.run(STT,input);return json({text:String(out.text||'').trim()},200,cors);}catch(e){return json({error:'stt_failed',detail:String(e).slice(0,200)},502,cors);}}
 let body;try{body=await req.json();}catch(e){return json({error:'bad_json'},400,cors);}
 const prompt=String(body.prompt||'').slice(0,14000);if(!prompt){return json({error:'empty'},400,cors);}

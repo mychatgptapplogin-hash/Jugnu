@@ -1,6 +1,6 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Jugnu Munshi</title>
+<title>Jugnu</title>
 <meta name="theme-color" content="#0B5D45">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="icon-192.png">
@@ -196,7 +196,28 @@ body.night .wrap{padding-bottom:0}
 .jhome .jform .btn{min-width:64px}
 /* bottom tabs */
 .tabs{position:fixed;left:0;right:0;bottom:0;z-index:7;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));background:#FFFBF0;border-top:2px solid var(--gold);padding-bottom:env(safe-area-inset-bottom,0px)}
-.tabs.stuTabs{grid-template-columns:repeat(3,minmax(0,1fr))}
+.tabs{grid-template-columns:repeat(5,minmax(0,1fr))!important}
+.tabs.stuTabs{grid-template-columns:repeat(3,minmax(0,1fr))!important}
+.jimg{display:block;max-width:180px;max-height:180px;border-radius:12px;margin-bottom:4px}
+.jform .pbtn2{flex-shrink:0}
+.tabs .uic{font-size:19px;line-height:1}
+.modesw{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin:10px 0 2px;background:rgba(255,255,255,.06);border:1px solid #3A3648;border-radius:16px;padding:4px}
+.modesw button{min-height:46px;border:none;border-radius:12px;background:transparent;color:#F7F3EA;font:inherit;font-weight:700;font-size:15px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;flex-wrap:wrap;line-height:1.2}
+.modesw button small{font-weight:500;font-size:12px;opacity:.85;width:100%;text-align:center}
+.modesw button[aria-pressed="true"]{background:#FFB547;color:#1A1405}
+body.jlight .modesw{background:#FFFFFF;border-color:#CFE0D8}
+body.jlight .modesw button{color:#123B2E}
+body.jlight .modesw button[aria-pressed="true"]{background:#0E7A5B;color:#FFFFFF}
+body.stu .modesw button[aria-pressed="true"]{background:#4C9BEF;color:#06182E}
+body.stu.jlight .modesw button[aria-pressed="true"]{background:#1D5FA8;color:#FFFFFF}
+.ustchip{border-color:#4C9BEF!important;font-weight:700}
+.fdoor h1{text-align:center}
+.fcard{display:flex;gap:14px;align-items:center;text-align:start;width:100%;border:2px solid #CFE0D8;background:#FFFFFF;color:#10231C;border-radius:18px;padding:16px;font:inherit;cursor:pointer;min-height:84px}
+.fcard b{display:block;font-size:18px}
+.fcard small{display:block;color:#33463F;font-size:14px;line-height:1.5;margin-top:2px}
+.fcard .fic{font-size:30px;flex-shrink:0}
+.fcard.home{border-color:#7A3FB0}.fcard.shop{border-color:#0E7A5B}.fcard.stu{border-color:#1D5FA8}.fcard.both{border-color:#C98A12}
+.fcard:focus-visible{outline:3px solid #FFB547;outline-offset:2px}
 .tabs button{min-height:62px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;background:none;border:none;color:var(--ink2);font:inherit;font-size:13px;line-height:1.3;cursor:pointer;padding:4px 2px}
 html[lang="ur"] .tabs button{font-size:14px;line-height:1.7}
 .tabs button[aria-current="page"]{color:var(--cover);font-weight:700}
@@ -378,7 +399,7 @@ body.jlight .uexam{background:#FFF3D6;color:#6B4400}
 
 <div class="wrap">
   <header>
-    <button class="logo" data-act="jhome" aria-label="Jugnu"><span class="ffw" id="logoFF"></span>jugnu<small>munshi</small></button>
+    <button class="logo" data-act="jhome" aria-label="Jugnu"><span class="ffw" id="logoFF"></span>jugnu</button>
     <div class="hbtns" id="hbtns"></div>
   </header>
   <main id="app" aria-live="polite"></main>
@@ -461,9 +482,9 @@ const T={
    parseFail:'Could not understand. Write a name and amount, like: "Bilal paid 1500"',manual:'Entry by form',noPhone:'This customer has no phone number. Add one first.',sentLog:'Reminder sent',lastRem:'Last reminder',
    colNo:'No.',colDate:'Date',colDet:'Details',colCr:'Credit',colRv:'Received',colBal:'Balance',total:'Total',
    receipt:'Receipt',receiptNo:'Receipt no.',from:'Received from',amtRecv:'Amount received',method:'Method',remain:'Balance remaining',sign:'Signature',thanks:'Thank you! Please visit again',
-   statement:'Account statement',totCr:'Total credit',totRv:'Total received',made:'Made with Jugnu Khata',page:'Page',
+   statement:'Account statement',totCr:'Total credit',totRv:'Total received',made:'Made with Jugnu',page:'Page',
    pdfR:'Receipt PDF',pdfS:'Statement PDF',img:'Image',print:'Print',share:'Send on WhatsApp',making:'Preparing…',cash:'Cash',
-   start:'Start',demo:'View the demo shop',welcome:'Welcome',intro:'Jugnu Khata keeps your credit accounts like a register, makes receipts and reminds customers politely. Everything stays saved on this phone.',
+   start:'Start',demo:'View the demo shop',welcome:'Welcome',intro:'Jugnu keeps your credit accounts like a register, makes receipts and reminds customers politely. Everything stays saved on this phone.',
    shopName:'Shop name',owner:'Owner name',city:'City',iban:'Bank / Raast IBAN (optional)',payNote:'These numbers print on reminders and receipts so customers can pay you directly. Jugnu never holds money.',
    saved:'Saved',savedShop:'Shop saved',bkNote:'Your accounts live only on this phone. Back up once a week and send it to yourself on WhatsApp.',csv:'Ledger CSV',bkFile:'Backup file',bkCopy:'Copy backup',bkRestoreF:'Restore from backup file',bkRestoreP:'Paste a copied backup',wipe:'Delete all accounts',danger:'Careful',
    pilotNote:'For the field team: counts only, no names or amounts.',copyRep:'Copy report',entries:'entries',tapRow:'Tap any row for receipt, edit or delete.',nameAmt:'Write a name and a valid amount'},
@@ -477,9 +498,9 @@ const T={
    parseFail:'Samajh nahi aaya. Naam aur raqam likhein, jaise: "Bilal ne 1500 diye"',manual:'Form se indraaj',noPhone:'Is gaahak ka phone number nahi. Pehle number daalein.',sentLog:'Yaad dihaani bhej di',lastRem:'Aakhri yaad dihaani',
    colNo:'No.',colDate:'Tareekh',colDet:'Tafseel',colCr:'Udhaar',colRv:'Wasooli',colBal:'Baqaya',total:'Meezan',
    receipt:'Raseed',receiptNo:'Raseed no.',from:'Wasool az',amtRecv:'Wasool shuda raqam',method:'Zariya',remain:'Baqi baqaya',sign:'Dastakhat',thanks:'Shukriya! Dobara tashreef laayein',
-   statement:'Khate ka goshwara',totCr:'Kul udhaar',totRv:'Kul wasooli',made:'Jugnu Khata se tayyar',page:'Safha',
+   statement:'Khate ka goshwara',totCr:'Kul udhaar',totRv:'Kul wasooli',made:'Jugnu se tayyar',page:'Safha',
    pdfR:'Raseed PDF',pdfS:'Khata PDF',img:'Tasveer',print:'Print',share:'WhatsApp pe bhejein',making:'Tayyar ho raha hai…',cash:'Naqad',
-   start:'Shuru karein',demo:'Demo dukaan dekhein',welcome:'Khush aamdeed',intro:'Jugnu Khata aap ka udhaar register ki tarah rakhta hai, raseed banata hai aur gaahakon ko izzat se yaad dilata hai. Sara hisaab isi phone par mehfooz rehta hai.',
+   start:'Shuru karein',demo:'Demo dukaan dekhein',welcome:'Khush aamdeed',intro:'Jugnu aap ka udhaar register ki tarah rakhta hai, raseed banata hai aur gaahakon ko izzat se yaad dilata hai. Sara hisaab isi phone par mehfooz rehta hai.',
    shopName:'Dukaan ka naam',owner:'Maalik ka naam',city:'Shehar',iban:'Bank / Raast IBAN (optional)',payNote:'Ye number yaad dihaani aur raseed par chhapte hain taake gaahak seedha aap ko paisay bhej sake. Jugnu khud kabhi paisay nahi pakarta.',
    saved:'Save ho gaya',savedShop:'Dukaan save ho gayi',bkNote:'Hisaab sirf isi phone par hai. Hafte mein aik dafa backup lein aur khud ko WhatsApp kar dein.',csv:'Khata CSV',bkFile:'Backup file',bkCopy:'Backup copy karein',bkRestoreF:'Backup file se wapis laayein',bkRestoreP:'Copy kiya hua backup lagayein',wipe:'Sara hisaab delete karein',danger:'Ehtiyaat',
    pilotNote:'Field team ke liye: sirf ginti, koi naam ya raqam nahi.',copyRep:'Report copy karein',entries:'indraaj',tapRow:'Kisi bhi line ko dabayein: raseed, durusti ya delete.',nameAmt:'Naam aur sahi raqam likhein'}
@@ -541,7 +562,10 @@ const J={
    yes:'Yes, write it',editB:'Edit',noB:'No',openB:'Open account',remindB:'Reminder',stmtB:'Statement PDF',
    aiOn:'AI munshi',aiOff:'Offline munshi',viewer:"Print and share work when the app is opened from its website link. For now, save the PDF and print or share it from your phone's files.",noShare:'This phone cannot share files from here. Save the PDF and attach it in WhatsApp.',share:'Share PDF',print:'Print'}
 };
-const jt=(k,l)=>((J[l||D.lang]||J.ur)[k])||J.en[k];
+const jt0=(k,l)=>((J[l||D.lang]||J.ur)[k])||J.en[k];
+const isHome=()=>!!(D&&D.shop&&D.shop.kind==='home');
+const HOME_ADDR=/(Seth ji|seth ji|سیٹھ جی|مالک صاحب)/g;
+const jt=(k,l)=>{const v=jt0(k,l);if(!isHome())return v;if(k==='greet')return ({roman:'Assalam o alaikum! Main Jugnu hoon, aap ka hisaab kitaab rakhne wala. Kisi ko paise diye, kisi se liye, ghar ka kharcha, committee: bas bol dein.',ur:'السلام علیکم! میں جگنو ہوں، آپ کا حساب کتاب رکھنے والا۔ کسی کو پیسے دیے، کسی سے لیے، گھر کا خرچہ، کمیٹی: بس بول دیں۔',ps:'السلام علیکم! زه جګنو یم، ستاسو حساب کتاب ساتم. چا ته مو پیسې ورکړې، له چا مو واخیستې، د کور لګښت، کمېټي: یوازې ووایاست.',en:'Assalam o alaikum! I am Jugnu, I keep your accounts. Money you gave or took, home expenses, committee: just tell me.'})[l||D.lang]||v;if(typeof v==='string')return v.replace(HOME_ADDR,'ji');if(Array.isArray(v))return v.map(x=>typeof x==='string'?x.replace(HOME_ADDR,'ji'):x);return v;};
 const tL=(k,l)=>((T[l||D.lang]||T.ur)[k])||T.en[k]||k;
 const fill=(s,o)=>s.replace(/\{(\w)\}/g,(m,k)=>o[k]!=null?o[k]:m);
 /* ---- Jugnu v0.4: small talk, shop health, business ideas (all offline) ---- */
@@ -693,6 +717,7 @@ function jugnuAnswer(text,l){
   if(/(committee|comittee|kameti|kamaiti|\bbc\b|کمیٹی|کمیٹی|کمېټي|کمیټه)/.test(s)){const cs=D.committees||[];return{text:cs.length?cs.map(c=>comSummary(c,l)).join('\n'):ct('none',l),kind:'com'};}
   const isQ=/[?؟]/.test(text)||/(kaise|kaisay|kese|kyun|kyon|kya |kia |kitn|kab |kahan|how |what|why|which|when|batao|bataein|samjhao|کیسے|کیوں|کیا |کتن|بتاؤ|څنګه|ولې|څومره|راته ووایه)/.test(s)||RX.idea.test(s)||RX.health.test(s);
   if(/\d/.test(s)&&!isQ){const p=parseEntry(text);if(p&&p.amount>=10)return{entry:p};}
+  if(ADVICE_RX.test(s)&&(isQ||RX.idea.test(s)||/(improve|barha|badha|barh|kam ho|nahi ho|nahin ho|nai ho|کم ہو|نہیں ہو|بڑھ)/.test(s)))return{text:nextTip(l),kind:'idea'};
   if(/(shukriya|thank|شکریہ|مننه|jazak|meherbani)/.test(s))return{text:jt('thanks',l)};
   if(/(yaad|remind|یاد|یادونه|reminder)/.test(s)&&named)return{text:custLine(named,l),cid:named.c.id,action:'remind'};
   if(/(goshwara|statement|گوشوارہ|pdf)/.test(s)&&named)return{text:custLine(named,l),cid:named.c.id,action:'statement'};
@@ -719,6 +744,7 @@ function jugnuAnswer(text,l){
   if(/(salam|سلام|hello|\bhi\b|assalam|aoa|سلام علیکم)/.test(s))return{text:jt('greet',l)};
   return{text:jt('dont',l)};
 }
+const ADVICE_RX=/(improve|increase|grow|growth|boost|barh|badh|barha|badha|zyada|ziada|kam ho|kam kyun|nahi ho rahi|nahin ho rahi|nai ho rahi|nahi ho raha|nahin ho raha|nahi bik|nahin bik|kyun|kyon|why|how (can|do|to)|kaise|kese|kaisay|tips?|mashwa?ra|tareeqa|tariqa|strategy|plan|munafa|profit|loss|nuqsan|nuksan|customer nahi|gahak nahi|gaahak nahi|marketing|advertis|competition|muqabla|بڑھ|کم ہو|کیوں|کیسے|مشورہ|طریقہ|منافع|نقصان|گاہک نہیں|زیات|ولې|څنګه|ګټه|زیان)/;
 const SIGN={credit:1,payment:-1,goods:-1,paid:1,expense:1,sale:1};
 function applyLang(){const l=D.lang||'ur';document.documentElement.lang=l==='roman'?'ur-Latn':l;document.documentElement.dir=(l==='ur'||l==='ps')?'rtl':'ltr';}
 
@@ -854,16 +880,17 @@ const ICON={
  book:'<svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h11a3 3 0 0 1 3 3v13H7a3 3 0 0 1-3-3zM4 17a3 3 0 0 1 3-3h11M8 8h6"/></svg>',
  rcpt:'<svg aria-hidden="true" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2h12v20l-3-2-3 2-3-2-3 2zM9 7h6M9 11h6M9 15h4"/></svg>'
 };
-function header(){const lf=$('logoFF');if(lf&&!lf.firstChild)lf.innerHTML=ffSVG();const sm=document.querySelector('.logo small');if(sm)sm.textContent=(D.shop&&isStudent())?'ustad':'munshi';$('hbtns').innerHTML='';}
+function header(){const lf=$('logoFF');if(lf&&!lf.firstChild)lf.innerHTML=ffSVG();const sm=document.querySelector('.logo small');if(sm)sm.textContent='';$('hbtns').innerHTML='';}
 function jLight(){try{return localStorage.getItem('jugnu_jtheme')==='light';}catch(e){return false;}}
 function setJTheme(v){try{localStorage.setItem('jugnu_jtheme',v);}catch(e){}render();}
 function render(){
   applyLang();header();const app=$('app');$('fabHost').innerHTML='';$('tabHost').innerHTML='';document.body.classList.remove('night');
   if(!D.lang){app.innerHTML=langView();return;}
-  if(!D.shop){app.innerHTML=setupView();bindAfter();return;}
+  if(!D.shop){if(S.startMode==='stu'){app.innerHTML=stuStartView();bindFrontDoor();return;}if(S.startMode==='home'){app.innerHTML=homeStartView();bindHomeDoor();return;}if(!S.startMode){app.innerHTML=startView();return;}app.innerHTML=setupView();bindAfter();return;}
   if(S.screen==='home')S.screen='khata';
   ensureProfiles();const stu=isStudent();document.body.classList.toggle('stu',stu);
   if(stu&&!['ustad','progress'].includes(S.screen))S.screen='ustad';
+  if(!stu&&D.shop.studentOnly){app.innerHTML=`<p class="note" dir="auto" style="margin:8px 0">${esc(fd('shopNeed'))}</p>`+setupView().replace(`id="sName" required dir="auto"`,`id="sName" required dir="auto"`);$('tabHost').innerHTML='';bindAfter();const sf=$('setupForm');if(sf)sf.onsubmit=e=>{e.preventDefault();D.shop=Object.assign(D.shop,shopFromForm());delete D.shop.studentOnly;save();go('jugnu');};return;}
   if(!stu&&['ustad','progress'].includes(S.screen))S.screen='jugnu';
   const sc=S.screen;
   document.body.classList.toggle('jlight',jLight()&&(sc==='jugnu'||sc==='ustad'));
@@ -878,13 +905,14 @@ function render(){
   else if(sc==='committee')app.innerHTML=committeeView();
   $('tabHost').innerHTML=tabBar();
   bindAfter();
+  bindPhoto();
   if(sc==='jugnu')jugnuMount();
   if(sc==='ustad')ustadMount();
   if((sc==='jugnu'||sc==='ustad')&&!window.__shareDone){window.__shareDone=true;handleShared();}
 }
 const storageWarn=()=>storageOK?'':`<div class="warnbox">This browser is not letting the app save. Open it in Chrome normally (not private mode), or data will be lost.</div>`;
 function langButtons(){return `<div class="seg" role="group" aria-label="Language"><button class="ur" data-lang="ur" aria-pressed="${D.lang==='ur'}">اردو</button><button class="ps" data-lang="ps" aria-pressed="${D.lang==='ps'}">پښتو</button><button class="lat" data-lang="roman" aria-pressed="${D.lang==='roman'}">Roman Urdu</button><button class="lat" data-lang="en" aria-pressed="${D.lang==='en'}">English</button></div>`;}
-function langView(){return `<div class="page stack" style="text-align:center"><h1 style="font-family:var(--latin)">Jugnu Khata</h1><p style="font-family:var(--urdu);font-size:18px;line-height:2.2">زبان منتخب کریں · ژبه وټاکئ · Choose language</p>${langButtons()}</div>`;}
+function langView(){return `<div class="page stack" style="text-align:center"><h1 style="font-family:var(--latin)">Jugnu</h1><p style="font-family:var(--urdu);font-size:18px;line-height:2.2">زبان منتخب کریں · ژبه وټاکئ · Choose language</p>${langButtons()}</div>`;}
 function setupView(){
   return `<div class="page ruled stack">${storageWarn()}
    <h1>${esc(t('welcome'))}</h1><p class="soft">${esc(t('intro'))}</p>
@@ -985,7 +1013,7 @@ function settingsView(){
     <button class="btn ghost full" data-act="pasteRestore">${esc(t('bkRestoreP'))}</button></div>
    ${fbCardHTML()}
    ${voiceSettingsHTML()}
-   <div class="page stack"><h2 style="margin-top:0">${esc(t('danger'))}</h2><button class="btn danger full" data-act="wipe">${esc(t('wipe'))}</button><p class="note">Jugnu Munshi · ConceptAI · v0.17.1</p></div></div>`;
+   <div class="page stack"><h2 style="margin-top:0">${esc(t('danger'))}</h2><button class="btn danger full" data-act="wipe">${esc(t('wipe'))}</button><p class="note">Jugnu · ConceptAI · v0.18.0</p></div></div>`;
 }
 function pilotView(){
   const now=Date.now(),wk=7*86400000;
@@ -1018,14 +1046,15 @@ function tabBar(){
   const cur=S.screen==='committee'?'pilot':S.screen==='customer'||S.screen==='entry'?(S.draft&&S.draft.fromJugnu?'jugnu':'khata'):S.screen;
   const b=(k,lab,ic)=>`<button data-act="tab" data-t="${k}" ${cur===k?'aria-current="page"':''}>${ic}<span>${esc(lab)}</span></button>`;
   if(isStudent())return `<nav class="tabs stuTabs" aria-label="Ustad">${b('ustad',ft('ustad'),'<span class="tdot" aria-hidden="true"></span>')}${b('progress',ft('progress'),ICON.chart)}<button data-act="profiles">${ICON.user}<span>${esc(ft('switchB'))}</span></button></nav>`;
-  return `<nav class="tabs" aria-label="Jugnu">${b('jugnu',t('tabJ'),'<span class="tdot" aria-hidden="true"></span>')}${b('khata',t('tabK'),ICON.book)}${b('pilot',t('tabR'),ICON.chart)}${b('settings',t('tabS'),ICON.gear)}</nav>`;
+  return `<nav class="tabs" aria-label="Jugnu">${b('jugnu',t('tabJ'),'<span class="tdot" aria-hidden="true"></span>')}${b('khata',t('tabK'),ICON.book)}<button data-act="modeU" class="utab"><span class="uic" aria-hidden="true">📚</span><span>${esc(fd('tabU'))}</span></button>${b('pilot',t('tabR'),ICON.chart)}${b('settings',t('tabS'),ICON.gear)}</nav>`;
 }
 function jugnuView(){
   return `<div class="jhome">
-   <div class="jhero"><span class="ffw listening" id="jFF">${ffSVG()}</span><div><div class="jname">Jugnu<small>munshi</small></div><div class="jstat" id="jStat" aria-live="polite">${esc(jt('listening'))}</div><span class="jmode" id="jMode"></span><button class="jtheme" data-act="jTheme" aria-label="Light / dark">${jLight()?'☾':'☀'}</button></div>${profChip()}</div>
+   <div class="jhero"><span class="ffw listening" id="jFF">${ffSVG()}</span><div><div class="jname">Jugnu</div><div class="jstat" id="jStat" aria-live="polite">${esc(jt('listening'))}</div><span class="jmode" id="jMode"></span><button class="jtheme" data-act="jTheme" aria-label="Light / dark">${jLight()?'☾':'☀'}</button></div>${profChip()}</div>
+   ${modeSwitchHTML()}
    <div class="jchat" id="jChat" aria-live="polite"></div>
-   <div class="jchips">${smartChipsHTML('j')}</div>
-   <form class="jform" id="jForm"><label for="jIn" class="sr">${esc(jt('ask'))}</label><input id="jIn" dir="auto" autocomplete="off" enterkeyhint="send" placeholder="${esc(jt('ph'))}"><button type="button" class="vbtn" data-rec="1" title="${esc(jt('vBtn'))}" aria-label="${esc(jt('vBtn'))}"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg></button><input type="file" accept="audio/*" hidden data-voice="1"><button class="btn" type="submit">${esc(t('go'))}</button></form>
+   <div class="jchips">${students().length?'':`<button class="jchip ustchip" data-act="modeU">${esc(fd('chip'))}</button>`}${smartChipsHTML('j')}</div>
+   <form class="jform" id="jForm"><label for="jIn" class="sr">${esc(jt('ask'))}</label><input id="jIn" dir="auto" autocomplete="off" enterkeyhint="send" placeholder="${esc(jt('ph'))}"><button type="button" class="vbtn" data-rec="1" title="${esc(jt('vBtn'))}" aria-label="${esc(jt('vBtn'))}"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg></button><input type="file" accept="audio/*" hidden data-voice="1">${photoBtnHTML()}<button class="btn" type="submit">${esc(t('go'))}</button></form>
    <p class="jhint">${esc(t('hint'))}</p></div>`;
 }
 function jGreet(){
@@ -1051,7 +1080,7 @@ function cardHTML(d,id,l){
 }
 function msgHTML(m){
   const l=m.l||D.lang;
-  let h=`<div class="jmsg ${m.who==='me'?'jme':'jai'} l-${l}" dir="${RTL(l)?'rtl':'ltr'}">${esc(m.text).replace(/Rs [\d,]+/g,x=>`<bdi dir="ltr">${x}</bdi>`)}`;
+  let h=`<div class="jmsg ${m.who==='me'?'jme':'jai'} l-${l}" dir="${RTL(l)?'rtl':'ltr'}">${m.img?`<img class="jimg" src="${m.img}" alt="">`:''}${esc(m.text).replace(/Rs [\d,]+/g,x=>`<bdi dir="ltr">${x}</bdi>`)}`;
   if(m.card&&S.drafts[m.card])h+=cardHTML(S.drafts[m.card],m.card,l);
   if(m.btns&&m.btns.length)h+=`<div class="jbtns">${m.btns.map(b=>`<button class="jchip" data-act="${b.act}" data-id="${esc(b.id||'')}">${esc(b.label)}</button>`).join('')}</div>`;
   return h+'</div>';
@@ -1170,18 +1199,20 @@ async function askAI(q,l,mode){
     const td=todayISO();const aaj=D.entries.filter(e=>e.type==='payment'&&e.date===td).reduce((s,e)=>s+e.amount,0);
     const led=D.customers.map(c=>{const b=balance(c.id);return `- ${c.name} | ${c.type} | ${b>0?'owes the shop Rs '+num(b):b<0?'the shop owes Rs '+num(b):'settled'} | oldest unpaid: ${oldestUnpaidDays(c.id)} days`;}).join('\n')||'(no accounts yet)';
     const hist=S.chat.slice(-11,-1).map(m=>(m.who==='me'?'Shopkeeper: ':'Jugnu: ')+m.text).join('\n');
-    const prompt=`You are Jugnu, a Pakistani AI assistant who works as the munshi (trusted bookkeeper and advisor) of a small shop. You understand Urdu in Urdu script, Roman Urdu, Pashto and English.
+    const prompt=`${isHome()?'You are Jugnu, a Pakistani AI assistant who keeps the personal and family hisaab kitaab of this person: money lent to or borrowed from relatives and friends (lena dena), home expenses, committee (BC) and saving. Give practical personal money advice for a Pakistani household when asked. Talk like a trusted, sensible family elder friend, not a shopkeeper. Never call him Seth ji. In the ledger below, "customer" means someone who owes him and "supplier" means someone he owes.':''}You are Jugnu, a Pakistani AI assistant who works as the munshi (trusted bookkeeper and advisor) of a small shop. You understand Urdu in Urdu script, Roman Urdu, Pashto and English.
 You help with: the shop's khata, practical business advice for small Pakistani shops (personalise it with the ledger numbers below), everyday questions, and friendly chat.
 Rules:
 - Reply ONLY in ${LNAME[l]}, the same language and script the shopkeeper just used. Address him as "${ADDR[l]}".
 - Talk like an experienced, respectful human munshi having a real conversation: first respond to what he actually said (agree, answer, or ask one short question if unclear), then help. Warm, practical, simple words. Never sound like a robot or repeat a template. No emojis. No dashes.
 - If he says you made a mistake or something is wrong, admit it simply and tell him you will fix it (the app shows the fix buttons).
-- Length: ${mode==='advice'?'up to 4 short numbered points, each one line, low cost and doable this week in a Pakistani market (JazzCash, Easypaisa, Raast QR, WhatsApp, local suppliers)':'at most 3 short sentences'}.
+- Length: ${mode==='advice'?'Answer like an experienced retail business consultant who knows Pakistani bazaars and talks to the owner face to face. First, in one or two lines, explain what HIS numbers below suggest (for example sales down compared with last month, too much udhaar stuck, expenses rising), and if there is not enough data say so honestly. Then give 3 or 4 short numbered steps, each practical, low cost and doable this week in a Pakistani market (stock and display, WhatsApp catalogue and status, Raast QR, small bundles and deals, collecting old udhaar, timing, loyal customers). End with one short question to understand his shop better (for example what he sells or which hours are slow) if you do not know it':'at most 3 short sentences'}.
 - Use ONLY the numbers in the ledger below. Never invent a balance.
 - Medical, legal or religious ruling questions: give only a short, general, safe answer and advise him to ask a doctor, a lawyer or a mufti. Never give medicine doses. Money or investment questions: say it is general information, not financial advice.
 - If his message records a transaction, fill "entry" with name, amount (rupees, integer) and type: "credit" (customer took goods on udhaar), "payment" (customer paid the shop), "goods" (supplier delivered stock), "paid" (shop paid a supplier), "expense" (shop cost like electricity bill, rent, salary, fuel; then name is the cost). Put items or reason in "note". Do NOT say it is saved: the app shows a confirm card.
 - If the message is about one person in the ledger, put their exact ledger name in "customer". Set "action" to "remind" if he wants a WhatsApp reminder, or "statement" if he wants their statement.
 Shop: ${D.shop.name}${D.shop.city?', '+D.shop.city:''}. Today: ${td}. Collected today: Rs ${num(aaj)}.
+Business numbers:
+${bizStats()}
 Ledger:
 ${led}
 Records written in the last hour:
@@ -1734,16 +1765,120 @@ const U_FOLLOW=/(samajh nahi|samjh nahi|nahi samjh|nahi samajh|samajh nahin|nahi
 function uFollow(q){const ch=uChat();const lastAi=[...ch].reverse().find(m=>m.who==='ai'&&m.text);if(!lastAi)return false;if(U_FOLLOW.test(q))return true;
   if(words(q).length<=6&&/^(ye|yeh|is|isko|iska|us|wo|aur|or|phir|to|so|and|but|lekin|magar|یہ|اس|وہ|اور|پھر|دا|هغه|او)\b/i.test(q.trim()))return true;
   if(/^[\d\s.+\-*/=xX×÷^()a-z]{1,30}$/i.test(q.trim())&&/\?|=/.test(lastAi.text))return true;return false;}
+/* v0.18 Front door: people see straight away that Jugnu is two helpers, a Munshi for the shop and an Ustad for students */
+const FD={roman:{q:'Jugnu ko kis kaam ke liye istemal karenge?',shopT:'Dukaan ka hisaab',shopD:'Udhaar, wasooli, khata, roz ki sale. Munshi sambhalega.',stuT:'Parhai aur tutor',stuD:'Kisi bhi class ka sawal, test, paper ki tayyari. Ustad parhayega.',bothT:'Dono',bothD:'Dukaan bhi, aur bachon ki parhai bhi.',stuSetT:'Ustad: aap ki parhai',stuName:'Aap ka naam',start:'Shuru karein',munshi:'Munshi',ustad:'Ustad',munshiS:'Hisaab',ustadS:'Parhai',chip:'📚 Bachon ke liye Ustad',tabU:'Ustad',tip:'Naya: bachon ke liye Ustad Jugnu. Neeche 📚 Ustad dabayein, ya oopar Ustad chunein.',shopNeed:'Dukaan ka hisaab shuru karne ke liye dukaan ka naam likhein.',back:'Wapis'},
+ ur:{q:'جگنو کو کس کام کے لیے استعمال کریں گے؟',shopT:'دکان کا حساب',shopD:'ادھار، وصولی، کھاتہ، روز کی سیل۔ منشی سنبھالے گا۔',stuT:'پڑھائی اور ٹیوٹر',stuD:'کسی بھی جماعت کا سوال، ٹیسٹ، پرچے کی تیاری۔ استاد پڑھائے گا۔',bothT:'دونوں',bothD:'دکان بھی، اور بچوں کی پڑھائی بھی۔',stuSetT:'استاد: آپ کی پڑھائی',stuName:'آپ کا نام',start:'شروع کریں',munshi:'منشی',ustad:'استاد',munshiS:'حساب',ustadS:'پڑھائی',chip:'📚 بچوں کے لیے استاد',tabU:'استاد',tip:'نیا: بچوں کے لیے استاد جگنو۔ نیچے 📚 استاد دبائیں، یا اوپر استاد چنیں۔',shopNeed:'دکان کا حساب شروع کرنے کے لیے دکان کا نام لکھیں۔',back:'واپس'},
+ ps:{q:'جګنو به د څه لپاره کاروئ؟',shopT:'د دوکان حساب',shopD:'پور، وصولي، کهاته، د ورځې خرڅلاو. منشي به یې سمبالوي.',stuT:'زده کړه او ښوونکی',stuD:'د هر ټولګي پوښتنه، ازموینه، د پرچې تیاري. استاد به درس درکړي.',bothT:'دواړه',bothD:'دوکان هم، او د ماشومانو زده کړه هم.',stuSetT:'استاد: ستاسو زده کړه',stuName:'ستاسو نوم',start:'پیل کړئ',munshi:'منشي',ustad:'استاد',munshiS:'حساب',ustadS:'زده کړه',chip:'📚 د ماشومانو لپاره استاد',tabU:'استاد',tip:'نوی: د ماشومانو لپاره استاد جګنو. لاندې 📚 استاد کېکاږئ، یا پورته استاد وټاکئ.',shopNeed:'د دوکان د حساب د پیل لپاره د دوکان نوم ولیکئ.',back:'بېرته'},
+ en:{q:'What will you use Jugnu for?',shopT:'Shop accounts',shopD:'Udhaar, payments, khata, daily sales. The Munshi handles it.',stuT:'Study and tutor',stuD:'Questions for any class, tests, exam prep. The Ustad teaches.',bothT:'Both',bothD:'The shop, and the children\'s studies.',stuSetT:'Ustad: your studies',stuName:'Your name',start:'Start',munshi:'Munshi',ustad:'Ustad',munshiS:'Accounts',ustadS:'Study',chip:'📚 Ustad for children',tabU:'Ustad',tip:'New: Ustad Jugnu for children. Tap 📚 Ustad below, or choose Ustad at the top.',shopNeed:'To start shop accounts, enter the shop name.',back:'Back'}};
+const fd=k=>(FD[D.lang]||FD.roman)[k]||FD.roman[k];
+function startView(){return `<div class="page stack fdoor"><h1 dir="auto">${esc(fd('q'))}</h1>${langButtons()}
+  <button class="fcard shop" data-act="fdShop"><span class="fic" aria-hidden="true">🧮</span><span><b dir="auto">${esc(fd('shopT'))}</b><small dir="auto">${esc(fd('shopD'))}</small></span></button>
+  <button class="fcard stu" data-act="fdStu"><span class="fic" aria-hidden="true">📚</span><span><b dir="auto">${esc(fd('stuT'))}</b><small dir="auto">${esc(fd('stuD'))}</small></span></button>
+  <button class="fcard home" data-act="fdHome"><span class="fic" aria-hidden="true">🏠</span><span><b dir="auto">${esc(fd('homeT'))}</b><small dir="auto">${esc(fd('homeD'))}</small></span></button>
+  <button class="fcard both" data-act="fdBoth"><span class="fic" aria-hidden="true">🏪📚</span><span><b dir="auto">${esc(fd('bothT'))}</b><small dir="auto">${esc(fd('bothD'))}</small></span></button>
+  <button class="btn full" data-act="accLogin">${esc(at('have'))}</button>
+  <button class="btn ghost sm" data-act="demo" style="align-self:center">${esc(t('demo')||'Demo')}</button></div>`;}
+function stuStartView(){const CL=['1','2','3','4','5','6','7','8','9','10','11','12','O','A'];
+  return `<div class="page stack"><button class="btn ghost sm" data-act="fdBack" style="align-self:flex-start">${esc(fd('back'))}</button><h1 dir="auto">📚 ${esc(fd('stuSetT'))}</h1>
+  <form id="fdStuForm" class="stack"><div><label for="fdN">${esc(fd('stuName'))}</label><input id="fdN" dir="auto" required maxlength="30"></div>
+   <div class="grid2"><div><label for="fdC">${esc(st('clsL'))}</label><select id="fdC">${CL.map(c=>`<option value="${c}" ${c==='9'?'selected':''}>${esc(clsLabel(c,D.lang))}</option>`).join('')}</select></div>
+   <div><label for="fdB">${esc(st('boardL'))}</label><select id="fdB">${['kp','fed','cam','aku','own'].map(b=>`<option value="${b}">${esc(st('b'+b))}</option>`).join('')}</select></div></div>
+   <button class="btn full" type="submit">${esc(fd('start'))}</button></form></div>`;}
+function bindFrontDoor(){const f=$('fdStuForm');if(!f)return;f.onsubmit=e=>{e.preventDefault();const n=cap($('fdN').value);if(!n)return;const c=$('fdC').value,b=$('fdB').value;
+  D.shop={name:'',owner:'',city:'',jc:'',ep:'',iban:'',created:Date.now(),studentOnly:true};
+  const sp={id:uid(),type:'student',name:n,cls:c,created:Date.now(),stats:{days:[],asked:[],quizzes:[]},syl:{board:b,cls:c,medium:'en',group:'',exam:'',book:'',school:''}};
+  D.profiles=[{id:'p0',type:'munshi',name:''},sp];D.active=sp.id;save();S.startMode=null;go('ustad');setTimeout(()=>sylModal(sp.id),400);};}
+function modeSwitchHTML(){const stu=isStudent();
+  return `<div class="modesw" role="group" aria-label="Jugnu"><button data-act="modeM" aria-pressed="${!stu}"><span aria-hidden="true">🧮</span> ${esc(fd('munshi'))}<small>${esc(fd('munshiS'))}</small></button><button data-act="modeU" aria-pressed="${stu}"><span aria-hidden="true">📚</span> ${esc(fd('ustad'))}<small>${esc(fd('ustadS'))}</small></button></div>`;}
+function goUstad(){if(isStudent())return;const st2=students();if(!st2.length){addStuModal();return;}if(st2.length===1){switchTo(st2[0].id);return;}profilesModal();}
+function goMunshi(){if(!isStudent())return;const m=D.profiles.find(p=>p.type==='munshi');if(m)switchTo(m.id);}
+function fdAction(act){
+  if(act==='fdShop'){S.startMode='shop';render();return true;}
+  if(act==='fdBoth'){S.startMode='both';render();return true;}
+  if(act==='fdHome'){S.startMode='home';render();return true;}
+  if(act==='fdStu'){S.startMode='stu';render();return true;}
+  if(act==='fdBack'){S.startMode=null;render();return true;}
+  if(act==='modeU'){goUstad();return true;}
+  if(act==='modeM'){goMunshi();return true;}
+  return false;}
+Object.assign(FD.roman,{homeT:'Ghar aur zaati hisaab',homeD:'Kis ko paise diye, kis se liye, ghar ka kharcha, committee.',homeSetT:'Aap ka hisaab kitaab',homeName:'Aap ka naam'});
+Object.assign(FD.ur,{homeT:'گھر اور ذاتی حساب',homeD:'کس کو پیسے دیے، کس سے لیے، گھر کا خرچہ، کمیٹی۔',homeSetT:'آپ کا حساب کتاب',homeName:'آپ کا نام'});
+Object.assign(FD.ps,{homeT:'کور او شخصي حساب',homeD:'چا ته مو پیسې ورکړې، له چا مو واخیستې، د کور لګښت، کمېټي.',homeSetT:'ستاسو حساب کتاب',homeName:'ستاسو نوم'});
+Object.assign(FD.en,{homeT:'Home and personal accounts',homeD:'Money you lent or borrowed, home expenses, committee.',homeSetT:'Your accounts',homeName:'Your name'});
+function homeStartView(){return `<div class="page stack"><button class="btn ghost sm" data-act="fdBack" style="align-self:flex-start">${esc(fd('back'))}</button><h1 dir="auto">🏠 ${esc(fd('homeSetT'))}</h1>
+  <form id="fdHomeForm" class="stack"><div><label for="fhN">${esc(fd('homeName'))}</label><input id="fhN" dir="auto" required maxlength="40"></div>
+   <div><label for="fhC">${esc(t('city'))}</label><input id="fhC" dir="auto" maxlength="40"></div>
+   <div class="grid2"><div><label for="fhJ">JazzCash</label><input id="fhJ" inputmode="tel" dir="ltr" placeholder="03xx xxxxxxx"></div><div><label for="fhE">Easypaisa</label><input id="fhE" inputmode="tel" dir="ltr" placeholder="03xx xxxxxxx"></div></div>
+   <button class="btn full" type="submit">${esc(fd('start'))}</button></form></div>`;}
+function bindHomeDoor(){const f=$('fdHomeForm');if(!f)return;f.onsubmit=e=>{e.preventDefault();const n=cap($('fhN').value);if(!n)return;
+  D.shop={name:n,owner:n,city:$('fhC').value.trim(),jc:$('fhJ').value.trim(),ep:$('fhE').value.trim(),iban:'',created:Date.now(),kind:'home'};save();S.startMode=null;S.chat=[];go('jugnu');if(typeof acctPrompt==='function')setTimeout(acctPrompt,600);};}
+/* the numbers an advisor needs: sales trend, udhaar, expenses */
+function bizStats(){const td=todayISO();const d0=addDays(td,-29),d30=addDays(td,-59);const ms=monthStart();
+  const sum=(f)=>D.entries.filter(f).reduce((a,e)=>a+e.amount,0);const isSale=e=>{const c=cust(e.cid);return c&&c.type==='sales';};const isExp=e=>{const c=cust(e.cid);return c&&c.type==='expense';};
+  const s30=sum(e=>isSale(e)&&e.date>=d0),sPrev=sum(e=>isSale(e)&&e.date>=d30&&e.date<d0);
+  const wk=[0,1,2,3].map(i=>sum(e=>isSale(e)&&e.date>addDays(td,-7*(i+1))&&e.date<=addDays(td,-7*i))).reverse();
+  const udh=D.customers.filter(c=>c.type==='customer').map(c=>({c,b:balance(c.id),d:oldestUnpaidDays(c.id)})).filter(x=>x.b>0);
+  const lines=[`- Sales last 30 days: Rs ${num(s30)}; the 30 days before: Rs ${num(sPrev)}${sPrev?` (${s30>=sPrev?'+':''}${Math.round((s30-sPrev)/sPrev*100)}%)`:''}`,
+   `- Weekly sales, oldest to newest: ${wk.map(x=>'Rs '+num(x)).join(', ')}`,
+   `- Expenses this month: Rs ${num(sum(e=>isExp(e)&&e.date>=ms))}`,
+   `- Udhaar outstanding: Rs ${num(udh.reduce((a,x)=>a+x.b,0))} with ${udh.length} customers; ${udh.filter(x=>x.d>30).length} of them over 30 days late`,
+   `- Collected from customers last 30 days: Rs ${num(sum(e=>e.type==='payment'&&e.date>=d0))}`,
+   `- Udhaar given last 30 days: Rs ${num(sum(e=>e.type==='credit'&&e.date>=d0))}`,
+   `- Accounts: ${D.customers.filter(c=>c.type==='customer').length} customers, ${D.customers.filter(c=>c.type==='supplier').length} suppliers`];
+  if(!s30&&!sPrev)lines.push('- No daily sales have been recorded yet, so sales trends are unknown.');
+  return lines.join('\n');}
+/* v0.18 Photo reading: a bill, a receipt, a handwritten khata page or a homework question.
+   The phone shrinks the photo, Jugnu's worker sends it to a vision AI, and the entries come back as normal cards to confirm. */
+const PHOTO_KEY='jugnu_photo_day';
+function isPaid(){try{const a=accGet&&accGet();return D.plan==='family'||D.plan==='paid'||(a&&(a.plan==='paid'||a.plan==='family'));}catch(e){return D.plan==='family';}}
+function photoLeft(){const free=parseInt(brainVal('photo_free_per_day')||'3',10)||3;if(isPaid())return 99;let o={};try{o=JSON.parse(localStorage.getItem(PHOTO_KEY)||'{}');}catch(e){}return o.d===todayISO()?Math.max(0,free-(o.n||0)):free;}
+function photoUse(){try{let o=JSON.parse(localStorage.getItem(PHOTO_KEY)||'{}');if(o.d!==todayISO())o={d:todayISO(),n:0};o.n++;localStorage.setItem(PHOTO_KEY,JSON.stringify(o));}catch(e){}}
+async function shrinkImage(file,max){max=max||1280;const url=URL.createObjectURL(file);try{const img=await new Promise((ok,no)=>{const i=new Image();i.onload=()=>ok(i);i.onerror=no;i.src=url;});
+  let w=img.naturalWidth,h=img.naturalHeight;const k=Math.min(1,max/Math.max(w,h));w=Math.round(w*k);h=Math.round(h*k);const c=document.createElement('canvas');c.width=w;c.height=h;const g=c.getContext('2d');g.fillStyle='#fff';g.fillRect(0,0,w,h);g.drawImage(img,0,0,w,h);
+  const full=c.toDataURL('image/jpeg',0.8);const tc=document.createElement('canvas');const tk=Math.min(1,220/Math.max(w,h));tc.width=Math.round(w*tk);tc.height=Math.round(h*tk);tc.getContext('2d').drawImage(c,0,0,tc.width,tc.height);return{full,thumb:tc.toDataURL('image/jpeg',0.7)};}finally{URL.revokeObjectURL(url);}}
+async function visionAI(img,prompt){const ctl=new AbortController();const tm=setTimeout(()=>ctl.abort(),60000);
+  try{const r=await fetch(AI_URL+'vision',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({image:img,prompt}),signal:ctl.signal});if(!r.ok)return null;const j=await r.json();const t=String(j.text||'');const m=t.match(/\{[\s\S]*\}/);if(!m)return null;try{return JSON.parse(m[0]);}catch(e){return null;}}catch(e){return null;}finally{clearTimeout(tm);}}
+const PHOTO_PROMPT="You are the munshi (bookkeeper) of a Pakistani shop or household. Look at the photo. It may be a printed bill or receipt from a supplier or shop, a handwritten udhaar slip, a page of a handwritten khata register (Urdu, Pashto, Roman Urdu or English, with names and amounts), a JazzCash or Easypaisa or bank payment screenshot, or something else.\nExisting accounts: {{ACCTS}}\nList EVERY money entry you can read, one per person and amount.\n- \"name\": the person or business. If it matches an existing account (even spelled differently or in another script), copy that exact account name. For a supplier bill, the supplier or shop name on the bill.\n- \"said\": the name exactly as written in the photo.\n- \"type\": credit = a customer took goods or cash on udhaar; payment = money received from a customer; goods = a supplier gave stock to the shop on credit (a supplier bill); paid = the shop paid a supplier (a paid bill or a payment screenshot sent to a supplier); expense = a shop or home cost (electricity, gas, rent, fuel, salary bill).\n- \"amount\": the total in rupees as an integer for that entry (for a bill use the grand total, not each line).\n- \"date\": YYYY-MM-DD if a date is clearly written, else \"\".\n- \"note\": a few words, for example main items or bill number, in {{LANG}}.\n- If a number or name is unclear, still include your best reading and add \"(?)\" in the note.\n- \"kind\": receipt, bill, khata_page, payment_screenshot, homework or other.\n- \"summary\": one short sentence in {{LANG}} saying what the photo is and what you found.\nIf there is no money information, return an empty list and say what the photo shows in the summary.\nReply with only JSON: {\"kind\":\"\",\"entries\":[{\"name\":\"\",\"said\":\"\",\"type\":\"\",\"amount\":0,\"date\":\"\",\"note\":\"\"}],\"summary\":\"\"}";
+function cleanEntries(r,l){const out=[];for(const e of (r&&Array.isArray(r.entries)?r.entries:[]).slice(0,25)){if(!e)continue;
+  const ty=['credit','payment','goods','paid','expense','sale'].includes(e.type)?e.type:null;const amt=Math.round(Number(String(e.amount).replace(/[^\d.]/g,'')));if(!ty||!(amt>=1&&amt<1e9))continue;
+  let name=String(e.name||'').trim().slice(0,40);const note=String(e.note||'').trim().slice(0,70);
+  if(ty==='sale')name=SALE_ACC[l]||SALE_ACC.roman;else if(ty==='expense')name=EXP_ACC[l]||EXP_ACC.roman;else{if(!name)continue;const ex=findByName(name);name=ex?ex.name:cap(name);}
+  let t2=ty;const ex2=findByName(name);if(ex2&&ex2.type==='supplier'){if(t2==='credit')t2='goods';if(t2==='payment')t2='paid';}
+  const dt=/^\d{4}-\d{2}-\d{2}$/.test(String(e.date||''))&&String(e.date)<=todayISO()?String(e.date):todayISO();
+  out.push({name,said:(ty==='sale'||ty==='expense')?'':cap(String(e.said||'').trim().slice(0,40)),amount:amt,type:t2,date:dt,note});}
+  return out;}
+async function photoFlow(file){const l=D.lang;const stu=isStudent();const push=stu?uPush:jPush;
+  if(!online()||!AI_URL){push({who:'ai',text:jt('phNet',l),l});return;}
+  if(photoLeft()<=0){push({who:'ai',text:jt('phLimit',l),btns:[{act:'phPlus',id:'',label:'⭐ '+jt('phPlusB',l)}],l});return;}
+  let im;try{im=await shrinkImage(file);}catch(e){push({who:'ai',text:jt('phBad',l),l});return;}
+  push({who:'me',text:'',img:im.thumb,l});push({who:'ai',text:jt('phRead',l),l});jState('thinking');jBusy=true;
+  try{
+    if(stu){const p=activeP();const prompt=`You are Ustad Jugnu, a kind tutor for a Pakistani student named ${p.name}. ${sylPrompt(p)}\nThe student sent a photo, usually a homework or textbook question. Read the question from the photo. Then teach: explain step by step in simple words in ${LNAME[l]}, give the method and a hint, and for a calculation show the working. If it is a full homework set, solve the first question as an example and ask the student to try the next. If the photo is unclear or not about studies, say so kindly. No emojis. No dashes.\nReply with only JSON: {"question":"the question as read","reply":"your teaching"}`;
+      const r=await visionAI(im.full,prompt);if(!r||!r.reply){push({who:'ai',text:jt('phFail',l),l});return;}photoUse();push({who:'ai',text:(r.question?'“'+String(r.question).slice(0,300)+'”\n':'')+String(r.reply).slice(0,1500),l});jState('happy');return;}
+    const accts=D.customers.filter(c=>c.type!=='expense'&&c.type!=='sales').slice(0,80).map(c=>`${c.name} (${c.type})`).join(', ')||'(none)';
+    const r=await visionAI(im.full,PHOTO_PROMPT.split('{{ACCTS}}').join(accts).split('{{LANG}}').join(STORY_LANG[l]||'Roman Urdu'));
+    if(!r){push({who:'ai',text:jt('phFail',l),l});return;}photoUse();
+    const entries=cleanEntries(r,l);
+    if(!entries.length){push({who:'ai',text:(r.summary?String(r.summary).slice(0,300)+'\n':'')+jt('phNone',l),l});return;}
+    storyCards({entries,summary:String(r.summary||'').slice(0,300)},'[photo] '+String(r.summary||''),l);
+  }finally{jBusy=false;setTimeout(()=>{if(!jBusy)jState('idle');},800);}}
+function photoBtnHTML(){return `<button type="button" class="vbtn pbtn2" data-act="jPhoto" title="${esc(jt('phBtn'))}" aria-label="${esc(jt('phBtn'))}"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg></button><input type="file" accept="image/*" hidden id="jPhotoIn">`;}
+function bindPhoto(){const i=$('jPhotoIn');if(i)i.onchange=()=>{const f=i.files&&i.files[0];i.value='';if(f)photoFlow(f);};}
+Object.assign(J.roman,{phBtn:'Bill ya parchi ki photo',phRead:'Photo parh raha hoon…',phNet:'Photo parhne ke liye internet chahiye.',phBad:'Ye photo khul nahi saki. Dobara koshish karein.',phFail:'Photo saaf parhi nahi gayi. Roshni mein, seedhi aur qareeb se photo lein.',phNone:'Is photo mein koi raqam nahi mili.',phLimit:'Aaj ki free photos khatam (roz 3). Jugnu Plus mein jitni chahein photos parhwayein.',phPlusB:'Jugnu Plus ke baare mein',phPlus:'Jugnu Plus: be hisaab photos (bill, parchi, purana register), be hisaab Ustad sawal, cloud backup. Qeemat jald. Abhi pilot mein hain, dilchaspi ho to Settings mein Raaye bhejein.'});
+Object.assign(J.ur,{phBtn:'بل یا پرچی کی تصویر',phRead:'تصویر پڑھ رہا ہوں…',phNet:'تصویر پڑھنے کے لیے انٹرنیٹ چاہیے۔',phBad:'یہ تصویر کھل نہیں سکی۔ دوبارہ کوشش کریں۔',phFail:'تصویر صاف نہیں پڑھی گئی۔ روشنی میں، سیدھی اور قریب سے تصویر لیں۔',phNone:'اس تصویر میں کوئی رقم نہیں ملی۔',phLimit:'آج کی مفت تصویریں ختم (روزانہ 3)۔ جگنو پلس میں جتنی چاہیں تصویریں پڑھوائیں۔',phPlusB:'جگنو پلس کے بارے میں',phPlus:'جگنو پلس: بے حساب تصویریں (بل، پرچی، پرانا رجسٹر)، بے حساب استاد سوال، کلاؤڈ بیک اپ۔ قیمت جلد۔ ابھی پائلٹ میں ہیں، دلچسپی ہو تو سیٹنگز میں رائے بھیجیں۔'});
+Object.assign(J.ps,{phBtn:'د بل یا پرچې عکس',phRead:'عکس لولم…',phNet:'د عکس لوستلو لپاره انټرنېټ پکار دی.',phBad:'دا عکس خلاص نه شو. بیا هڅه وکړئ.',phFail:'عکس په ښه توګه ونه لوستل شو. په رڼا کې، نېغ او نږدې عکس واخلئ.',phNone:'په دې عکس کې هېڅ رقم ونه موندل شو.',phLimit:'د نن وړیا عکسونه پای ته ورسېدل (هره ورځ 3). په جګنو پلس کې هر څومره چې غواړئ.',phPlusB:'د جګنو پلس په اړه',phPlus:'جګنو پلس: بې حده عکسونه (بل، پرچه، زوړ رجسټر)، بې حده استاد پوښتنې، کلاوډ بیک اپ. بیه ژر. اوس پایلټ کې یو، که علاقه لرئ په ترتیباتو کې نظر ولېږئ.'});
+Object.assign(J.en,{phBtn:'Photo of a bill or slip',phRead:'Reading the photo…',phNet:'Reading a photo needs internet.',phBad:'Could not open this photo. Try again.',phFail:'Could not read the photo clearly. Take it in good light, straight and close.',phNone:'No amounts found in this photo.',phLimit:'Today\'s free photos are used up (3 a day). Jugnu Plus reads as many as you like.',phPlusB:'About Jugnu Plus',phPlus:'Jugnu Plus: unlimited photos (bills, slips, old registers), unlimited Ustad questions, cloud backup. Price coming soon. We are in pilot; if interested, send feedback from Settings.'});
 function ustadView(){const p=activeP();
   return `<div class="jhome ustadT">
-   <div class="jhero"><span class="ffw listening" id="jFF">${ffSVG()}</span><div><div class="jname">Ustad<small>jugnu</small></div><div class="jstat" id="jStat" aria-live="polite">${esc(jt('listening'))}</div><span class="jmode" id="jMode"></span><button class="jtheme" data-act="jTheme" aria-label="Light / dark">${jLight()?'☾':'☀'}</button></div>${profChip()}</div>
+   <div class="jhero"><span class="ffw listening" id="jFF">${ffSVG()}</span><div><div class="jname">Jugnu</div><div class="jstat" id="jStat" aria-live="polite">${esc(jt('listening'))}</div><span class="jmode" id="jMode"></span><button class="jtheme" data-act="jTheme" aria-label="Light / dark">${jLight()?'☾':'☀'}</button></div>${profChip()}</div>
+   ${modeSwitchHTML()}
    <div class="urow"><button class="usyl" data-act="sylOpen" data-id="${p.id}">📘 ${esc(sylShort(p)||st('sylBtn'))}</button><button class="uexam" data-act="examOpen">📝 ${esc(et('exBtn'))}</button></div>
    <div class="jchat" id="jChat" aria-live="polite"></div>
    <div class="jchips">${smartChipsHTML('u')}</div>
-   <form class="jform" id="jForm"><label for="jIn" class="sr">Ustad</label><input id="jIn" dir="auto" autocomplete="off" enterkeyhint="send" placeholder="${esc(ft('uPh'))}"><button type="button" class="vbtn" data-rec="1" title="${esc(jt('vBtn'))}" aria-label="${esc(jt('vBtn'))}"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg></button><input type="file" accept="audio/*" hidden data-voice="1"><button class="btn" type="submit">${esc(t('go'))}</button></form>
+   <form class="jform" id="jForm"><label for="jIn" class="sr">Ustad</label><input id="jIn" dir="auto" autocomplete="off" enterkeyhint="send" placeholder="${esc(ft('uPh'))}"><button type="button" class="vbtn" data-rec="1" title="${esc(jt('vBtn'))}" aria-label="${esc(jt('vBtn'))}"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg></button><input type="file" accept="audio/*" hidden data-voice="1">${photoBtnHTML()}<button class="btn" type="submit">${esc(t('go'))}</button></form>
    <p class="jhint" id="uCap">${esc(D.plan==='family'?ft('famNote'):fill(ft('aiLeft'),{u:aiQuota().n,c:STU_CAP}))}</p></div>`;}
 function uMsgHTML(m,i){const l=m.l||D.lang;
-  let h=`<div class="jmsg ${m.who==='me'?'jme':'jai'} l-${l}" dir="${RTL(l)?'rtl':'ltr'}">${esc(m.text||'')}`;
+  let h=`<div class="jmsg ${m.who==='me'?'jme':'jai'} l-${l}" dir="${RTL(l)?'rtl':'ltr'}">${m.img?`<img class="jimg" src="${m.img}" alt="">`:''}${esc(m.text||'')}`;
   if(m.quiz){const q=QB[m.quiz.qi];h+=`<div class="qcard" dir="ltr"><p class="qq">${esc(q[1])}</p>${q[2].map((o,j)=>{const st=m.quiz.pick==null?'':(j===q[3]?'ok':(j===m.quiz.pick?'bad':''));return `<button class="qopt ${st}" data-act="uAns" data-id="${i}:${j}" ${m.quiz.pick!=null?'disabled':''}>${esc(o)}</button>`;}).join('')}</div>`;}
   if(m.mcq){const q=m.mcq;h+=`<div class="qcard" dir="auto"><p class="qq">${esc(q.q)}</p>${q.o.map((o,j)=>{const stt=q.pick==null?'':(j===q.a?'ok':(j===q.pick?'bad':''));return `<button class="qopt ${stt}" data-act="eAns" data-id="${i}:${j}" ${q.pick!=null?'disabled':''}>${esc(o)}</button>`;}).join('')}</div>`;}
   if(m.btns&&m.btns.length)h+=`<div class="jbtns">${m.btns.map(b=>`<button class="jchip" data-act="${b.act}" data-id="${esc(b.id||'')}">${esc(b.label)}</button>`).join('')}</div>`;
@@ -2122,7 +2257,7 @@ function reminderText(c){
 function shopFromForm(){return{name:$('sName').value.trim(),owner:$('sOwner').value.trim(),city:$('sCity').value.trim(),jc:$('sJc').value.trim(),ep:$('sEp').value.trim(),iban:$('sIban').value.trim()};}
 function bindAfter(){
   bindAcct();
-  const sf=$('setupForm');if(sf)sf.onsubmit=e=>{e.preventDefault();D.shop=Object.assign(shopFromForm(),{created:Date.now()});save();S.chat=[];go('jugnu');toast(t('savedShop'));if(typeof acctPrompt==='function')acctPrompt();};
+  const sf=$('setupForm');if(sf)sf.onsubmit=e=>{e.preventDefault();D.shop=Object.assign(shopFromForm(),{created:Date.now()});save();S.chat=[];const both=S.startMode==='both';S.startMode=null;go('jugnu');toast(t('savedShop'));if(both)setTimeout(addStuModal,500);else if(typeof acctPrompt==='function')acctPrompt();};
   const qf=$('quickForm');if(qf)qf.onsubmit=e=>{e.preventDefault();const v=$('quick').value.trim();if(!v)return;const p=parseEntry(v);if(!p){toast(t('parseFail'));return;}S.cid=null;go('entry',{draft:Object.assign(p,{fromQuick:true,raw:v})});};
   const sr=$('search');if(sr)sr.oninput=()=>{S.q=sr.value;const pos=sr.selectionStart;render();const n=$('search');if(n){n.focus();n.setSelectionRange(pos,pos);}};
   const ef=$('entryForm');if(ef){const nm=$('eName'),ty=$('eType');
@@ -2173,6 +2308,9 @@ document.addEventListener('click',async e=>{
   if(act==='eAns'){const [mi,o]=String(id).split(':').map(Number);examPick(mi,o);return;}
   if(act==='eStop'){S.examQ=null;S.exam=null;S.examSolve=null;uPush({who:'ai',text:et('stopped'),l:D.lang});return;}
   if(fixAction(act,id))return;
+  if(fdAction(act))return;
+  if(act==='jPhoto'){const i=$('jPhotoIn');if(i)i.click();return;}
+  if(act==='phPlus'){(isStudent()?uPush:jPush)({who:'ai',text:jt('phPlus',D.lang),l:D.lang});return;}
   if(act==='ePapers'){examPapers(id);return;}
   if(act==='psSetup'){psLocalSetup(el);return;}
   if(act==='psOff'){psLocalOff();return;}
