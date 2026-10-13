@@ -1128,7 +1128,7 @@ function settingsView(){
     <button class="btn ghost full" data-act="pasteRestore">${esc(t('bkRestoreP'))}</button></div>
    ${fbCardHTML()}
    ${voiceSettingsHTML()}
-   <div class="page stack"><h2 style="margin-top:0">${esc(t('danger'))}</h2><button class="btn danger full" data-act="wipe">${esc(t('wipe'))}</button><p class="note">Jugnu · ConceptAI · v0.19.1</p></div></div>`;
+   <div class="page stack"><h2 style="margin-top:0">${esc(t('danger'))}</h2><button class="btn danger full" data-act="wipe">${esc(t('wipe'))}</button><p class="note">Jugnu · ConceptAI · v0.19.2</p></div></div>`;
 }
 function pilotView(){
   const now=Date.now(),wk=7*86400000;
@@ -2891,4 +2891,18 @@ render=function(){_render2();const b=document.body;b.classList.add('d2');const m
   const mt=document.querySelector('meta[name="theme-color"]');if(mt)mt.setAttribute('content',{shop:'#FF9F3A',study:'#1747A6',home:'#25D366'}[md]);};
 const _startView2=startView;
 startView=function(){return _startView2().replace('<div class="page stack fdoor">',`<div class="page stack fdoor"><div class="d2greet"><span class="ffw happy">${ffSVG()}</span><div class="d2bub" dir="auto">${d2t('greet')}</div></div>`);};
+/* v0.19.2 one app per signup: Dukaan, Ghar and Parhai stay separate; only "Dono" (or a family with a child added) gets the Munshi/Ustad switch */
+function d2Both(){return !!(D.shop&&(D.shop.both||students().length));}
+function d2Single(){return !!(D.shop&&!D.shop.studentOnly&&!d2Both());}
+let d2WantBoth=false;
+const _fdAction2=fdAction;fdAction=function(act){if(act==='fdBoth')d2WantBoth=true;else if(/^fd(Shop|Home|Stu)$/.test(act))d2WantBoth=false;return _fdAction2(act);};
+const D2_HOME_CHIPS=['owe','total','old','remind','stmt','exp','com'];
+const _jChips2=jugnuChipList;jugnuChipList=function(){const L=_jChips2();if(!isHome())return L;const R=L.filter(x=>D2_HOME_CHIPS.includes(x.k));['owe','total'].forEach(k=>{if(!R.some(x=>x.k===k))R.push({k,c:'owe',b:.8,t:fill(ch(k,D.lang),{n:''}),act:'jAsk'});});return R;};
+function d2Separate(){if(!D.shop)return;
+  if(d2WantBoth){d2WantBoth=false;D.shop.both=true;save();}
+  const both=d2Both();
+  if(!both||D.shop.studentOnly)document.querySelectorAll('.modesw').forEach(e=>e.remove());
+  if(d2Single()){document.querySelectorAll('.ustchip').forEach(e=>e.remove());
+    const nav=document.querySelector('#tabHost .tabs');const u=nav&&nav.querySelector('.utab');if(u){u.remove();nav.style.setProperty('grid-template-columns','repeat(4,minmax(0,1fr))','important');}}}
+const _render3=render;render=function(){_render3();d2Separate();};
 </script>
