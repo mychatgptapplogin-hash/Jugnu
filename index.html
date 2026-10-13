@@ -1128,7 +1128,7 @@ function settingsView(){
     <button class="btn ghost full" data-act="pasteRestore">${esc(t('bkRestoreP'))}</button></div>
    ${fbCardHTML()}
    ${voiceSettingsHTML()}
-   <div class="page stack"><h2 style="margin-top:0">${esc(t('danger'))}</h2><button class="btn danger full" data-act="wipe">${esc(t('wipe'))}</button><p class="note">Jugnu · ConceptAI · v0.19.3</p></div></div>`;
+   <div class="page stack"><h2 style="margin-top:0">${esc(t('danger'))}</h2><button class="btn danger full" data-act="wipe">${esc(t('wipe'))}</button><p class="note">Jugnu · ConceptAI · v0.19.4</p></div></div>`;
 }
 function pilotView(){
   const now=Date.now(),wk=7*86400000;
@@ -2909,4 +2909,23 @@ const _render3=render;render=function(){_render3();d2Separate();};
 try{if('serviceWorker' in navigator&&!inViewer()){const hadCtl=!!navigator.serviceWorker.controller;let rl=false;
   navigator.serviceWorker.addEventListener('controllerchange',()=>{if(!hadCtl||rl)return;rl=true;location.reload();});
   window.addEventListener('load',()=>{navigator.serviceWorker.getRegistration().then(g=>{if(g)g.update();}).catch(()=>{});});}}catch(e){}
+/* v0.19.4 the 4th signup option covers Ghar too: "Hisaab + Parhai" asks Dukaan or Ghar, then adds the child */
+Object.assign(FD.roman,{bothT:'Hisaab + bachon ki parhai',bothD:'Dukaan ya ghar ka hisaab, aur bachon ka Ustad bhi.',pickQ:'Hisaab kis cheez ka rakhna hai?',bShopT:'Dukaan + Parhai',bShopD:'Dukaan ka khata, aur bachon ka Ustad.',bHomeT:'Ghar + Parhai',bHomeD:'Ghar ka hisaab (maa ya baap), aur bachon ka Ustad.',ghar:'Ghar'});
+Object.assign(FD.ur,{bothT:'حساب + بچوں کی پڑھائی',bothD:'دکان یا گھر کا حساب، اور بچوں کا استاد بھی۔',pickQ:'حساب کس چیز کا رکھنا ہے؟',bShopT:'دکان + پڑھائی',bShopD:'دکان کا کھاتہ، اور بچوں کا استاد۔',bHomeT:'گھر + پڑھائی',bHomeD:'گھر کا حساب (ماں یا باپ)، اور بچوں کا استاد۔',ghar:'گھر'});
+Object.assign(FD.ps,{bothT:'حساب + د ماشومانو زده کړه',bothD:'د دوکان یا کور حساب، او د ماشومانو استاد هم.',pickQ:'د څه شي حساب ساتئ؟',bShopT:'دوکان + زده کړه',bShopD:'د دوکان کهاته، او د ماشومانو استاد.',bHomeT:'کور + زده کړه',bHomeD:'د کور حساب (مور یا پلار)، او د ماشومانو استاد.',ghar:'کور'});
+Object.assign(FD.en,{bothT:"Accounts + children's studies",bothD:"Shop or home accounts, plus a tutor for the children.",pickQ:'Which accounts will you keep?',bShopT:'Shop + Studies',bShopD:"The shop's khata, plus a tutor for the children.",bHomeT:'Home + Studies',bHomeD:'Home accounts (mother or father), plus a tutor for the children.',ghar:'Home'});
+let d2HomeChild=false;
+function d2BothPick(){return `<div class="page stack"><button class="btn ghost sm" data-act="fdBack" style="align-self:flex-start">${esc(fd('back'))}</button><h1 dir="auto">${esc(fd('pickQ'))}</h1>
+  <button class="fcard shop" data-act="fdBothShop"><span class="fic" aria-hidden="true">🏪📚</span><span><b dir="auto">${esc(fd('bShopT'))}</b><small dir="auto">${esc(fd('bShopD'))}</small></span></button>
+  <button class="fcard home" data-act="fdBothHome"><span class="fic" aria-hidden="true">🏠📚</span><span><b dir="auto">${esc(fd('bHomeT'))}</b><small dir="auto">${esc(fd('bHomeD'))}</small></span></button></div>`;}
+const _fdAction4=fdAction;fdAction=function(act){
+  if(act==='fdBoth'){d2WantBoth=false;d2HomeChild=false;S.startMode='bothPick';render();return true;}
+  if(act==='fdBothShop'){const r=_fdAction4('fdBoth');d2WantBoth=true;return r;}
+  if(act==='fdBothHome'){const r=_fdAction4('fdHome');d2WantBoth=true;d2HomeChild=true;return r;}
+  return _fdAction4(act);};
+const _render4=render;render=function(){
+  _render4();
+  if(!D.shop&&S.startMode==='bothPick'){$('app').innerHTML=d2BothPick();return;}
+  if(d2HomeChild&&D.shop&&isHome()){d2HomeChild=false;setTimeout(()=>{try{if(!document.querySelector('#stuForm')){closeModal();addStuModal();}}catch(e){}},900);}
+  if(isHome()){const m=document.querySelector('.modesw [data-act="modeM"]');if(m)m.innerHTML=`<span aria-hidden="true">🏠</span> ${esc(fd('ghar'))}<small>${esc(fd('munshiS'))}</small>`;}};
 </script>
