@@ -1128,7 +1128,7 @@ function settingsView(){
     <button class="btn ghost full" data-act="pasteRestore">${esc(t('bkRestoreP'))}</button></div>
    ${fbCardHTML()}
    ${voiceSettingsHTML()}
-   <div class="page stack"><h2 style="margin-top:0">${esc(t('danger'))}</h2><button class="btn danger full" data-act="wipe">${esc(t('wipe'))}</button><p class="note">Jugnu · ConceptAI · v0.19.2</p></div></div>`;
+   <div class="page stack"><h2 style="margin-top:0">${esc(t('danger'))}</h2><button class="btn danger full" data-act="wipe">${esc(t('wipe'))}</button><p class="note">Jugnu · ConceptAI · v0.19.3</p></div></div>`;
 }
 function pilotView(){
   const now=Date.now(),wk=7*86400000;
@@ -2905,4 +2905,8 @@ function d2Separate(){if(!D.shop)return;
   if(d2Single()){document.querySelectorAll('.ustchip').forEach(e=>e.remove());
     const nav=document.querySelector('#tabHost .tabs');const u=nav&&nav.querySelector('.utab');if(u){u.remove();nav.style.setProperty('grid-template-columns','repeat(4,minmax(0,1fr))','important');}}}
 const _render3=render;render=function(){_render3();d2Separate();};
+/* always pick up a new version: check for an update on open, reload once when the new worker takes over */
+try{if('serviceWorker' in navigator&&!inViewer()){const hadCtl=!!navigator.serviceWorker.controller;let rl=false;
+  navigator.serviceWorker.addEventListener('controllerchange',()=>{if(!hadCtl||rl)return;rl=true;location.reload();});
+  window.addEventListener('load',()=>{navigator.serviceWorker.getRegistration().then(g=>{if(g)g.update();}).catch(()=>{});});}}catch(e){}
 </script>

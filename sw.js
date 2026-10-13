@@ -1,6 +1,6 @@
 /* Jugnu offline worker: keeps the app, PDF tool and fonts on the phone after the first visit,
    and receives text or voice notes shared from WhatsApp (Share > Jugnu). */
-const CACHE='jugnu-v35';
+const CACHE='jugnu-v36';
 const SHARE='jugnu-share';
 const MODELS='jugnu-models'; // big voice model files: kept across app updates
 const CORE=['./','./index.html','./manifest.webmanifest','./icon-192.png','./icon-512.png'];
@@ -26,7 +26,7 @@ self.addEventListener('fetch',e=>{
   if(req.method!=='GET')return;
   if(req.mode==='navigate'&&/admin\.html$/.test(u.pathname))return; // dashboard: always live, never cached
   if(req.mode==='navigate'){ // newest app when online, saved app when offline
-    e.respondWith(fetch(req).then(r=>{if(r.ok){const cp=r.clone();caches.open(CACHE).then(c=>c.put('./index.html',cp));}return r;}).catch(()=>caches.match('./index.html',{ignoreSearch:true}).then(r=>r||caches.match('./'))));return;}
+    e.respondWith(fetch(req,{cache:'no-store'}).then(r=>{if(r.ok){const cp=r.clone();caches.open(CACHE).then(c=>c.put('./index.html',cp));}return r;}).catch(()=>caches.match('./index.html',{ignoreSearch:true}).then(r=>r||caches.match('./'))));return;}
   if((u.origin===location.origin&&u.pathname.indexOf('/models/')>=0)||u.hostname==='cdn.jsdelivr.net'){ // voice model + its runtime: download once, then offline
     e.respondWith(caches.open(MODELS).then(c=>c.match(req).then(hit=>hit||fetch(req).then(r=>{if(r&&r.ok)c.put(req,r.clone());return r;}))));return;}
   if(u.origin===location.origin||/(fonts\.googleapis\.com|fonts\.gstatic\.com|cdnjs\.cloudflare\.com)$/.test(u.hostname)){
