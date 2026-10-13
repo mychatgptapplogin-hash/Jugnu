@@ -985,7 +985,7 @@ function settingsView(){
     <button class="btn ghost full" data-act="pasteRestore">${esc(t('bkRestoreP'))}</button></div>
    ${fbCardHTML()}
    ${voiceSettingsHTML()}
-   <div class="page stack"><h2 style="margin-top:0">${esc(t('danger'))}</h2><button class="btn danger full" data-act="wipe">${esc(t('wipe'))}</button><p class="note">Jugnu Munshi · ConceptAI · v0.17.0</p></div></div>`;
+   <div class="page stack"><h2 style="margin-top:0">${esc(t('danger'))}</h2><button class="btn danger full" data-act="wipe">${esc(t('wipe'))}</button><p class="note">Jugnu Munshi · ConceptAI · v0.17.1</p></div></div>`;
 }
 function pilotView(){
   const now=Date.now(),wk=7*86400000;
@@ -1676,10 +1676,12 @@ function ruleFix(q,l,T){const s=' '+toAsciiDigits(q).toLowerCase()+' ';const v=t
   return{target:0,intent:'correct',changes:ch,reply:''};}
 function describe(v,l){return `${v.name||'—'} · ${tL(v.type+'S',l)} · ${rs(v.amount)} · ${dmy(v.date).slice(0,5)}`;}
 function applyView(v,ch){const n=Object.assign({},v);if(ch.type)n.type=ch.type;if(ch.amount)n.amount=ch.amount;if(ch.day)n.date=addDays(todayISO(),ch.day);if(ch.note)n.note=ch.note;if(ch.account)n.name=ch.account;return n;}
-function showFix(plan,l,T){jState('idle');
+const DONE_RX=/(kar diya|kar di\b|kar diye|kar dia|ho gaya|ho gayi|badal diya|change kar diya|changed|done|updated|کر دیا|کر دی|ہو گیا|بدل دیا|کړ\b|شو\b)/i;
+function showFix(plan,l,T){jState('idle');if(plan.reply&&DONE_RX.test(plan.reply)&&plan.intent!=='delete')plan.reply=jt('fxWill',l);
   if(plan.none){jPush({who:'ai',text:plan.reply||jt('fxNone',l),l});return;}
   const t=T[plan.target]||T[0];const v=tgtView(t);
   if(plan.intent==='menu'){const id='fx'+(++FIXN);FIXES[id]={t,plan};jPush({who:'ai',text:plan.reply+'\n'+describe(v,l),btns:[{act:'fxEdit',id,label:'✎ '+jt('fxEditB',l)},{act:'fxDel',id,label:'🗑 '+jt('fxDelB',l)}],l});return;}
+  if(plan.ask&&!(plan.options&&plan.options.length)&&['credit','payment','goods','paid'].includes(v.type)){const sup=['goods','paid'].includes(v.type);plan.options=[{label:jt(sup?'fxGoods':'fxCredit',l),changes:Object.assign({},plan.changes,{type:sup?'goods':'credit'})},{label:jt(sup?'fxPaid':'fxPay',l),changes:Object.assign({},plan.changes,{type:sup?'paid':'payment'})}];}
   if(plan.ask&&plan.options&&plan.options.length){const btns=plan.options.map(o=>{const id='fx'+(++FIXN);FIXES[id]={t,plan:{intent:'correct',changes:o.changes}};return{act:'fxGo',id,label:o.label};});
     jPush({who:'ai',text:(plan.reply?plan.reply+'\n':'')+plan.ask+'\n'+describe(v,l),btns,l});return;}
   const id='fx'+(++FIXN);FIXES[id]={t,plan};
@@ -1725,7 +1727,8 @@ Object.assign(J.ps,{fxWill:'هو، سم یې کوم:',fxWas:'مخکې:',fxNow:'�
 Object.assign(J.en,{fxWill:'Sure, I will fix it:',fxWas:'Before:',fxNow:'Now:',fxYes:'Yes, fix it',fxDone:'Fixed, sir.',fxUndoB:'Undo',fxUndone:'Put back as it was.',fxKept:'OK, I left it as it was.',fxDelQ:'Shall I remove this entry?',fxDelYes:'Yes, remove it',fxDeleted:'Removed.',fxDraftGone:'Not saved.',fxDraftOk:'Card corrected. Tap "Yes" and I will save it.',fxWhich:'Sir, just to be sure, what was it?',fxCredit:'Udhaar given (they owe us)',fxPay:'Payment received (they paid us)',fxGoods:'Stock received (we owe them)',fxPaid:'We paid them',fxWho:'Whose account should it be in?',fxMenu:'Tell me what went wrong. I can:',fxEditB:'Edit it',fxDelB:'Remove it',fxNone:'Understood.',fxNewQ:'There is no account named "{n}". Create a new one?',fxNewB:'Create new account'});
 
 const BAL_RX=/(kitn|kitna|kitne|baqi|baaqi|baqaya|hisaab|hisab|balance|statement|goshwara|کتن|باقی|بقایا|حساب|گوشوارہ|څومره|پاتې)/i;
-function chatty(q,a){if(!a||a.entry||a.action)return false;if(a.cid&&words(q).length>=4&&!BAL_RX.test(q))return true;return false;}
+const STORY_RX=/\b(aaya|aya|aayi|ayi|aaye|keh raha|kehta|keh rahi|bola|boli|kaha|bataya|said|told|promise|promised|wada|waada|dega|degi|denge|aayega|ayega|kal aaye|phone kiya|call ki|naraz|gussa|bimar|shaadi)\b|آیا|کہہ رہا|کہا|بتایا|وعدہ|دے گا|راغی|وویل|ورکوي/i;
+function chatty(q,a){if(!a||a.entry||a.action)return false;if(a.cid&&words(q).length>=4&&(STORY_RX.test(q)||!BAL_RX.test(q)))return true;return false;}
 function recentLines(){return (S.recent||[]).slice(-5).reverse().map(x=>{const e=D.entries.find(y=>y.id===x.id);if(!e)return '';const c=cust(e.cid);return `- ${c?c.name:''}: ${e.type} Rs ${e.amount} on ${e.date}${e.note?' ('+e.note+')':''}`;}).filter(Boolean).join('\n');}
 const U_FOLLOW=/(samajh nahi|samjh nahi|nahi samjh|nahi samajh|samajh nahin|nahi aaya|nahi aya|galat|ghalat|wrong|dobara|phir se|fir se|aasaan|asaan|simple|easy|example|misaal|mithal|aur batao|aur samjhao|detail|tafseel|kyun|kyon|why|how come|matlab|meaning|sure\?|pakka|سمجھ نہیں|سمجھا نہیں|غلط|دوبارہ|آسان|مثال|مطلب|کیوں|پوه نه شوم|نه پوهېږم|بیا|اسانه|بېلګه|ولې)/i;
 function uFollow(q){const ch=uChat();const lastAi=[...ch].reverse().find(m=>m.who==='ai'&&m.text);if(!lastAi)return false;if(U_FOLLOW.test(q))return true;
