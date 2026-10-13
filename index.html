@@ -688,7 +688,7 @@ function jugnuAnswer(text,l){
   l=l||detectLang(text);
   const s=' '+toAsciiDigits(text).toLowerCase()+' ';
   const custs=D.customers.map(c=>({c,b:balance(c.id),d:oldestUnpaidDays(c.id)}));
-  const hit=nameInText(text);if(hit)learnAlias(hit.c,hit.tok);const named=hit?custs.find(x=>x.c.id===hit.c.id):null;
+  const hit=nameInText(text);const named=hit?custs.find(x=>x.c.id===hit.c.id):null;
   if(named&&/(\bhad\b|limit|حد)/.test(s)&&/\d/.test(s)){const am=pAmounts(pTokens(text)).filter(a=>!a.qty).sort((a,b)=>b.v-a.v)[0];if(am&&am.v>0){named.c.limit=am.v;save();return{text:fill(jt('limitSet',l),{n:nameFor(named.c,l),a:rs(am.v)}),cid:named.c.id};}}
   if(/(committee|comittee|kameti|kamaiti|\bbc\b|کمیٹی|کمیٹی|کمېټي|کمیټه)/.test(s)){const cs=D.committees||[];return{text:cs.length?cs.map(c=>comSummary(c,l)).join('\n'):ct('none',l),kind:'com'};}
   const isQ=/[?؟]/.test(text)||/(kaise|kaisay|kese|kyun|kyon|kya |kia |kitn|kab |kahan|how |what|why|which|when|batao|bataein|samjhao|کیسے|کیوں|کیا |کتن|بتاؤ|څنګه|ولې|څومره|راته ووایه)/.test(s)||RX.idea.test(s)||RX.health.test(s);
@@ -985,7 +985,7 @@ function settingsView(){
     <button class="btn ghost full" data-act="pasteRestore">${esc(t('bkRestoreP'))}</button></div>
    ${fbCardHTML()}
    ${voiceSettingsHTML()}
-   <div class="page stack"><h2 style="margin-top:0">${esc(t('danger'))}</h2><button class="btn danger full" data-act="wipe">${esc(t('wipe'))}</button><p class="note">Jugnu Munshi · ConceptAI · v0.16.0</p></div></div>`;
+   <div class="page stack"><h2 style="margin-top:0">${esc(t('danger'))}</h2><button class="btn danger full" data-act="wipe">${esc(t('wipe'))}</button><p class="note">Jugnu Munshi · ConceptAI · v0.17.0</p></div></div>`;
 }
 function pilotView(){
   const now=Date.now(),wk=7*86400000;
@@ -1105,12 +1105,13 @@ Object.assign(J.en,{yesAll:'Save all {n}',savedAll:'Saved {n} entries.',leftOne:
 async function jSend(q){
   q=String(q||'').trim();if(!q||jBusy)return;hbNote(q,'j');jBusy=true;
   const l=detectLang(q);
+  if(looksFix(q)){try{await jFix(q,l);}finally{jBusy=false;}return;}
   jPush({who:'me',text:q,l});jState('thinking');
   await sleep(450);
   if(aiOn()&&looksStory(q)){const st=await readStory(q,/[\u0900-\u097F]/.test(q)?D.lang:l);if(st&&st.entries.length){storyCards(st,q,/[\u0900-\u097F]/.test(q)?D.lang:l);jBusy=false;return;}}
   let a=jugnuAnswer(q,l);
   if(a.entry&&aiOn()){a={entry:await refineEntry(q,l,a.entry)};}
-  else if(!a.entry&&aiOn()&&(a.text===jt('dont',l)||a.kind==='idea')){const r=await askAI(q,l,a.kind==='idea'?'advice':'chat');if(r)a=r;}
+  else if(!a.entry&&aiOn()&&(a.text===jt('dont',l)||a.kind==='idea'||chatty(q,a))){const r=await askAI(q,l,a.kind==='idea'?'advice':'chat');if(r)a=r;}
   else if(!a.entry&&!aiOn()&&a.text===jt('dont',l))a={text:jt('dont',l)+'\n'+jt('needNet',l)};
   jHandle(a,q,l);jBusy=false;
 }
@@ -1168,12 +1169,13 @@ async function askAI(q,l,mode){
   try{
     const td=todayISO();const aaj=D.entries.filter(e=>e.type==='payment'&&e.date===td).reduce((s,e)=>s+e.amount,0);
     const led=D.customers.map(c=>{const b=balance(c.id);return `- ${c.name} | ${c.type} | ${b>0?'owes the shop Rs '+num(b):b<0?'the shop owes Rs '+num(b):'settled'} | oldest unpaid: ${oldestUnpaidDays(c.id)} days`;}).join('\n')||'(no accounts yet)';
-    const hist=S.chat.slice(-7,-1).map(m=>(m.who==='me'?'Shopkeeper: ':'Jugnu: ')+m.text).join('\n');
+    const hist=S.chat.slice(-11,-1).map(m=>(m.who==='me'?'Shopkeeper: ':'Jugnu: ')+m.text).join('\n');
     const prompt=`You are Jugnu, a Pakistani AI assistant who works as the munshi (trusted bookkeeper and advisor) of a small shop. You understand Urdu in Urdu script, Roman Urdu, Pashto and English.
 You help with: the shop's khata, practical business advice for small Pakistani shops (personalise it with the ledger numbers below), everyday questions, and friendly chat.
 Rules:
 - Reply ONLY in ${LNAME[l]}, the same language and script the shopkeeper just used. Address him as "${ADDR[l]}".
-- Talk like a respectful, loyal old-school munshi: warm, practical, simple words. No emojis. No dashes.
+- Talk like an experienced, respectful human munshi having a real conversation: first respond to what he actually said (agree, answer, or ask one short question if unclear), then help. Warm, practical, simple words. Never sound like a robot or repeat a template. No emojis. No dashes.
+- If he says you made a mistake or something is wrong, admit it simply and tell him you will fix it (the app shows the fix buttons).
 - Length: ${mode==='advice'?'up to 4 short numbered points, each one line, low cost and doable this week in a Pakistani market (JazzCash, Easypaisa, Raast QR, WhatsApp, local suppliers)':'at most 3 short sentences'}.
 - Use ONLY the numbers in the ledger below. Never invent a balance.
 - Medical, legal or religious ruling questions: give only a short, general, safe answer and advise him to ask a doctor, a lawyer or a mufti. Never give medicine doses. Money or investment questions: say it is general information, not financial advice.
@@ -1182,6 +1184,8 @@ Rules:
 Shop: ${D.shop.name}${D.shop.city?', '+D.shop.city:''}. Today: ${td}. Collected today: Rs ${num(aaj)}.
 Ledger:
 ${led}
+Records written in the last hour:
+${recentLines()||'(none)'}
 Recent chat:
 ${hist||'(none)'}
 Shopkeeper's new message: """${q}"""
@@ -1605,6 +1609,128 @@ Object.assign(J.roman,{psT:'Pashto awaaz phone par',psNote:'Pashto voice note bi
 Object.assign(J.ur,{psT:'پشتو آواز فون پر',psNote:'پشتو وائس نوٹ بغیر انٹرنیٹ کے سمجھنے کے لیے ایک دفعہ ماڈل ڈاؤن لوڈ کریں (تقریباً 125 ایم بی، وائی فائی پر بہتر)۔ انٹرنیٹ ہو تو جگنو اور بھی طاقتور ماڈل استعمال کرتا ہے۔',psBtn:'ڈاؤن لوڈ کریں (125 ایم بی)',psDl:'ڈاؤن لوڈ',psReady:'پشتو آواز فون پر تیار ہے، آف لائن بھی۔',psFail:'ڈاؤن لوڈ نہیں ہو سکا۔ وائی فائی پر دوبارہ کوشش کریں۔',psRemove:'فون سے ہٹائیں',psCredit:'شکریہ: پشتو وسپر (ihanif)، قہوہ پشتو ایل ایل ایم (جنید اسلم)، اردو وسپر (kingabzpro)۔ اپاچی 2.0۔'});
 Object.assign(J.ps,{psT:'پښتو غږ په ټیلیفون',psNote:'د دې لپاره چې پښتو غږیز پیغامونه بې انټرنېټه پوه شي، یو ځل ماډل ښکته کړئ (شاوخوا 125 MB، په وای فای ښه). که انټرنېټ وي جګنو لا قوي ماډل کاروي.',psBtn:'ښکته کړئ (125 MB)',psDl:'ښکته کول',psReady:'پښتو غږ په ټیلیفون چمتو دی، بې انټرنېټه هم.',psFail:'ښکته نه شو. په وای فای بیا هڅه وکړئ.',psRemove:'له ټیلیفون لرې کړئ',psCredit:'مننه: پښتو وسپر (ihanif)، قهوه پښتو ماډل (جنید اسلم)، اردو وسپر (kingabzpro). اپاچي 2.0.'});
 Object.assign(J.en,{psT:'Pashto voice on the phone',psNote:'Download the model once (about 125 MB, best on WiFi) so Jugnu understands Pashto voice notes without internet. When online, Jugnu uses an even stronger model.',psBtn:'Download (125 MB)',psDl:'Downloading',psReady:'Pashto voice is ready on this phone, offline too.',psFail:'Download failed. Try again on WiFi.',psRemove:'Remove from phone',psCredit:'Thanks: Pashto Whisper (ihanif), Qehwa Pashto LLM (Junaid Aslam), Urdu Whisper (kingabzpro). Apache 2.0.'});
+/* v0.17 Conversation: Jugnu listens and fixes, like a real munshi.
+   "Ye galat hai", "credit nahi wasooli thi", "Ali Khan nahi Ali Mochi", "500 nahi 5000", "mita do":
+   Jugnu understands which record is meant, says what it will change, changes it after one tap, and offers Undo. */
+S.recent=S.recent||[];
+const _commitEntry0=commitEntry;
+commitEntry=function(d){const r=_commitEntry0(d);try{if(r&&r.saved){S.recent=(S.recent||[]).filter(x=>x.id!==r.saved.id);S.recent.push({id:r.saved.id,at:Date.now()});if(S.recent.length>12)S.recent.shift();}}catch(e){}return r;};
+const FIX_RX=/\b(galat|ghalat|ghalt|galt|wrong|mistake|ghalti|galti|theek karo|thik karo|sahi karo|durust karo|correct (it|this|karo)|change karo|badlo|badal do|tabdeel|undo|wapis lo|cancel karo|delete|mita do|mitao|hata do|hatao|remove|reverse|ulta|nahi tha|nahin tha|nai tha|nahi thi|nahin thi|nahi the|instead|balke|bulke|balkay|not (a |an )?(debit|credit|udhaar|payment)|it'?s (a )?(credit|debit|payment))\b|غلط|غلطی|درست کر|ٹھیک کر|بدل|مٹا|ہٹا|واپس لو|نہیں تھا|نہیں تھی|بلکہ|کینسل|ڈیلیٹ|سم یې کړه|ړنګ|لرې یې کړه|نه و|بلکې/i;
+const TYPE_W={credit:/\b(udhaar|udhar|udhaari|credit pe|on credit|naam|liya|liye|le gaya|le gayi)\b|ادھار|نام لکھ|پور|یوړل/i,payment:/\b(wasooli|wasuli|wusooli|payment|jama|mile|mila|received|wapis kiye|ada kiye|paid back)\b|وصول|جمع|ادا|راکړل/i};
+function recentTargets(){const out=[];const now=Date.now();
+  Object.keys(S.drafts||{}).reverse().forEach(k=>{const d=S.drafts[k];if(d&&!d.status&&d.amount&&out.length<6)out.push({kind:'draft',key:k,d});});
+  (S.recent||[]).slice().reverse().forEach(x=>{if(now-x.at>60*60000||out.length>=6)return;const e=D.entries.find(y=>y.id===x.id);if(e)out.push({kind:'saved',key:e.id,e});});
+  return out;}
+function tgtView(t){if(t.kind==='draft'){const d=t.d;const c=d.cid?cust(d.cid):null;return{name:c?c.name:(d.said||d.name||''),cid:c?c.id:null,type:d.type,amount:d.amount,date:d.date||todayISO(),note:d.note||''};}
+  const e=t.e,c=cust(e.cid);return{name:c?c.name:'',cid:e.cid,type:e.type,amount:e.amount,date:e.date,note:e.note||''};}
+const TYPE_PLAIN={credit:'credit = customer took goods or cash on udhaar, so the customer owes the shop more',payment:'payment = customer paid money to the shop (wasooli), so the customer owes less',goods:'goods = supplier gave stock to the shop on credit, so the shop owes the supplier more',paid:'paid = the shop paid money to a supplier',expense:'expense = shop cost',sale:'sale = cash sales of the day'};
+function looksFix(q){if(!FIX_RX.test(q)&&!/\b(nahi|nahin|not)\b[^.?!]{0,25}\d|\d[^.?!]{0,12}\b(nahi|nahin)\b|نہیں[^.؟]{0,25}\d|\d[^.؟]{0,12}نہیں/i.test(toAsciiDigits(q))&&!/\b(nahi|nahin|not|na)\b.*\b(udhaar|wasooli|credit|debit|payment|jama)\b|\b(udhaar|wasooli|credit|debit|payment|jama)\b.*\b(nahi|nahin|not)\b/i.test(q))return false;return recentTargets().length>0;}
+let FIXN=0;const FIXES={};
+async function jFix(q,l){const T=recentTargets();if(!T.length)return false;
+  jPush({who:'me',text:q,l});jState('thinking');
+  let plan=null;if(aiOn())plan=await aiFix(q,l,T);if(!plan)plan=ruleFix(q,l,T);
+  showFix(plan,l,T);return true;}
+async function aiFix(q,l,T){try{
+  const recs=T.map((t,i)=>{const v=tgtView(t);const c=v.cid?cust(v.cid):null;return `[R${i+1}] ${t.kind==='draft'?'NOT SAVED YET (card waiting for Yes)':'saved'}: account "${v.name}"${c&&c.phone?' (phone ending '+String(c.phone).replace(/\D/g,'').slice(-4)+')':''}${c&&c.tag?' ['+c.tag+']':''}, ${TYPE_PLAIN[v.type]||v.type}, Rs ${v.amount}, date ${v.date}${v.note?', note "'+v.note+'"':''}`;}).join('\n');
+  const near=new Set();T.forEach(t=>{const v=tgtView(t);looseMatches(words(v.name)[0]||'').forEach(c=>near.add(c.name));});words(q).forEach(w=>{if(w.length>=3)looseMatches(w).forEach(c=>near.add(c.name));});
+  const hist=S.chat.slice(-8,-1).map(m=>(m.who==='me'?'Shopkeeper: ':'Jugnu: ')+m.text).join('\n');
+  const prompt=`You are Jugnu, the experienced munshi (bookkeeper) of a Pakistani shop. The shopkeeper is telling you that something you just recorded is wrong, or wants it changed or removed.
+Recent records (R1 is the newest):
+${recs}
+Accounts with similar names: ${[...near].slice(0,12).join(', ')||'(none)'}
+Recent chat:
+${hist||'(none)'}
+Shopkeeper's message: <<${q}>>
+Work out which record he means (usually R1) and exactly what to change.
+- Types: credit (udhaar given to customer), payment (wasooli, customer paid), goods (supplier stock on credit), paid (shop paid supplier), expense, sale.
+- Pakistani shopkeepers say "credit pe diya" for udhaar, but some use accounting words where "credit" means money received and "debit" means udhaar. If his words "credit" or "debit" could mean either for this record, do not guess: set "ask" and give two "options" in plain shop words (for example "Udhaar diya, us ne dene hain" and "Wasooli, us ne paise diye").
+- If he names a different person, set changes.account to that exact account name from the similar names list, or to the new name if it is a new person.
+- If he wants it removed or undone, intent is "delete".
+- If it is not a correction at all, intent is "none".
+- "reply": one or two short sentences in ${LNAME[l]}, spoken like a polite expert human munshi: acknowledge the mistake simply (no long apology), and say exactly what you will change. Do not say it is already done: he confirms with a button. No emojis. No dashes.
+Reply with only JSON: {"intent":"correct|delete|none","target":"R1","changes":{"account":"","type":"","amount":0,"day":0,"note":""},"ask":"","options":[{"label":"","changes":{"type":""}}],"reply":""}
+Include in "changes" only the fields that change.`;
+  const r=await aiJSON(prompt,'@cf/openai/gpt-oss-120b');if(!r||typeof r!=='object')return null;
+  if(r.intent==='none')return{none:true,reply:String(r.reply||'')};
+  const ti=Math.max(0,Math.min(T.length-1,(parseInt(String(r.target||'R1').replace(/\D/g,''),10)||1)-1));
+  const clean=c=>{const o={};if(!c||typeof c!=='object')return o;if(c.account&&String(c.account).trim())o.account=String(c.account).trim().slice(0,40);
+    if(['credit','payment','goods','paid','expense','sale'].includes(c.type))o.type=c.type;const a=Math.round(Number(c.amount));if(a>=1&&a<1e9)o.amount=a;
+    if([-1,-2].includes(Number(c.day)))o.day=Number(c.day);if(typeof c.note==='string'&&c.note.trim())o.note=c.note.trim().slice(0,70);return o;};
+  const opts=Array.isArray(r.options)?r.options.filter(o=>o&&o.label).slice(0,3).map(o=>({label:String(o.label).slice(0,60),changes:clean(o.changes)})).filter(o=>Object.keys(o.changes).length):[];
+  return{target:ti,intent:r.intent==='delete'?'delete':'correct',changes:clean(r.changes),ask:String(r.ask||'').slice(0,240),options:opts,reply:String(r.reply||'').slice(0,300)};
+}catch(e){return null;}}
+function ruleFix(q,l,T){const s=' '+toAsciiDigits(q).toLowerCase()+' ';const v=tgtView(T[0]);
+  if(/\b(delete|mita|mitao|hata|hatao|remove|undo|cancel)\b|مٹا|ہٹا|کینسل|ڈیلیٹ|ړنګ|لرې/.test(s))return{target:0,intent:'delete',changes:{},reply:jt('fxDelQ',l)};
+  const ch={};
+  const am=pAmounts(pTokens(q)).filter(a=>!a.qty).map(a=>a.v);if(am.length>=2)ch.amount=am[am.length-1];else if(am.length===1&&am[0]!==v.amount)ch.amount=am[0];
+  const after=s.split(/\b(nahi|nahin|not|balke|bulke|instead)\b|نہیں|بلکہ|نه|بلکې/).pop()||s;
+  const want=TYPE_W.payment.test(after)?'payment':TYPE_W.credit.test(after)?'credit':TYPE_W.payment.test(s)&&!TYPE_W.credit.test(s)?'payment':TYPE_W.credit.test(s)&&!TYPE_W.payment.test(s)?'credit':null;
+  const plainW=s.replace(/credit pe|on credit/g,' ');const ambig=/\b(credit|debit)\b/.test(plainW)&&!TYPE_W.payment.test(plainW)&&!/\b(udhaar|udhar|naam|liya|liye)\b|ادھار|پور/.test(plainW);
+  const sup=v.cid&&cust(v.cid)&&cust(v.cid).type==='supplier';const map=t=>sup?(t==='credit'?'goods':'paid'):t;
+  if(ambig)return{target:0,intent:'correct',changes:ch,ask:jt('fxWhich',l),options:[{label:jt(sup?'fxGoods':'fxCredit',l),changes:Object.assign({},ch,{type:map('credit')})},{label:jt(sup?'fxPaid':'fxPay',l),changes:Object.assign({},ch,{type:map('payment')})}],reply:''};
+  if(want&&map(want)!==v.type)ch.type=map(want);
+  const cands=[];words(q).forEach(w=>{if(w.length>=3)looseMatches(w).forEach(c=>{if(c.id!==v.cid&&!cands.includes(c))cands.push(c);});});
+  if(cands.length===1)ch.account=cands[0].name;
+  if(cands.length>1)return{target:0,intent:'correct',changes:ch,ask:jt('fxWho',l),options:cands.slice(0,3).map(c=>({label:c.name+(c.tag?' ('+c.tag+')':phoneTail(c)?' '+phoneTail(c):''),changes:Object.assign({},ch,{account:c.name})})),reply:''};
+  if(!Object.keys(ch).length)return{target:0,intent:'menu',changes:{},reply:jt('fxMenu',l)};
+  return{target:0,intent:'correct',changes:ch,reply:''};}
+function describe(v,l){return `${v.name||'—'} · ${tL(v.type+'S',l)} · ${rs(v.amount)} · ${dmy(v.date).slice(0,5)}`;}
+function applyView(v,ch){const n=Object.assign({},v);if(ch.type)n.type=ch.type;if(ch.amount)n.amount=ch.amount;if(ch.day)n.date=addDays(todayISO(),ch.day);if(ch.note)n.note=ch.note;if(ch.account)n.name=ch.account;return n;}
+function showFix(plan,l,T){jState('idle');
+  if(plan.none){jPush({who:'ai',text:plan.reply||jt('fxNone',l),l});return;}
+  const t=T[plan.target]||T[0];const v=tgtView(t);
+  if(plan.intent==='menu'){const id='fx'+(++FIXN);FIXES[id]={t,plan};jPush({who:'ai',text:plan.reply+'\n'+describe(v,l),btns:[{act:'fxEdit',id,label:'✎ '+jt('fxEditB',l)},{act:'fxDel',id,label:'🗑 '+jt('fxDelB',l)}],l});return;}
+  if(plan.ask&&plan.options&&plan.options.length){const btns=plan.options.map(o=>{const id='fx'+(++FIXN);FIXES[id]={t,plan:{intent:'correct',changes:o.changes}};return{act:'fxGo',id,label:o.label};});
+    jPush({who:'ai',text:(plan.reply?plan.reply+'\n':'')+plan.ask+'\n'+describe(v,l),btns,l});return;}
+  const id='fx'+(++FIXN);FIXES[id]={t,plan};
+  if(plan.intent==='delete'){jPush({who:'ai',text:(plan.reply||jt('fxDelQ',l))+'\n'+describe(v,l),btns:[{act:'fxDo',id,label:'✓ '+jt('fxDelYes',l)},{act:'fxNo',id,label:jt('noB',l)}],l});return;}
+  if(!Object.keys(plan.changes||{}).length){FIXES[id].plan={intent:'menu'};jPush({who:'ai',text:(plan.reply||jt('fxMenu',l))+'\n'+describe(v,l),btns:[{act:'fxEdit',id,label:'✎ '+jt('fxEditB',l)},{act:'fxDel',id,label:'🗑 '+jt('fxDelB',l)}],l});return;}
+  const nv=applyView(v,plan.changes);
+  jPush({who:'ai',text:(plan.reply||jt('fxWill',l))+'\n'+jt('fxWas',l)+' '+describe(v,l)+'\n'+jt('fxNow',l)+' '+describe(nv,l),btns:[{act:'fxDo',id,label:'✓ '+jt('fxYes',l)},{act:'fxNo',id,label:jt('noB',l)}],l});}
+function resolveAccount(name,l,cb){const sm=sureMatch(name);if(sm)return cb(sm);const cs=looseMatches(name);
+  if(cs.length===1&&norm(cs[0].name)===norm(name))return cb(cs[0]);
+  if(cs.length){const btns=cs.slice(0,3).map(c=>{const id='fa'+(++FIXN);FIXES[id]={cb,c};return{act:'fxAcc',id,label:c.name+(c.tag?' ('+c.tag+')':phoneTail(c)?' '+phoneTail(c):'')};});const nid='fa'+(++FIXN);FIXES[nid]={cb,newName:name};btns.push({act:'fxAccNew',id:nid,label:'＋ '+fill(jt('newPerson',l),{n:words(name)[0]||name})});
+    jPush({who:'ai',text:fill(jt('whichQ',l),{n:cap(words(name)[0]||name),k:cs.length}),btns,l});return;}
+  const nid='fa'+(++FIXN);FIXES[nid]={cb,newName:name};jPush({who:'ai',text:fill(jt('fxNewQ',l),{n:cap(name)}),btns:[{act:'fxAccNew',id:nid,label:'＋ '+jt('fxNewB',l)}],l});}
+function doFix(id){const f=FIXES[id];if(!f)return;const l=D.lang;const t=f.t;const ch=(f.plan&&f.plan.changes)||{};delete FIXES[id];
+  if(f.plan.intent==='delete'){if(t.kind==='draft'){t.d.status='no';renderChat();jPush({who:'ai',text:jt('fxDraftGone',l),l});return;}
+    const e=D.entries.find(x=>x.id===t.e.id);if(!e)return;const snap=JSON.parse(JSON.stringify(e));D.entries=D.entries.filter(x=>x.id!==e.id);save();
+    const uid2='fu'+(++FIXN);FIXES[uid2]={undo:'restore',snap};const c=cust(snap.cid);
+    jPush({who:'ai',text:jt('fxDeleted',l)+(c&&isPerson(c)?'\n'+nameFor(c,l)+': '+rs(Math.abs(balance(c.id))):''),btns:[{act:'fxUndo',id:uid2,label:'↶ '+jt('fxUndoB',l)}],l});jState('happy');return;}
+  const go2=acc=>{if(t.kind==='draft'){const d=t.d;if(acc){d.cid=acc.id;d.name=acc.name;d.sure=true;delete d.amb;}if(ch.type)d.type=ch.type;if(ch.amount)d.amount=ch.amount;if(ch.day)d.date=addDays(todayISO(),ch.day);if(ch.note)d.note=ch.note;renderChat();jPush({who:'ai',text:jt('fxDraftOk',l),l});return;}
+    const e=D.entries.find(x=>x.id===t.e.id);if(!e)return;const snap=JSON.parse(JSON.stringify(e));const oldC=e.cid;
+    if(acc)e.cid=acc.id;if(ch.type){e.type=ch.type;if(e.type==='payment'&&!e.rno)e.rno=D.seq++;}if(ch.amount)e.amount=ch.amount;if(ch.day)e.date=addDays(todayISO(),ch.day);if(ch.note)e.note=ch.note;e.fixed=Date.now();save();
+    const uid2='fu'+(++FIXN);FIXES[uid2]={undo:'revert',snap};
+    const ids=[...new Set([oldC,e.cid])];const lines=ids.map(cid=>{const c=cust(cid);return c&&isPerson(c)?'• '+nameFor(c,l)+': '+rs(Math.abs(balance(cid)))+(balance(cid)>0?' '+jt('idOwes',l):balance(cid)<0?' '+jt('idWeOwe',l):''):'';}).filter(Boolean);
+    jPush({who:'ai',text:jt('fxDone',l)+'\n'+describe(tgtView({kind:'saved',e}),l)+(lines.length?'\n'+lines.join('\n'):''),btns:[{act:'fxUndo',id:uid2,label:'↶ '+jt('fxUndoB',l)},{act:'jOpen',id:e.cid,label:jt('openB',l)}],l});jState('happy');setTimeout(()=>{if(!jBusy)jState('idle');},1400);};
+  if(ch.account){const v=tgtView(t);if(norm(ch.account)!==norm(v.name))return resolveAccount(ch.account,l,go2);}
+  go2(null);}
+function undoFix(id){const f=FIXES[id];if(!f)return;const l=D.lang;delete FIXES[id];
+  if(f.undo==='restore'){D.entries.push(f.snap);}else{const e=D.entries.find(x=>x.id===f.snap.id);if(e)Object.assign(e,f.snap);else D.entries.push(f.snap);}
+  save();jPush({who:'ai',text:jt('fxUndone',l),l});}
+function fixAction(act,id){
+  if(act==='fxGo'||act==='fxDo'){doFix(id);return true;}
+  if(act==='fxNo'){delete FIXES[id];jPush({who:'ai',text:jt('fxKept',D.lang),l:D.lang});return true;}
+  if(act==='fxUndo'){undoFix(id);return true;}
+  if(act==='fxDel'){const f=FIXES[id];if(f){f.plan={intent:'delete',changes:{}};doFix(id);}return true;}
+  if(act==='fxEdit'){const f=FIXES[id];if(!f)return true;delete FIXES[id];
+    if(f.t.kind==='draft'){S.cid=null;go('entry',{draft:Object.assign({},f.t.d,{fromQuick:true,fromJugnu:f.t.key})});}
+    else{const en=f.t.e;go('entry',{draft:{id:en.id,cid:en.cid,name:cust(en.cid).name,amount:en.amount,type:en.type,date:en.date,note:en.note}});}return true;}
+  if(act==='fxAcc'){const f=FIXES[id];if(f){delete FIXES[id];f.cb(f.c);}return true;}
+  if(act==='fxAccNew'){const f=FIXES[id];if(f){delete FIXES[id];newPersonModal(f.newName,'credit',c=>f.cb(c));}return true;}
+  return false;}
+Object.assign(J.roman,{fxWill:'Ji, theek kar deta hoon:',fxWas:'Pehle:',fxNow:'Ab:',fxYes:'Haan, theek karo',fxDone:'Theek kar diya, Seth ji.',fxUndoB:'Wapis pehle jaisa',fxUndone:'Pehle jaisa kar diya.',fxKept:'Theek hai, jaisa tha waisa rehne diya.',fxDelQ:'Ye hisaab mita doon?',fxDelYes:'Haan, mita do',fxDeleted:'Mita diya.',fxDraftGone:'Ye hisaab nahi likha.',fxDraftOk:'Card theek kar diya. Ab "Haan" dabayein to likh doon.',fxWhich:'Seth ji, zara wazeh kar dein, ye kya tha?',fxCredit:'Udhaar diya (us ne dene hain)',fxPay:'Wasooli (us ne paise diye)',fxGoods:'Maal aaya (hum ne dene hain)',fxPaid:'Hum ne paise diye',fxWho:'Kis ke khate mein likhna tha?',fxMenu:'Ji, batayein kya galat hua. Main ye kar sakta hoon:',fxEditB:'Badal kar likho',fxDelB:'Mita do',fxNone:'Ji, samajh gaya.',fxNewQ:'"{n}" naam ka khata nahi hai. Naya bana doon?',fxNewB:'Naya khata banao'});
+Object.assign(J.ur,{fxWill:'جی، ٹھیک کر دیتا ہوں:',fxWas:'پہلے:',fxNow:'اب:',fxYes:'ہاں، ٹھیک کرو',fxDone:'ٹھیک کر دیا، سیٹھ جی۔',fxUndoB:'واپس پہلے جیسا',fxUndone:'پہلے جیسا کر دیا۔',fxKept:'ٹھیک ہے، جیسا تھا ویسا رہنے دیا۔',fxDelQ:'یہ حساب مٹا دوں؟',fxDelYes:'ہاں، مٹا دو',fxDeleted:'مٹا دیا۔',fxDraftGone:'یہ حساب نہیں لکھا۔',fxDraftOk:'کارڈ ٹھیک کر دیا۔ اب "ہاں" دبائیں تو لکھ دوں۔',fxWhich:'سیٹھ جی، ذرا واضح کر دیں، یہ کیا تھا؟',fxCredit:'ادھار دیا (اس نے دینے ہیں)',fxPay:'وصولی (اس نے پیسے دیے)',fxGoods:'مال آیا (ہم نے دینے ہیں)',fxPaid:'ہم نے پیسے دیے',fxWho:'کس کے کھاتے میں لکھنا تھا؟',fxMenu:'جی، بتائیں کیا غلط ہوا۔ میں یہ کر سکتا ہوں:',fxEditB:'بدل کر لکھو',fxDelB:'مٹا دو',fxNone:'جی، سمجھ گیا۔',fxNewQ:'"{n}" نام کا کھاتہ نہیں ہے۔ نیا بنا دوں؟',fxNewB:'نیا کھاتہ بناؤ'});
+Object.assign(J.ps,{fxWill:'هو، سم یې کوم:',fxWas:'مخکې:',fxNow:'اوس:',fxYes:'هو، سم یې کړه',fxDone:'سم مې کړ، مالک صاحب.',fxUndoB:'بېرته لکه مخکې',fxUndone:'لکه مخکې مې کړ.',fxKept:'سمه ده، څنګه چې و هماغسې پاتې شو.',fxDelQ:'دا حساب ړنګ کړم؟',fxDelYes:'هو، ړنګ یې کړه',fxDeleted:'ړنګ شو.',fxDraftGone:'دا حساب ونه لیکل شو.',fxDraftOk:'کارت مې سم کړ. اوس "هو" کېکاږئ چې ویې لیکم.',fxWhich:'مالک صاحب، لږ یې واضح کړئ، دا څه و؟',fxCredit:'پور ورکړل شو (هغه باید راکړي)',fxPay:'وصولي (هغه پیسې راکړې)',fxGoods:'مال راغی (موږ باید ورکړو)',fxPaid:'موږ پیسې ورکړې',fxWho:'د چا په حساب کې باید لیکل شوی وای؟',fxMenu:'هو، ووایاست څه غلط شو. زه دا کولی شم:',fxEditB:'بدل یې کړه',fxDelB:'ړنګ یې کړه',fxNone:'هو، پوه شوم.',fxNewQ:'د "{n}" په نوم حساب نشته. نوی یې جوړ کړم؟',fxNewB:'نوی حساب جوړ کړه'});
+Object.assign(J.en,{fxWill:'Sure, I will fix it:',fxWas:'Before:',fxNow:'Now:',fxYes:'Yes, fix it',fxDone:'Fixed, sir.',fxUndoB:'Undo',fxUndone:'Put back as it was.',fxKept:'OK, I left it as it was.',fxDelQ:'Shall I remove this entry?',fxDelYes:'Yes, remove it',fxDeleted:'Removed.',fxDraftGone:'Not saved.',fxDraftOk:'Card corrected. Tap "Yes" and I will save it.',fxWhich:'Sir, just to be sure, what was it?',fxCredit:'Udhaar given (they owe us)',fxPay:'Payment received (they paid us)',fxGoods:'Stock received (we owe them)',fxPaid:'We paid them',fxWho:'Whose account should it be in?',fxMenu:'Tell me what went wrong. I can:',fxEditB:'Edit it',fxDelB:'Remove it',fxNone:'Understood.',fxNewQ:'There is no account named "{n}". Create a new one?',fxNewB:'Create new account'});
+
+const BAL_RX=/(kitn|kitna|kitne|baqi|baaqi|baqaya|hisaab|hisab|balance|statement|goshwara|کتن|باقی|بقایا|حساب|گوشوارہ|څومره|پاتې)/i;
+function chatty(q,a){if(!a||a.entry||a.action)return false;if(a.cid&&words(q).length>=4&&!BAL_RX.test(q))return true;return false;}
+function recentLines(){return (S.recent||[]).slice(-5).reverse().map(x=>{const e=D.entries.find(y=>y.id===x.id);if(!e)return '';const c=cust(e.cid);return `- ${c?c.name:''}: ${e.type} Rs ${e.amount} on ${e.date}${e.note?' ('+e.note+')':''}`;}).filter(Boolean).join('\n');}
+const U_FOLLOW=/(samajh nahi|samjh nahi|nahi samjh|nahi samajh|samajh nahin|nahi aaya|nahi aya|galat|ghalat|wrong|dobara|phir se|fir se|aasaan|asaan|simple|easy|example|misaal|mithal|aur batao|aur samjhao|detail|tafseel|kyun|kyon|why|how come|matlab|meaning|sure\?|pakka|سمجھ نہیں|سمجھا نہیں|غلط|دوبارہ|آسان|مثال|مطلب|کیوں|پوه نه شوم|نه پوهېږم|بیا|اسانه|بېلګه|ولې)/i;
+function uFollow(q){const ch=uChat();const lastAi=[...ch].reverse().find(m=>m.who==='ai'&&m.text);if(!lastAi)return false;if(U_FOLLOW.test(q))return true;
+  if(words(q).length<=6&&/^(ye|yeh|is|isko|iska|us|wo|aur|or|phir|to|so|and|but|lekin|magar|یہ|اس|وہ|اور|پھر|دا|هغه|او)\b/i.test(q.trim()))return true;
+  if(/^[\d\s.+\-*/=xX×÷^()a-z]{1,30}$/i.test(q.trim())&&/\?|=/.test(lastAi.text))return true;return false;}
 function ustadView(){const p=activeP();
   return `<div class="jhome ustadT">
    <div class="jhero"><span class="ffw listening" id="jFF">${ffSVG()}</span><div><div class="jname">Ustad<small>jugnu</small></div><div class="jstat" id="jStat" aria-live="polite">${esc(jt('listening'))}</div><span class="jmode" id="jMode"></span><button class="jtheme" data-act="jTheme" aria-label="Light / dark">${jLight()?'☾':'☀'}</button></div>${profChip()}</div>
@@ -1646,6 +1772,7 @@ function uAnswerPick(mi,opt){const ch=uChat();const m=ch[mi];const Q=S.quiz;if(!
 async function uSend(q){q=String(q||'').trim();if(!q||jBusy)return;hbNote(q,'u');if(S.examQ&&S.examQ.pid===D.active){await examMark(q);return;}if(S.examSolve&&S.examSolve.pid===D.active){await examSolve(q);return;}jBusy=true;const l=detectLang(q);const p=activeP();
   uPush({who:'me',text:q,l});markStudy(p,true);jState('thinking');await sleep(400);
   let a=ustadAnswer(q,l);
+  if(aiOn()&&!a.quiz&&uFollow(q))a={ai:true};
   if(!a.ai&&!a.quiz&&aiOn()&&String(a.text||'').startsWith(ft('fLead',l))&&/(samjh|explain|detail|tafseel|tafsil|kaise|kese|kaisay|kyun|kyon|process|describe|derive|prove|example|misaal|سمجھا|تفصیل|وضاحت|کیسے|کیوں|مثال|څنګه|ولې|تشریح|بېلګه)/i.test(q))a={ai:true};
   if(a.quiz){startQuiz(a.quiz,l);jBusy=false;jState('idle');return;}
   if(!a.ai){uPush({who:'ai',text:a.text,l});jState('happy');setTimeout(()=>{if(!jBusy)jState('idle');},1300);jBusy=false;return;}
@@ -1655,12 +1782,17 @@ async function uSend(q){q=String(q||'').trim();if(!q||jBusy)return;hbNote(q,'u')
   const r=await askTutor(q,l,p);if(r){qa.n++;if(q.length>8&&!/^(Revise|Ye dobara)/.test(q))p.lastQ=q.slice(0,120);save();}
   uPush({who:'ai',text:r||ft('uNeedNet',l),l});jState(r?'happy':'idle');setTimeout(()=>{if(!jBusy)jState('idle');},1300);jBusy=false;}
 async function askTutor(q,l,p){
-  try{const gloss=(l==='ps'||/[ښږځڅړټډګېۍ]/.test(q))?await psGloss(q):null;const lib=await libFind(q,p,guessSub(q));const hist=uChat().filter(m=>m.text).slice(-7,-1).map(m=>(m.who==='me'?'Student: ':'Ustad: ')+m.text).join('\n');
+  try{const gloss=(l==='ps'||/[ښږځڅړټډګېۍ]/.test(q))?await psGloss(q):null;const lib=await libFind(q,p,guessSub(q));const hist=uChat().filter(m=>m.text).slice(-11,-1).map(m=>(m.who==='me'?'Student: ':'Ustad: ')+m.text).join('\n');
     const prompt=`You are Ustad Jugnu, a kind, patient tutor for a Pakistani school student named ${p.name}. ${sylPrompt(p)}${libBlock(lib)}
 Rules:
 - Be accurate. Never invent chapter numbers, page numbers, exercise numbers, dates or exam statistics. If you are not sure something is in this student's book, say so and ask them to check the book.
 - Reply ONLY in ${LNAME[l]}, the same language and script the student used. Technical terms and formulas may stay in English as in the textbook.
+- This is a conversation, not a lookup. Read the recent chat and first react to what the student just said, like a real, caring teacher (for example: "Achha, chalo isay aur aasaan tareeqe se dekhte hain"). Never sound robotic or repeat yourself word for word.
+- If the student says they did not understand: explain again more simply, in a different way, with a new everyday Pakistani example (bazaar, cricket, roti, rickshaw).
+- If the student says your answer is wrong: re-check it carefully step by step. If you were wrong, say so honestly in one line and give the correct answer. If you were right, kindly show why, without making them feel bad.
+- If the student gives their own answer, check it: praise what is right and gently fix what is wrong.
 - Teach, do not just hand over answers: explain step by step in simple words, give one small example, and for homework give a hint first and ask the student to try.
+- When you teach a concept, end with one short question to check understanding.
 - Keep it short: at most 6 short lines. No emojis. No dashes.
 - Only school study topics (Maths, Science, English, Urdu, Pashto, Islamiyat, Pakistan Studies, Computer, General Knowledge, exam preparation, study tips). If the question is not about studies, kindly say so in one line and suggest a study topic.
 - Never discuss romance, adult content, violence, drugs or anything unsafe for a child. Never ask for personal details, addresses, photos or phone numbers.
@@ -1805,6 +1937,7 @@ async function handleVoice(blob){
   if(stu)uSend(tx);else jSendShared(tx,l);
 }
 async function jSendShared(text,vl){
+  if(looksFix(text)&&!jBusy){jBusy=true;try{await jFix(text,vl||detectLang(text));}finally{jBusy=false;}return;}
   if(aiOn()&&!jBusy){jBusy=true;const l0=vl||(/[\u0900-\u097F]/.test(text)?D.lang:detectLang(text));jState('thinking');
     const st=await readStory(text,l0);jBusy=false;
     if(st&&st.entries.length){jPush({who:'me',text,l:l0});storyCards(st,text,l0);return;}
@@ -2036,6 +2169,7 @@ document.addEventListener('click',async e=>{
   if(act==='examOpen'){examModal();return;}
   if(act==='eAns'){const [mi,o]=String(id).split(':').map(Number);examPick(mi,o);return;}
   if(act==='eStop'){S.examQ=null;S.exam=null;S.examSolve=null;uPush({who:'ai',text:et('stopped'),l:D.lang});return;}
+  if(fixAction(act,id))return;
   if(act==='ePapers'){examPapers(id);return;}
   if(act==='psSetup'){psLocalSetup(el);return;}
   if(act==='psOff'){psLocalOff();return;}
@@ -2094,7 +2228,7 @@ document.addEventListener('click',async e=>{
         <button class="btn ghost full" data-act="editEntry" data-id="${en.id}">${ICON.pen} ${esc(t('edit'))}</button>
         <button class="btn danger full" data-act="delEntry" data-id="${en.id}">${ICON.bin} ${esc(t('del'))}</button>
         <button class="btn ghost full" data-act="closeModal">${esc(t('cancel'))}</button>`);break;}
-    case 'editEntry':{closeModal();const en=D.entries.find(x=>x.id===id);if(en)go('entry',{draft:{id:en.id,name:cust(en.cid).name,amount:en.amount,type:en.type,date:en.date,note:en.note}});break;}
+    case 'editEntry':{closeModal();const en=D.entries.find(x=>x.id===id);if(en)go('entry',{draft:{id:en.id,cid:en.cid,name:cust(en.cid).name,amount:en.amount,type:en.type,date:en.date,note:en.note}});break;}
     case 'delEntry':modal(`<h1>${esc(t('delQ'))}</h1><div class="row"><button class="btn danger" data-act="doDel" data-id="${esc(id)}" style="flex:1">${esc(t('del'))}</button><button class="btn ghost" data-act="closeModal">${esc(t('cancel'))}</button></div>`);break;
     case 'doDel':D.entries=D.entries.filter(x=>x.id!==id);save();closeModal();render();break;
     case 'receipt':{const en=D.entries.find(x=>x.id===id);if(!en)break;toast(t('making'));const c=await receiptCanvas(en);D.receiptsMade=(D.receiptsMade||0)+1;save();docModal(t('receipt'),[c],'receipt',148,148,cust(en.cid));break;}
