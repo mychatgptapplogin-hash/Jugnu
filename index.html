@@ -510,6 +510,9 @@ body.d2.night{padding-inline:0}
 body.d2.night .jhome{margin-inline:0;height:calc(100dvh - 62px - env(safe-area-inset-bottom,0px))}
 body.d2{margin:0}
 body.d2.night{background:#EFEAE2}
+.d2cats{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.d2cats button{border:1px solid var(--line);background:#FFFFFF;color:var(--ink);border-radius:999px;padding:6px 12px;min-height:40px;font:inherit;font-size:14px;cursor:pointer}
+.d2cats button[aria-pressed="true"]{background:var(--mTint);border-color:var(--cover2);color:var(--cover);font-weight:700}
 </style>
 
 <div class="wrap">
@@ -1128,7 +1131,7 @@ function settingsView(){
     <button class="btn ghost full" data-act="pasteRestore">${esc(t('bkRestoreP'))}</button></div>
    ${fbCardHTML()}
    ${voiceSettingsHTML()}
-   <div class="page stack"><h2 style="margin-top:0">${esc(t('danger'))}</h2><button class="btn danger full" data-act="wipe">${esc(t('wipe'))}</button><p class="note">Jugnu · ConceptAI · v0.19.4</p></div></div>`;
+   <div class="page stack"><h2 style="margin-top:0">${esc(t('danger'))}</h2><button class="btn danger full" data-act="wipe">${esc(t('wipe'))}</button><p class="note">Jugnu · ConceptAI · v0.19.5</p></div></div>`;
 }
 function pilotView(){
   const now=Date.now(),wk=7*86400000;
@@ -2386,7 +2389,7 @@ function bindAfter(){
       const {c,saved}=commitEntry({id:d.id,cid,name,amount,type,date,note});
       if(d.fromJugnu){const dr=S.drafts[d.fromJugnu];if(dr)Object.assign(dr,{status:'yes',name:c.name,amount,type,date,note});go('jugnu',{draft:null});jSaved(c,saved,dr?dr.l:D.lang);return;}
       go('customer',{cid:c.id,draft:null});toast(t('saved'),true);
-      if(!c.phone)setTimeout(()=>{if(S.screen==='customer'&&S.cid===c.id)editCustModal();},450);
+      if(!c.phone&&c.type!=='expense'&&c.type!=='sales')setTimeout(()=>{if(S.screen==='customer'&&S.cid===c.id)editCustModal();},450);
     };}
   const shf=$('shopForm');if(shf)shf.onsubmit=e=>{e.preventDefault();D.shop=Object.assign(D.shop,shopFromForm());save();toast(t('savedShop'));go('home');};
   const imp=$('importFile');if(imp)imp.onchange=()=>{const f=imp.files&&imp.files[0];if(!f)return;const rd=new FileReader();rd.onload=()=>restoreFrom(String(rd.result));rd.readAsText(f);};
@@ -2928,4 +2931,33 @@ const _render4=render;render=function(){
   if(!D.shop&&S.startMode==='bothPick'){$('app').innerHTML=d2BothPick();return;}
   if(d2HomeChild&&D.shop&&isHome()){d2HomeChild=false;setTimeout(()=>{try{if(!document.querySelector('#stuForm')){closeModal();addStuModal();}}catch(e){}},900);}
   if(isHome()){const m=document.querySelector('.modesw [data-act="modeM"]');if(m)m.innerHTML=`<span aria-hidden="true">🏠</span> ${esc(fd('ghar'))}<small>${esc(fd('munshiS'))}</small>`;}};
+/* v0.19.5 Ghar mode speaks household, not shop: entry types, labels and expense categories for home accounts */
+const D2_HOME_T={
+ roman:{credit:'Paise diye (udhaar diya)',creditS:'Udhaar diya',payment:'Paise wapas mile',paymentS:'Wapas mile',goods:'Paise liye (udhaar liya)',goodsS:'Udhaar liya',paid:'Udhaar wapas kiya',paidS:'Wapas kiya',expense:'Ghar ka kharcha',expenseS:'Kharcha',sale:'Aamdani (tankhwah, kiraya, munafa)',saleS:'Aamdani',customer:'Rishtedar / dost',supplier:'Jis se udhaar liya',aaj:'Aaj wapas mile',quickPh:'Likhein: Bijli ka bill 8450',colCr:'Diye',colRv:'Mile',shopName:'Ghar ka naam',statement:'Hisaab ka goshwara',none:'Abhi koi hisaab nahi. "+ Naya indraaj" dabayein.'},
+ ur:{credit:'پیسے دیے (ادھار دیا)',creditS:'ادھار دیا',payment:'پیسے واپس ملے',paymentS:'واپس ملے',goods:'پیسے لیے (ادھار لیا)',goodsS:'ادھار لیا',paid:'ادھار واپس کیا',paidS:'واپس کیا',expense:'گھر کا خرچہ',expenseS:'خرچہ',sale:'آمدنی (تنخواہ، کرایہ، منافع)',saleS:'آمدنی',customer:'رشتہ دار / دوست',supplier:'جس سے ادھار لیا',aaj:'آج واپس ملے',quickPh:'لکھیں: بجلی کا بل 8450',colCr:'دیے',colRv:'ملے',shopName:'گھر کا نام',statement:'حساب کا گوشوارہ',none:'ابھی کوئی حساب نہیں۔ "+ نیا اندراج" دبائیں۔'},
+ ps:{credit:'پیسې مې ورکړې (پور مې ورکړ)',creditS:'پور ورکړ',payment:'پیسې بېرته راغلې',paymentS:'بېرته راغلې',goods:'پیسې مې واخیستې (پور مې واخیست)',goodsS:'پور واخیست',paid:'پور مې بېرته ورکړ',paidS:'بېرته ورکړ',expense:'د کور لګښت',expenseS:'لګښت',sale:'عاید (تنخوا، کرایه، ګټه)',saleS:'عاید',customer:'خپلوان / ملګری',supplier:'چې پور مې ترې اخیستی',aaj:'نن بېرته راغلې',quickPh:'ولیکئ: د برېښنا بل 8450',colCr:'ورکړل',colRv:'راغلل',shopName:'د کور نوم',statement:'د حساب شرح',none:'تراوسه هېڅ حساب نشته. "+ نوې لیکنه" کېکاږئ.'},
+ en:{credit:'Money given (lent)',creditS:'Lent',payment:'Money got back',paymentS:'Got back',goods:'Money taken (borrowed)',goodsS:'Borrowed',paid:'Paid back',paidS:'Paid back',expense:'Household expense',expenseS:'Expense',sale:'Income (salary, rent, profit)',saleS:'Income',customer:'Relative / friend',supplier:'Lender',aaj:'Got back today',quickPh:'Type: Electricity bill 8450',colCr:'Given',colRv:'Received',shopName:'Household name',statement:'Account statement',none:'No accounts yet. Tap "+ New entry".'}
+};
+const D2_CATS={
+ roman:{expense:['Ration','Sabzi / phal','Doodh','Bijli bill','Gas bill','Pani bill','Makaan ka kiraya','School fees','Dawai / doctor','Petrol / safar','Mobile / internet','Kapray','Shaadi / tohfa','Committee qist','Marammat','Doosra kharcha'],sale:['Tankhwah','Kiraya aamdani','Karobar munafa','Pension','Bahar se paise'],nmE:'Kis cheez par kharcha?',nmS:'Aamdani kahan se?',nmP:'Naam (kis ko diye / kis se liye)'},
+ ur:{expense:['راشن','سبزی / پھل','دودھ','بجلی کا بل','گیس کا بل','پانی کا بل','مکان کا کرایہ','اسکول فیس','دوائی / ڈاکٹر','پیٹرول / سفر','موبائل / انٹرنیٹ','کپڑے','شادی / تحفہ','کمیٹی کی قسط','مرمت','دوسرا خرچہ'],sale:['تنخواہ','کرایہ آمدنی','کاروبار منافع','پنشن','باہر سے پیسے'],nmE:'کس چیز پر خرچہ؟',nmS:'آمدنی کہاں سے؟',nmP:'نام (کس کو دیے / کس سے لیے)'},
+ ps:{expense:['راشن','سبزي / مېوه','شیدې','د برېښنا بل','د ګاز بل','د اوبو بل','د کور کرایه','د ښوونځي فیس','دوا / ډاکټر','پټرول / سفر','موبایل / انټرنېټ','کالي','واده / ډالۍ','د کمیټۍ قسط','ترمیم','بل لګښت'],sale:['تنخوا','د کرایې عاید','د کاروبار ګټه','پنشن','له بهر پیسې'],nmE:'په څه لګښت؟',nmS:'عاید له کومه؟',nmP:'نوم (چا ته مو ورکړل / له چا مو واخیستل)'},
+ en:{expense:['Groceries','Vegetables / fruit','Milk','Electricity bill','Gas bill','Water bill','House rent','School fees','Medicine / doctor','Fuel / travel','Mobile / internet','Clothes','Wedding / gift','Committee instalment','Repairs','Other expense'],sale:['Salary','Rent income','Business profit','Pension','Money from abroad'],nmE:'Spent on what?',nmS:'Income from where?',nmP:'Name (who you gave to / took from)'}
+};
+const D2_SHOP_T={};
+function d2Labels(){const home=isHome();['roman','ur','ps','en'].forEach(l=>{const H=D2_HOME_T[l];if(!H||!T[l])return;if(!D2_SHOP_T[l]){D2_SHOP_T[l]={};Object.keys(H).forEach(k=>D2_SHOP_T[l][k]=T[l][k]);}Object.assign(T[l],home?H:D2_SHOP_T[l]);});}
+function d2HomeEntry(){if(S.screen!=='entry'||!isHome())return;const ty=$('eType'),nm=$('eName');if(!ty||!nm||ty.dataset.d2)return;ty.dataset.d2='1';
+  const C=D2_CATS[D.lang]||D2_CATS.roman;
+  ['expense','sale','credit','payment','goods','paid'].forEach(v=>{const o=ty.querySelector(`option[value="${v}"]`);if(o)ty.appendChild(o);});
+  if(!S.draft||!S.draft.type)ty.value='expense';
+  const lab=document.querySelector('label[for="eName"]');
+  const box=document.createElement('div');box.className='d2cats';box.setAttribute('role','group');nm.after(box);
+  const upd=()=>{const k=ty.value;if(lab)lab.textContent=k==='expense'?C.nmE:k==='sale'?C.nmS:C.nmP;
+    const list=C[k]||[];box.hidden=!list.length;box.innerHTML=list.map(x=>`<button type="button" dir="auto" aria-pressed="${nm.value===x}">${esc(x)}</button>`).join('');
+    box.querySelectorAll('button').forEach(b=>b.onclick=()=>{nm.value=b.textContent;box.querySelectorAll('button').forEach(z=>z.setAttribute('aria-pressed',String(z===b)));const a=$('eAmt');if(a&&!a.value)a.focus();});};
+  ty.addEventListener('change',upd);upd();}
+const _render5=render;render=function(){d2Labels();_render5();d2HomeEntry();};
+/* an expense or income account is not a "customer": show what it really is under its name */
+const _render6=render;render=function(){_render6();if(S.screen!=='customer')return;const c=cust(S.cid);if(!c||(c.type!=='expense'&&c.type!=='sales'))return;
+  const p=document.querySelector('.shopname p.soft');if(p&&p.firstChild&&p.firstChild.nodeType===3)p.firstChild.textContent=t(c.type==='expense'?'expense':'sale');};
 </script>
