@@ -473,6 +473,43 @@ body.d2 .jform .d2go{width:46px;height:46px;min-width:46px;min-height:46px;paddi
 html[dir="rtl"] body.d2 .d2go svg{transform:scaleX(-1)}
 body.d2 .jmode.on{display:none}
 body.d2 .jform{gap:6px}
+/* v0.19.1 WhatsApp style chat: Jugnu avatar top left, mic and send at the bottom */
+body.d2.m-shop{--mBub:#FFE2BF}body.d2.m-study{--mBub:#DCE6FA}body.d2.m-home{--mBub:#D9FDD3}
+body.d2 .jhome{margin-inline:-16px;gap:0;height:calc(100dvh - 78px - env(safe-area-inset-bottom,0px))}
+body.d2 main{padding-top:0}
+body.d2 .jhero{border-radius:0!important;background:var(--mFill)!important;border-bottom:none!important;box-shadow:0 1px 3px rgba(16,19,26,.18)!important;padding:8px 12px!important;flex-shrink:0}
+body.d2 .jname{color:var(--mInk)!important;font-size:19px;line-height:1.25}
+body.d2 .jsub,body.d2 .jsub b,body.d2 .jstat{color:var(--mInk)!important}
+body.d2 .jmode{border-color:rgba(16,19,26,.3)!important;background:rgba(255,255,255,.85)!important}
+.d2av{width:50px;height:50px;border-radius:50%;background:#10131A;border:3px solid #FFD21F;display:grid;place-items:center;flex-shrink:0}
+body.d2 .d2av .ffw{width:44px!important;height:44px!important}
+body.d2 .pchip{background:rgba(255,255,255,.92)!important;border-color:transparent!important}
+body.d2 .d2sum{border-radius:0;background:#FFFFFF;color:var(--ink);padding:6px 14px;border-bottom:1px solid var(--line)}
+body.d2 .d2sum small{font-size:12px;color:#2C3340}
+body.d2 .d2sum b{font-size:17px;color:var(--cover2)}
+body.d2 .modesw{margin:6px 10px!important;padding:3px!important;flex-shrink:0}
+body.d2 .modesw button{min-height:38px!important}
+body.d2 .modesw button small{display:none}
+body.d2 .urow{margin:6px 10px 0;flex-shrink:0}
+body.d2 .jhome .jchat{flex:1;border:none!important;border-radius:0!important;background:#EFEAE2!important;background-image:radial-gradient(rgba(16,19,26,.05) 1px,transparent 1.2px)!important;background-size:18px 18px!important;padding:10px 12px!important;margin-top:6px}
+body.d2 .jmsg{box-shadow:0 1px .5px rgba(16,19,26,.15);border-radius:10px}
+body.d2 .jai{background:#FFFFFF!important;border:none!important;border-start-start-radius:2px}
+body.d2 .jme{background:var(--mBub)!important;border:none!important;border-start-end-radius:2px}
+body.d2 .jchips{background:#EFEAE2;padding:4px 10px 2px;flex-shrink:0}
+body.d2 .jchip{border-width:1px!important;background:#FFFFFF!important}
+body.d2 .jform{background:#EFEAE2;padding:6px 8px 8px;gap:6px;flex-shrink:0}
+.d2pill{flex:1;min-width:0;display:flex;align-items:center;background:#FFFFFF;border-radius:26px;padding-inline:14px 2px;min-height:50px;box-shadow:0 1px .5px rgba(16,19,26,.15)}
+body.d2 .d2pill input{border:none!important;background:transparent!important;border-radius:0!important;padding:0!important;min-height:48px!important;flex:1;min-width:0;box-shadow:none!important}
+body.d2 .d2pill .vbtn.pbtn2{background:transparent!important;border:none!important;color:#3B4A54!important;width:46px;height:46px;min-width:46px}
+body.d2 .d2round{width:50px!important;height:50px!important;min-width:50px!important;min-height:50px!important;border-radius:50%!important;border:none!important;background:var(--mFill)!important;color:var(--mInk)!important;padding:0!important;display:grid!important;place-items:center;flex-shrink:0;box-shadow:0 1px 2px rgba(16,19,26,.2)}
+body.d2 .jform:not(.typing) .d2go{display:none!important}
+body.d2 .jform.typing .d2micbtn:not(.rec){display:none!important}
+body.d2 .d2micbtn.rec{width:auto!important;padding:0 14px!important;border-radius:25px!important;background:#C62828!important;color:#FFFFFF!important}
+body.d2 header .logo .ffw{background:#10131A;border-radius:50%;border:2px solid #FFD21F;width:40px;height:40px;padding:2px}
+body.d2.night{padding-inline:0}
+body.d2.night .jhome{margin-inline:0;height:calc(100dvh - 62px - env(safe-area-inset-bottom,0px))}
+body.d2{margin:0}
+body.d2.night{background:#EFEAE2}
 </style>
 
 <div class="wrap">
@@ -1091,7 +1128,7 @@ function settingsView(){
     <button class="btn ghost full" data-act="pasteRestore">${esc(t('bkRestoreP'))}</button></div>
    ${fbCardHTML()}
    ${voiceSettingsHTML()}
-   <div class="page stack"><h2 style="margin-top:0">${esc(t('danger'))}</h2><button class="btn danger full" data-act="wipe">${esc(t('wipe'))}</button><p class="note">Jugnu · ConceptAI · v0.19.0</p></div></div>`;
+   <div class="page stack"><h2 style="margin-top:0">${esc(t('danger'))}</h2><button class="btn danger full" data-act="wipe">${esc(t('wipe'))}</button><p class="note">Jugnu · ConceptAI · v0.19.1</p></div></div>`;
 }
 function pilotView(){
   const now=Date.now(),wk=7*86400000;
@@ -2838,11 +2875,13 @@ function d2Decorate(){const home=document.querySelector('.jhome');if(!home)retur
   if(nm&&st&&!home.querySelector('.jsub')){const sub=document.createElement('div');sub.className='jsub';sub.innerHTML=`<b>${esc(d2t(md))}</b> · `;nm.after(sub);sub.appendChild(st);}
   const hero=home.querySelector('.jhero');
   if(S.screen==='jugnu'&&hero&&!home.querySelector('.d2sum'))hero.insertAdjacentHTML('afterend',d2Summary(md));
-  const f=$('jForm');if(!f)return;const inp=$('jIn');
-  const ph=f.querySelector('.pbtn2');if(ph&&inp)f.insertBefore(ph,inp);
-  const go2=f.querySelector('button[type="submit"]');if(go2&&!go2.classList.contains('d2go')){go2.classList.add('d2go');go2.setAttribute('aria-label',go2.textContent.trim());go2.innerHTML='<svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>';}
-  const mic=f.querySelector('.vbtn[data-rec]');
-  if(mic&&!mic.classList.contains('d2mic')){mic.classList.add('d2mic');const cur=($('jFF')&&$('jFF').className.replace('ffw','').trim())||'idle';mic.innerHTML=`<span class="ffw jm2 ${cur}">${ffSVG()}</span>`;f.appendChild(mic);}
+  const ff=$('jFF');if(ff&&!(ff.parentNode&&ff.parentNode.classList.contains('d2av'))){const w=document.createElement('span');w.className='d2av';ff.before(w);w.appendChild(ff);}
+  const f=$('jForm');if(!f)return;const inp=$('jIn');if(!inp)return;
+  let pill=f.querySelector('.d2pill');if(!pill){pill=document.createElement('div');pill.className='d2pill';inp.before(pill);pill.appendChild(inp);}
+  const ph=f.querySelector('.pbtn2');if(ph&&ph.parentNode!==pill)pill.appendChild(ph);
+  const go2=f.querySelector('button[type="submit"]');if(go2&&!go2.classList.contains('d2go')){go2.classList.add('d2go','d2round');go2.setAttribute('aria-label',go2.textContent.trim());go2.innerHTML='<svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>';f.appendChild(go2);}
+  const mic=f.querySelector('.vbtn[data-rec]');if(mic&&!mic.classList.contains('d2micbtn')){mic.classList.add('d2micbtn','d2round');f.appendChild(mic);}
+  if(!f.dataset.d2){f.dataset.d2='1';const tg=()=>f.classList.toggle('typing',!!inp.value.trim());inp.addEventListener('input',tg);f.addEventListener('submit',()=>setTimeout(tg,0));}
 }
 const _render2=render;
 render=function(){_render2();const b=document.body;b.classList.add('d2');const md=d2Mode();
