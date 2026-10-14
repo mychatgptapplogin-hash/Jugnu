@@ -1131,7 +1131,7 @@ function settingsView(){
     <button class="btn ghost full" data-act="pasteRestore">${esc(t('bkRestoreP'))}</button></div>
    ${fbCardHTML()}
    ${voiceSettingsHTML()}
-   <div class="page stack"><h2 style="margin-top:0">${esc(t('danger'))}</h2><button class="btn danger full" data-act="wipe">${esc(t('wipe'))}</button><p class="note">Jugnu · ConceptAI · v0.19.6</p></div></div>`;
+   <div class="page stack"><h2 style="margin-top:0">${esc(t('danger'))}</h2><button class="btn danger full" data-act="wipe">${esc(t('wipe'))}</button><p class="note">Jugnu · ConceptAI · v0.19.7</p></div></div>`;
 }
 function pilotView(){
   const now=Date.now(),wk=7*86400000;
@@ -2985,4 +2985,38 @@ const D2_STORE={};
 function d2Swap(tbl,over,tag){const home=isHome();['roman','ur','ps','en'].forEach(l=>{const H=over[l];if(!H||!tbl[l])return;const key=tag+l;if(!D2_STORE[key]){D2_STORE[key]={};Object.keys(H).forEach(k=>D2_STORE[key][k]=tbl[l][k]);}
   Object.keys(H).forEach(k=>{const v=home?H[k]:D2_STORE[key][k];if(v===undefined)delete tbl[l][k];else tbl[l][k]=v;});});}
 const _render7=render;render=function(){d2Swap(J,D2_HOME_J,'J');if(typeof FS!=='undefined')d2Swap(FS,D2_HOME_FS,'F');_render7();};
+/* v0.19.7 opt-in learning: when the user allows it, Jugnu keeps anonymous examples of its own mistakes
+   (corrections and edited drafts) so the models can be retrained later. Names and numbers are removed,
+   children are never included, nothing is sent without permission. */
+const LQ_KEY='jugnu_learnq';
+const LT={roman:{ask:'Jugnu ko behtar banane mein madad karenge? Jab aap meri ghalti theek karte hain, wo misaal gumnaam tareeqe se bheji jayegi (naam aur number hata kar). Bachon ka data kabhi nahi.',yes:'Haan, madad karunga',no:'Nahi',thx:'Shukriya! Aap ki madad se Jugnu behtar hoga.',set:'Jugnu ko behtar banane mein madad',note:'Sirf ghaltiyon ki durusti, naam aur number hata kar. Bachon ka data kabhi nahi.'},
+ ur:{ask:'جگنو کو بہتر بنانے میں مدد کریں گے؟ جب آپ میری غلطی ٹھیک کرتے ہیں، وہ مثال گمنام طریقے سے بھیجی جائے گی (نام اور نمبر ہٹا کر)۔ بچوں کا ڈیٹا کبھی نہیں۔',yes:'ہاں، مدد کروں گا',no:'نہیں',thx:'شکریہ! آپ کی مدد سے جگنو بہتر ہوگا۔',set:'جگنو کو بہتر بنانے میں مدد',note:'صرف غلطیوں کی درستی، نام اور نمبر ہٹا کر۔ بچوں کا ڈیٹا کبھی نہیں۔'},
+ ps:{ask:'جګنو په ښه کولو کې مرسته کوئ؟ کله چې زما تېروتنه سموئ، هغه بېلګه به بې نومه ولېږل شي (نوم او شمېره لرې). د ماشومانو معلومات هېڅکله نه.',yes:'هو، مرسته کوم',no:'نه',thx:'مننه! ستاسو په مرسته به جګنو ښه شي.',set:'د جګنو په ښه کولو کې مرسته',note:'یوازې د تېروتنو سمون، نوم او شمېره لرې. د ماشومانو معلومات هېڅکله نه.'},
+ en:{ask:'Will you help make Jugnu better? When you correct my mistakes, that example is sent anonymously (names and numbers removed). Children\'s data never.',yes:'Yes, I\'ll help',no:'No',thx:'Thank you! Your help will make Jugnu better.',set:'Help make Jugnu better',note:'Only corrections, with names and numbers removed. Children\'s data never.'}};
+function lt(k){const l=D.lang||'roman';return (LT[l]&&LT[l][k])||LT.roman[k];}
+function lRedact(s){s=String(s||'');const ns=new Set();(D.customers||[]).forEach(c=>{[c.name,c.ar,c.lat].concat(c.alias||[]).filter(Boolean).forEach(n=>{ns.add(n);words(n).forEach(w=>{if(w.length>=3)ns.add(w);});});});
+  [...ns].sort((a,b)=>b.length-a.length).forEach(n=>{const e=n.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');s=s.replace(new RegExp(e,'gi'),'[NAME]');});
+  return s.replace(/(\+?\d[\d\s-]{8,}\d)/g,'[PHONE]').replace(/PK\d{2}[A-Z0-9]{8,}/gi,'[IBAN]').slice(0,600);}
+function lOK(){return !!(D&&D.shop&&D.learn&&!isStudent()&&!D.shop.studentOnly);}
+function lPush(kind,sample){if(!lOK())return;try{const q=JSON.parse(localStorage.getItem(LQ_KEY)||'[]');q.push({kind,lang:D.lang,mode:isHome()?'home':'shop',app_version:'0.19.7',sample});localStorage.setItem(LQ_KEY,JSON.stringify(q.slice(-200)));}catch(e){}lFlush();}
+let lBusy=false;
+async function lFlush(){if(lBusy||!lOK()||navigator.onLine===false)return;let q;try{q=JSON.parse(localStorage.getItem(LQ_KEY)||'[]');}catch(e){q=[];}if(!q.length)return;lBusy=true;
+  try{const r=await sbFetch(SB_URL+'/rest/v1/learn_samples',{method:'POST',headers:{apikey:SB_KEY,'content-type':'application/json',Prefer:'return=minimal'},body:JSON.stringify(q.slice(0,50))},15000);
+    if(r.ok){const rest=q.slice(50);localStorage.setItem(LQ_KEY,JSON.stringify(rest));}}catch(e){}finally{lBusy=false;}}
+function lAskOnce(){if(!D.shop||D.learn!==undefined||D.learnAsked||isStudent())return;D.learnAsked=true;save();
+  setTimeout(()=>jPush({who:'ai',text:lt('ask'),btns:[{act:'learnYes',id:'',label:lt('yes')},{act:'learnNo',id:'',label:lt('no')}],l:D.lang}),900);}
+/* corrections through chat ("galat hai", "wasooli nahi udhaar") */
+const _doFixL=doFix;doFix=function(id){const f=FIXES[id];try{if(f){const t=f.t||{};const said=[...(S.chat||[])].reverse().find(m=>m.who==='me');
+  const ch=Object.assign({},(f.plan&&f.plan.changes)||{});if(ch.name)ch.name='[NAME]';if(ch.person)ch.person='[NAME]';
+  lPush('fix',{intent:f.plan&&f.plan.intent,changes:ch,said:lRedact(said&&said.text),orig:lRedact(t.kind==='draft'?(t.d&&t.d.raw):''),before:t.kind==='draft'?{type:t.d.type,amount:t.d.amount}:null});
+  lAskOnce();}}catch(e){}return _doFixL(id);};
+/* a Jugnu draft that the user changed in the form before saving */
+const _commitL=commitEntry;commitEntry=function(d){try{const dr=S.draft&&S.draft.fromJugnu&&S.drafts&&S.drafts[S.draft.fromJugnu];
+  if(dr&&(dr.type!==d.type||+dr.amount!==+d.amount||norm(dr.name||'')!==norm(d.name||''))){lPush('edit',{orig:lRedact(dr.raw),before:{type:dr.type,amount:dr.amount},after:{type:d.type,amount:d.amount},nameChanged:norm(dr.name||'')!==norm(d.name||'')});lAskOnce();}}catch(e){}return _commitL(d);};
+document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('[data-act="learnYes"],[data-act="learnNo"],[data-act="togLearn"]');if(!b)return;e.preventDefault();e.stopImmediatePropagation();
+  const a=b.dataset.act;if(a==='togLearn'){D.learn=!D.learn;save();render();if(D.learn)lFlush();return;}
+  D.learn=a==='learnYes';save();b.closest('.jbtns')&&b.closest('.jbtns').remove();if(D.learn){jPush({who:'ai',text:lt('thx'),l:D.lang});lFlush();}},true);
+const _render8=render;render=function(){_render8();if(S.screen!=='settings'||isStudent())return;const c=document.querySelector('[data-act="togConsent"]');const row=c&&c.closest('.tog');if(!row||document.querySelector('[data-act="togLearn"]'))return;
+  row.insertAdjacentHTML('afterend',`<div class="tog"><span>${esc(lt('set'))}<small class="note" style="display:block">${esc(lt('note'))}</small></span><button class="btn ${D.learn?'':'ghost'} sm" data-act="togLearn" aria-pressed="${!!D.learn}">${D.learn?'ON':'OFF'}</button></div>`);};
+window.addEventListener('online',()=>{try{lFlush();}catch(e){}});
 </script>
