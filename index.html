@@ -1132,7 +1132,7 @@ function settingsView(){
     <button class="btn ghost full" data-act="pasteRestore">${esc(t('bkRestoreP'))}</button></div>
    ${fbCardHTML()}
    ${voiceSettingsHTML()}
-   <div class="page stack"><h2 style="margin-top:0">${esc(t('danger'))}</h2><button class="btn danger full" data-act="wipe">${esc(t('wipe'))}</button><p class="note">Jugnu · ConceptAI · v0.19.9</p></div></div>`;
+   <div class="page stack"><h2 style="margin-top:0">${esc(t('danger'))}</h2><button class="btn danger full" data-act="wipe">${esc(t('wipe'))}</button><p class="note">Jugnu · ConceptAI · v0.20.0</p></div></div>`;
 }
 function pilotView(){
   const now=Date.now(),wk=7*86400000;
@@ -3000,7 +3000,7 @@ function lRedact(s){s=String(s||'');const ns=new Set();(D.customers||[]).forEach
   [...ns].sort((a,b)=>b.length-a.length).forEach(n=>{const e=n.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');s=s.replace(new RegExp(e,'gi'),'[NAME]');});
   return s.replace(/(\+?\d[\d\s-]{8,}\d)/g,'[PHONE]').replace(/PK\d{2}[A-Z0-9]{8,}/gi,'[IBAN]').slice(0,600);}
 function lOK(){return !!(D&&D.shop&&D.learn&&!isStudent()&&!D.shop.studentOnly);}
-function lPush(kind,sample){if(!lOK())return;try{const q=JSON.parse(localStorage.getItem(LQ_KEY)||'[]');q.push({kind,lang:D.lang,mode:isHome()?'home':'shop',app_version:'0.19.9',sample});localStorage.setItem(LQ_KEY,JSON.stringify(q.slice(-200)));}catch(e){}lFlush();}
+function lPush(kind,sample){if(!lOK())return;try{const q=JSON.parse(localStorage.getItem(LQ_KEY)||'[]');q.push({kind,lang:D.lang,mode:isHome()?'home':'shop',app_version:'0.20.0',sample});localStorage.setItem(LQ_KEY,JSON.stringify(q.slice(-200)));}catch(e){}lFlush();}
 let lBusy=false;
 async function lFlush(){if(lBusy||!lOK()||navigator.onLine===false)return;let q;try{q=JSON.parse(localStorage.getItem(LQ_KEY)||'[]');}catch(e){q=[];}if(!q.length)return;lBusy=true;
   try{const r=await sbFetch(SB_URL+'/rest/v1/learn_samples',{method:'POST',headers:{apikey:SB_KEY,'content-type':'application/json',Prefer:'return=minimal'},body:JSON.stringify(q.slice(0,50))},15000);
@@ -3080,5 +3080,37 @@ const _cleanE9=cleanEntries;cleanEntries=function(r,l){const out=_cleanE9(r,l);f
   if(D2_LAT.test(e.said)&&D2_LAT.test(e.name)&&norm(e.said)!==norm(e.name)){const a=d2Tok(e.said),b=d2Tok(e.name);const share=a.some(w=>b.some(v=>d2Near(w,v)));
     if(!share||(!a.length&&!b.length)){e.name=cap(e.said.toLowerCase().replace(/\b\w/g,c=>c.toUpperCase()));}}}
   return out;};
+
+/* v0.20.0 Voice like WhatsApp: the user's message shows as a voice bubble, not a typed transcript.
+   Jugnu just answers what it understood (cards already say "Main ne ye samjha"), and asks again when unclear. */
+const VT={roman:{vn:'Voice message',unclear:'Maaf kijiye, theek se sun nahi saka. Thora qareeb ho kar, aaram se dobara bolein ya likh dein.'},
+ ur:{vn:'وائس میسج',unclear:'معاف کیجیے، ٹھیک سے سن نہیں سکا۔ تھوڑا قریب ہو کر، آرام سے دوبارہ بولیں یا لکھ دیں۔'},
+ ps:{vn:'غږیز پیغام',unclear:'بښنه غواړم، ښه مې وانه ورېدل. لږ نږدې شئ، ورو بیا ووایاست یا یې ولیکئ.'},
+ en:{vn:'Voice message',unclear:'Sorry, I could not hear that clearly. Come a little closer and say it again slowly, or type it.'}};
+function vt(k,l){l=l||D.lang;return (VT[l]&&VT[l][k])||VT.roman[k];}
+let d2RecT0=0,d2Hide=null;
+document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('button[data-rec]');if(b&&!REC)d2RecT0=Date.now();},true);
+function d2Mute(m){if(d2Hide&&m&&m.who==='me'&&typeof m.text==='string'&&m.text.trim()===d2Hide.tx){d2Hide.hit++;return true;}return false;}
+const _jPush20=jPush;jPush=function(m){if(d2Mute(m))return;return _jPush20.apply(this,arguments);};
+const _uPush20=uPush;uPush=function(m){if(d2Mute(m))return;return _uPush20.apply(this,arguments);};
+handleVoice=async function(blob){
+  const l=D.lang;const stu=isStudent();const push=stu?uPush:jPush;
+  if(!AI_URL||navigator.onLine===false){if(!(l==='ps'&&psLocalOn())){push({who:'ai',text:jt('vNet',l),l});return;}}
+  const secs=d2RecT0?Math.max(1,Math.round((Date.now()-d2RecT0)/1000)):0;d2RecT0=0;
+  const bub={who:'me',text:'🎤 '+vt('vn',l)+(secs?'  '+Math.floor(secs/60)+':'+String(secs%60).padStart(2,'0'):''),voice:1,l};
+  push(bub);jState('listening');
+  let tx=null;try{tx=await transcribe(blob,l);}catch(e){tx=null;}
+  tx=tx?tx.replace(/(\d),(?=\d{3}\b)/g,'$1').replace(/₹\s?/g,'Rs ').trim():'';
+  const letters=(tx.match(/[\p{L}\p{N}]/gu)||[]).length;
+  if(!tx||letters<2||/^(\W|thank you\.?|thanks for watching\.?|you)$/i.test(tx)){push({who:'ai',text:vt('unclear',l),l});jState('sad');setTimeout(()=>{if(!jBusy)jState('idle');},2500);return;}
+  try{const ch=stu?uChat():S.chat;const last=[...ch].reverse().find(m=>m.voice);if(last){last.tx=tx.slice(0,500);save();}}catch(e){}
+  d2Hide={tx,hit:0};
+  try{if(stu)await uSend(tx);else await jSendShared(tx,l);}finally{setTimeout(()=>{d2Hide=null;},50);}
+};
+
+/* v0.20.0 "Send" instead of "Next/Aage" on chat and quick-entry buttons, and the keyboard's enter key says Send. */
+Object.assign(T.roman,{go:'Send'});Object.assign(T.en,{go:'Send'});Object.assign(T.ur,{go:'بھیجیں'});Object.assign(T.ps,{go:'ولېږئ'});
+const _render20=render;render=function(){_render20();try{document.querySelectorAll('#jIn,#quick').forEach(i=>{if(!i.hasAttribute('enterkeyhint')||i.getAttribute('enterkeyhint')!=='send')i.setAttribute('enterkeyhint','send');});
+  document.querySelectorAll('.d2go').forEach(b=>b.setAttribute('aria-label',t('go')));}catch(e){}};
 
 </script>
