@@ -513,6 +513,7 @@ body.d2.night{background:#EFEAE2}
 .d2cats{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
 .d2cats button{border:1px solid var(--line);background:#FFFFFF;color:var(--ink);border-radius:999px;padding:6px 12px;min-height:40px;font:inherit;font-size:14px;cursor:pointer}
 .d2cats button[aria-pressed="true"]{background:var(--mTint);border-color:var(--cover2);color:var(--cover);font-weight:700}
+
 </style>
 
 <div class="wrap">
@@ -1131,7 +1132,7 @@ function settingsView(){
     <button class="btn ghost full" data-act="pasteRestore">${esc(t('bkRestoreP'))}</button></div>
    ${fbCardHTML()}
    ${voiceSettingsHTML()}
-   <div class="page stack"><h2 style="margin-top:0">${esc(t('danger'))}</h2><button class="btn danger full" data-act="wipe">${esc(t('wipe'))}</button><p class="note">Jugnu · ConceptAI · v0.19.7</p></div></div>`;
+   <div class="page stack"><h2 style="margin-top:0">${esc(t('danger'))}</h2><button class="btn danger full" data-act="wipe">${esc(t('wipe'))}</button><p class="note">Jugnu · ConceptAI · v0.19.8</p></div></div>`;
 }
 function pilotView(){
   const now=Date.now(),wk=7*86400000;
@@ -2833,6 +2834,7 @@ const _loadDemo=loadDemo;loadDemo=function(){const r=_loadDemo.apply(this,argume
 
 render();
 acctBoot();
+
 /* ===== v0.19 Design 2: chat first, colour per mode (Dukaan orange, Parhai blue, Ghar WhatsApp green),
    Jugnu on a black button in the bottom middle, 6 moods shown with the eyes only. Design 1 is git tag design-1. */
 const D2T={
@@ -2998,7 +3000,7 @@ function lRedact(s){s=String(s||'');const ns=new Set();(D.customers||[]).forEach
   [...ns].sort((a,b)=>b.length-a.length).forEach(n=>{const e=n.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');s=s.replace(new RegExp(e,'gi'),'[NAME]');});
   return s.replace(/(\+?\d[\d\s-]{8,}\d)/g,'[PHONE]').replace(/PK\d{2}[A-Z0-9]{8,}/gi,'[IBAN]').slice(0,600);}
 function lOK(){return !!(D&&D.shop&&D.learn&&!isStudent()&&!D.shop.studentOnly);}
-function lPush(kind,sample){if(!lOK())return;try{const q=JSON.parse(localStorage.getItem(LQ_KEY)||'[]');q.push({kind,lang:D.lang,mode:isHome()?'home':'shop',app_version:'0.19.7',sample});localStorage.setItem(LQ_KEY,JSON.stringify(q.slice(-200)));}catch(e){}lFlush();}
+function lPush(kind,sample){if(!lOK())return;try{const q=JSON.parse(localStorage.getItem(LQ_KEY)||'[]');q.push({kind,lang:D.lang,mode:isHome()?'home':'shop',app_version:'0.19.8',sample});localStorage.setItem(LQ_KEY,JSON.stringify(q.slice(-200)));}catch(e){}lFlush();}
 let lBusy=false;
 async function lFlush(){if(lBusy||!lOK()||navigator.onLine===false)return;let q;try{q=JSON.parse(localStorage.getItem(LQ_KEY)||'[]');}catch(e){q=[];}if(!q.length)return;lBusy=true;
   try{const r=await sbFetch(SB_URL+'/rest/v1/learn_samples',{method:'POST',headers:{apikey:SB_KEY,'content-type':'application/json',Prefer:'return=minimal'},body:JSON.stringify(q.slice(0,50))},15000);
@@ -3019,4 +3021,53 @@ document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest
 const _render8=render;render=function(){_render8();if(S.screen!=='settings'||isStudent())return;const c=document.querySelector('[data-act="togConsent"]');const row=c&&c.closest('.tog');if(!row||document.querySelector('[data-act="togLearn"]'))return;
   row.insertAdjacentHTML('afterend',`<div class="tog"><span>${esc(lt('set'))}<small class="note" style="display:block">${esc(lt('note'))}</small></span><button class="btn ${D.learn?'':'ghost'} sm" data-act="togLearn" aria-pressed="${!!D.learn}">${D.learn?'ON':'OFF'}</button></div>`);};
 window.addEventListener('online',()=>{try{lFlush();}catch(e){}});
+
+/* v0.19.8 Document reading: PDF, Word (.docx) and text files.
+   Text is pulled out on the phone (pdf.js, mammoth), then Jugnu reads it like a bill (Munshi/Saathi) or teaches from it (Ustad).
+   A scanned PDF has no text, so its first page goes through the photo route. */
+const DT={roman:{btn:'Photo ya file (bill, PDF, Word)',open:'File khol raha hoon…',read:'File parh raha hoon…',big:'Ye file bohat bari hai (10 MB tak bhejein).',old:'Purani .doc file nahi khulti. Word mein "Save as" kar ke .docx ya PDF bhejein.',bad:'Ye file khul nahi saki. PDF, Word (.docx) ya photo bhejein.',net:'File parhne ke liye internet chahiye.',empty:'Is file mein parhne layak likhai nahi mili.',scan:'Ye scan ki hui PDF hai, pehla safha photo ki tarah parh raha hoon…',pages:'safhe',none:'Is file mein koi raqam nahi mili.',fail:'File samajh nahi aayi. Dobara koshish karein.'},
+ ur:{btn:'تصویر یا فائل (بل، PDF، ورڈ)',open:'فائل کھول رہا ہوں…',read:'فائل پڑھ رہا ہوں…',big:'یہ فائل بہت بڑی ہے (10 MB تک بھیجیں)۔',old:'پرانی .doc فائل نہیں کھلتی۔ ورڈ میں "Save as" کر کے .docx یا PDF بھیجیں۔',bad:'یہ فائل کھل نہیں سکی۔ PDF، ورڈ (.docx) یا تصویر بھیجیں۔',net:'فائل پڑھنے کے لیے انٹرنیٹ چاہیے۔',empty:'اس فائل میں پڑھنے کے قابل لکھائی نہیں ملی۔',scan:'یہ سکین شدہ PDF ہے، پہلا صفحہ تصویر کی طرح پڑھ رہا ہوں…',pages:'صفحے',none:'اس فائل میں کوئی رقم نہیں ملی۔',fail:'فائل سمجھ نہیں آئی۔ دوبارہ کوشش کریں۔'},
+ ps:{btn:'عکس یا فایل (بل، PDF، ورډ)',open:'فایل خلاصوم…',read:'فایل لولم…',big:'دا فایل ډېر لوی دی (تر 10 MB پورې ولېږئ).',old:'زړه .doc فایل نه خلاصېږي. په ورډ کې "Save as" وکړئ او .docx یا PDF ولېږئ.',bad:'دا فایل خلاص نه شو. PDF، ورډ (.docx) یا عکس ولېږئ.',net:'د فایل لوستلو لپاره انټرنېټ پکار دی.',empty:'په دې فایل کې د لوستلو وړ لیک ونه موندل شو.',scan:'دا سکین شوې PDF ده، لومړی مخ د عکس په څېر لولم…',pages:'مخونه',none:'په دې فایل کې هېڅ رقم ونه موندل شو.',fail:'فایل پوه نه شو. بیا هڅه وکړئ.'},
+ en:{btn:'Photo or file (bill, PDF, Word)',open:'Opening the file…',read:'Reading the file…',big:'This file is too big (send up to 10 MB).',old:'Old .doc files cannot be opened. In Word use "Save as" .docx or PDF.',bad:'Could not open this file. Send a PDF, Word (.docx) or a photo.',net:'Reading a file needs internet.',empty:'No readable text found in this file.',scan:'This is a scanned PDF, reading the first page like a photo…',pages:'pages',none:'No amounts found in this file.',fail:'Could not understand the file. Try again.'}};
+function dt(k,l){l=l||D.lang;return (DT[l]&&DT[l][k])||DT.roman[k];}
+['roman','ur','ps','en'].forEach(l=>{if(J[l])J[l].phBtn=DT[l].btn;});
+const D2_LIBS={};function d2Load(src){if(!D2_LIBS[src])D2_LIBS[src]=new Promise((ok,no)=>{const s=document.createElement('script');s.src=src;s.async=true;s.onload=ok;s.onerror=()=>{delete D2_LIBS[src];no(new Error('load'));};document.head.appendChild(s);});return D2_LIBS[src];}
+const PDFJS='https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/';
+async function d2PdfLib(){await d2Load(PDFJS+'pdf.min.js');const p=window.pdfjsLib;p.GlobalWorkerOptions.workerSrc=PDFJS+'pdf.worker.min.js';return p;}
+async function d2ReadDoc(file){const n=String(file.name||'').toLowerCase();const ty=String(file.type||'');
+  if(/\.pdf$/.test(n)||ty==='application/pdf'){const lib=await d2PdfLib();const pdf=await lib.getDocument({data:new Uint8Array(await file.arrayBuffer())}).promise;const max=Math.min(pdf.numPages,15);let out='';
+    for(let i=1;i<=max;i++){const pg=await pdf.getPage(i);const tc=await pg.getTextContent();let line='',lastY=null;for(const it of tc.items){const y=it.transform?Math.round(it.transform[5]):null;if(lastY!==null&&y!==null&&Math.abs(y-lastY)>3){out+=line.trim()+'\n';line='';}line+=it.str+' ';lastY=y;}out+=line.trim()+'\n\n';}
+    let first=null;if(out.replace(/\s/g,'').length<40){const pg=await pdf.getPage(1);const vp0=pg.getViewport({scale:1});const k=Math.min(2.5,1600/Math.max(vp0.width,vp0.height));const vp=pg.getViewport({scale:k});const c=document.createElement('canvas');c.width=Math.round(vp.width);c.height=Math.round(vp.height);const g=c.getContext('2d');g.fillStyle='#fff';g.fillRect(0,0,c.width,c.height);await pg.render({canvasContext:g,viewport:vp}).promise;first=await new Promise(ok=>c.toBlob(ok,'image/jpeg',0.85));}
+    return{kind:'pdf',text:out.trim(),pages:pdf.numPages,scan:first};}
+  if(/\.docx$/.test(n)||/wordprocessingml/.test(ty)){await d2Load('https://cdn.jsdelivr.net/npm/mammoth@1.6.0/mammoth.browser.min.js');const r=await window.mammoth.extractRawText({arrayBuffer:await file.arrayBuffer()});return{kind:'docx',text:String(r.value||'').trim()};}
+  if(/\.doc$/.test(n)||ty==='application/msword')return{kind:'old'};
+  if(/\.(txt|csv)$/.test(n)||/^text\//.test(ty))return{kind:'txt',text:String(await file.text()).trim()};
+  return{kind:'bad'};}
+async function d2AIJ(prompt){let r=null;try{r=await aiJSON(prompt,'@cf/openai/gpt-oss-120b');}catch(e){r=null;}if(!r){try{r=await aiJSON(prompt);}catch(e){r=null;}}return r;}
+async function docFlow(file){const l=D.lang;const stu=isStudent();const push=stu?uPush:jPush;
+  if(jBusy)return;if(!online()||!AI_URL){push({who:'ai',text:dt('net',l),l});return;}
+  if(file.size>10*1024*1024){push({who:'ai',text:dt('big',l),l});return;}
+  const nm=String(file.name||'file').slice(0,60);
+  push({who:'me',text:'📄 '+nm,l});push({who:'ai',text:dt('open',l),l});jState('thinking');jBusy=true;
+  let doc;try{doc=await d2ReadDoc(file);}catch(e){doc={kind:'bad'};}
+  if(doc.kind==='old'||doc.kind==='bad'){jBusy=false;jState('idle');push({who:'ai',text:dt(doc.kind,l),l});return;}
+  if(doc.scan){jBusy=false;push({who:'ai',text:dt('scan',l),l});return _photoFlow8(new File([doc.scan],'page1.jpg',{type:'image/jpeg'}));}
+  if(!doc.text||doc.text.replace(/\s/g,'').length<10){jBusy=false;jState('idle');push({who:'ai',text:dt('empty',l),l});return;}
+  const txt=doc.text.slice(0,9000);
+  try{
+    if(stu){const p=activeP();const qa=aiQuota();if(D.plan!=='family'&&qa.n>=STU_CAP){push({who:'ai',text:fill(ft('cap',l),{c:STU_CAP}),l});return;}
+      const prompt=`You are Ustad Jugnu, a kind tutor for a Pakistani school student named ${p.name}. ${sylPrompt(p)}\nThe student sent a document (${doc.kind}${doc.pages?', '+doc.pages+' pages':''}). Its text is below between <<< and >>>.\nDecide what it is: notes or a chapter, a question paper or worksheet, or something else.\n- Notes or chapter: explain the main points in simple words (at most 6 short points), with one everyday Pakistani example, then ask 2 short questions to check understanding.\n- Question paper or worksheet: list how many questions and the topics, solve the first question step by step as an example, and ask the student to try the next one.\n- Not about studies: say so kindly in one line.\nReply ONLY in ${LNAME[l]}. Never invent facts that are not in the document or the syllabus. No emojis. No dashes.\nReply with only JSON: {"kind":"notes|paper|other","title":"short title","reply":"your teaching"}\n<<<\n${txt}\n>>>`;
+      const r=await d2AIJ(prompt);if(!r||!r.reply){push({who:'ai',text:dt('fail',l),l});return;}
+      qa.n++;p.lastQ=String(r.title||nm).slice(0,120);save();push({who:'ai',text:(r.title?'“'+String(r.title).slice(0,120)+'”\n':'')+String(r.reply).slice(0,1800),l});jState('happy');return;}
+    const accts=D.customers.filter(c=>c.type!=='expense'&&c.type!=='sales').slice(0,80).map(c=>`${c.name} (${c.type})`).join(', ')||'(none)';
+    const prompt=PHOTO_PROMPT.replace('Look at the photo. It may be','Read the document text below (from a '+doc.kind+' file). It may be').split('{{ACCTS}}').join(accts).split('{{LANG}}').join(STORY_LANG[l]||'Roman Urdu').split('the photo').join('the document')+'\nDocument text:\n<<<\n'+txt+'\n>>>';
+    const r=await d2AIJ(prompt);if(!r){push({who:'ai',text:dt('fail',l),l});return;}
+    const entries=cleanEntries(r,l);
+    if(!entries.length){push({who:'ai',text:(r.summary?String(r.summary).slice(0,300)+'\n':'')+dt('none',l),l});return;}
+    storyCards({entries,summary:String(r.summary||'').slice(0,300)},'[file] '+String(r.summary||''),l);
+  }finally{jBusy=false;setTimeout(()=>{if(!jBusy)jState('idle');},800);}}
+const _photoFlow8=photoFlow;
+photoFlow=function(file){if(file&&/^image\//.test(String(file.type||''))&&!/\.(pdf|docx?|txt|csv)$/i.test(String(file.name||'')))return _photoFlow8(file);return docFlow(file);};
+photoBtnHTML=function(){return `<button type="button" class="vbtn pbtn2" data-act="jPhoto" title="${esc(jt('phBtn'))}" aria-label="${esc(jt('phBtn'))}"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5l-8.6 8.6a5 5 0 0 1-7.1-7.1l8.6-8.6a3.4 3.4 0 0 1 4.8 4.8l-8.6 8.6a1.7 1.7 0 0 1-2.4-2.4l7.9-7.9"/></svg></button><input type="file" accept="image/*,.pdf,application/pdf,.docx,application/vnd.openxmlformats-officedocument.wordprocessingml.document,.doc,.txt,text/plain" hidden id="jPhotoIn">`;};
+
 </script>
