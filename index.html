@@ -1150,7 +1150,7 @@ function settingsView(){
     <button class="btn ghost full" data-act="pasteRestore">${esc(t('bkRestoreP'))}</button></div>
    ${fbCardHTML()}
    ${voiceSettingsHTML()}
-   <div class="page stack"><h2 style="margin-top:0">${esc(t('danger'))}</h2><button class="btn danger full" data-act="wipe">${esc(t('wipe'))}</button><p class="note">Jugnu · ConceptAI · v0.21.0</p></div></div>`;
+   <div class="page stack"><h2 style="margin-top:0">${esc(t('danger'))}</h2><button class="btn danger full" data-act="wipe">${esc(t('wipe'))}</button><p class="note">Jugnu · ConceptAI · v0.21.1</p></div></div>`;
 }
 function pilotView(){
   const now=Date.now(),wk=7*86400000;
@@ -3018,7 +3018,7 @@ function lRedact(s){s=String(s||'');const ns=new Set();(D.customers||[]).forEach
   [...ns].sort((a,b)=>b.length-a.length).forEach(n=>{const e=n.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');s=s.replace(new RegExp(e,'gi'),'[NAME]');});
   return s.replace(/(\+?\d[\d\s-]{8,}\d)/g,'[PHONE]').replace(/PK\d{2}[A-Z0-9]{8,}/gi,'[IBAN]').slice(0,600);}
 function lOK(){return !!(D&&D.shop&&D.learn&&!isStudent()&&!D.shop.studentOnly);}
-function lPush(kind,sample){if(!lOK())return;try{const q=JSON.parse(localStorage.getItem(LQ_KEY)||'[]');q.push({kind,lang:D.lang,mode:isHome()?'home':'shop',app_version:'0.21.0',sample});localStorage.setItem(LQ_KEY,JSON.stringify(q.slice(-200)));}catch(e){}lFlush();}
+function lPush(kind,sample){if(!lOK())return;try{const q=JSON.parse(localStorage.getItem(LQ_KEY)||'[]');q.push({kind,lang:D.lang,mode:isHome()?'home':'shop',app_version:'0.21.1',sample});localStorage.setItem(LQ_KEY,JSON.stringify(q.slice(-200)));}catch(e){}lFlush();}
 let lBusy=false;
 async function lFlush(){if(lBusy||!lOK()||navigator.onLine===false)return;let q;try{q=JSON.parse(localStorage.getItem(LQ_KEY)||'[]');}catch(e){q=[];}if(!q.length)return;lBusy=true;
   try{const r=await sbFetch(SB_URL+'/rest/v1/learn_samples',{method:'POST',headers:{apikey:SB_KEY,'content-type':'application/json',Prefer:'return=minimal'},body:JSON.stringify(q.slice(0,50))},15000);
@@ -3319,5 +3319,21 @@ document.addEventListener('click',async e=>{const b=e.target.closest&&e.target.c
 window.addEventListener('online',()=>{try{kidPush();}catch(e){}});
 document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden'){try{kidPush();}catch(e){}}});
 setTimeout(()=>{try{kidPush();}catch(e){}},4000);
+
+/* v0.21.1 Signup: make clear the Parhai card is for children/students. Student accounts get a way out (logout, start over). */
+Object.assign(FD.roman,{stuT:'Bachon / students ki parhai',stuD:'AI Ustad: har class ka sawal, test aur paper ki tayyari. Bachay ke apne phone ke liye.'});
+Object.assign(FD.ur,{stuT:'بچوں / طلبہ کی پڑھائی',stuD:'اے آئی استاد: ہر جماعت کا سوال، ٹیسٹ اور پرچے کی تیاری۔ بچے کے اپنے فون کے لیے۔'});
+Object.assign(FD.ps,{stuT:'د ماشومانو / زده کوونکو زده کړه',stuD:'AI استاد: د هر ټولګي پوښتنه، ازموینه او د پرچې تیاري. د ماشوم د خپل تلیفون لپاره.'});
+Object.assign(FD.en,{stuT:'Study for children / students',stuD:'AI Ustad: questions for any class, tests and exam prep. For the child\'s own phone.'});
+const RT={roman:{t:'Yeh account',restart:'Shuru se karein (Dukaan / Ghar chunein)',q:'Is phone se yeh Parhai account hata kar shuru se karein? Is phone par Ustad ki parhai ka record mit jayega.'},
+ ur:{t:'یہ اکاؤنٹ',restart:'شروع سے کریں (دکان / گھر چنیں)',q:'اس فون سے یہ پڑھائی اکاؤنٹ ہٹا کر شروع سے کریں؟ اس فون پر استاد کی پڑھائی کا ریکارڈ مٹ جائے گا۔'},
+ ps:{t:'دا اکاونټ',restart:'له سره پیل کړئ (دوکان / کور وټاکئ)',q:'دا د زده کړې اکاونټ له دې تلیفون لرې کړئ او له سره پیل کړئ؟ د استاد ریکارډ به پاک شي.'},
+ en:{t:'This account',restart:'Start over (choose Shop / Home)',q:'Remove this study account from this phone and start over? The Ustad study record on this phone will be erased.'}};
+function rt(k){return (RT[D.lang]&&RT[D.lang][k])||RT.roman[k];}
+const _render211=render;render=function(){_render211();try{if(S.screen==='progress'&&D.shop&&D.shop.studentOnly&&!document.querySelector('.d2out')){const a=accGet();const app=$('app');if(!app)return;
+  app.insertAdjacentHTML('beforeend',`<div class="page stack d2out"><h2 style="margin-top:0">${esc(rt('t'))}</h2>${a?`<p class="note num">+${esc(a.phone)}</p><button class="btn ghost full" data-act="accOut">${esc(at('logout'))}</button>`:''}<button class="btn danger full" data-act="d2Restart">${esc(rt('restart'))}</button></div>`);}}catch(e){}};
+document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('[data-act="d2Restart"]');if(!b)return;e.preventDefault();e.stopImmediatePropagation();
+  if(!confirmSafe(rt('q')))return;const lang=D.lang;try{accSet(null);}catch(x){}try{localStorage.removeItem(KEY);}catch(x){}D=Object.assign(blank(),{lang});save();S.startMode=null;S.chat=[];S.screen='jugnu';render();},true);
+const _render212=render;render=function(){_render212();try{const s=document.querySelector('.fcard[data-act="fdStu"]'),h=document.querySelector('.fcard[data-act="fdHome"]');if(s&&h&&h.nextElementSibling!==s&&s.nextElementSibling===h)h.after(s);}catch(e){}};
 
 </script>
