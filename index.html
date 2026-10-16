@@ -1150,7 +1150,7 @@ function settingsView(){
     <button class="btn ghost full" data-act="pasteRestore">${esc(t('bkRestoreP'))}</button></div>
    ${fbCardHTML()}
    ${voiceSettingsHTML()}
-   <div class="page stack"><h2 style="margin-top:0">${esc(t('danger'))}</h2><button class="btn danger full" data-act="wipe">${esc(t('wipe'))}</button><p class="note">Jugnu · ConceptAI · v0.21.4</p></div></div>`;
+   <div class="page stack"><h2 style="margin-top:0">${esc(t('danger'))}</h2><button class="btn danger full" data-act="wipe">${esc(t('wipe'))}</button><p class="note">Jugnu · ConceptAI · v0.21.5</p></div></div>`;
 }
 function pilotView(){
   const now=Date.now(),wk=7*86400000;
@@ -3018,7 +3018,7 @@ function lRedact(s){s=String(s||'');const ns=new Set();(D.customers||[]).forEach
   [...ns].sort((a,b)=>b.length-a.length).forEach(n=>{const e=n.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');s=s.replace(new RegExp(e,'gi'),'[NAME]');});
   return s.replace(/(\+?\d[\d\s-]{8,}\d)/g,'[PHONE]').replace(/PK\d{2}[A-Z0-9]{8,}/gi,'[IBAN]').slice(0,600);}
 function lOK(){return !!(D&&D.shop&&D.learn&&!isStudent()&&!D.shop.studentOnly);}
-function lPush(kind,sample){if(!lOK())return;try{const q=JSON.parse(localStorage.getItem(LQ_KEY)||'[]');q.push({kind,lang:D.lang,mode:isHome()?'home':'shop',app_version:'0.21.4',sample});localStorage.setItem(LQ_KEY,JSON.stringify(q.slice(-200)));}catch(e){}lFlush();}
+function lPush(kind,sample){if(!lOK())return;try{const q=JSON.parse(localStorage.getItem(LQ_KEY)||'[]');q.push({kind,lang:D.lang,mode:isHome()?'home':'shop',app_version:'0.21.5',sample});localStorage.setItem(LQ_KEY,JSON.stringify(q.slice(-200)));}catch(e){}lFlush();}
 let lBusy=false;
 async function lFlush(){if(lBusy||!lOK()||navigator.onLine===false)return;let q;try{q=JSON.parse(localStorage.getItem(LQ_KEY)||'[]');}catch(e){q=[];}if(!q.length)return;lBusy=true;
   try{const r=await sbFetch(SB_URL+'/rest/v1/learn_samples',{method:'POST',headers:{apikey:SB_KEY,'content-type':'application/json',Prefer:'return=minimal'},body:JSON.stringify(q.slice(0,50))},15000);
@@ -3366,5 +3366,25 @@ const _addr215=d2Address;d2Address=function(t,l){t=_addr215(t,l);if(typeof t!=='
 let d2HadShop=!!(D&&D.shop);
 const _render215=render;render=function(){_render215();try{document.querySelectorAll('[data-act="demo"]').forEach(e=>e.remove());
   const has=!!D.shop;if(has&&!d2HadShop&&!D.shop.studentOnly&&!D.shop.demo&&!D.alt&&!accGet()&&online()&&!inViewer()){setTimeout(()=>{try{if(!accGet()&&!$('modalHost').innerHTML)acctModal('new');}catch(e){}},500);}d2HadShop=has;}catch(e){}};
+
+/* v0.21.5 Phone signup asks ONLY mobile number + PIN. Name, city, type and shop come from the setup already done. No "Student" type: children never make accounts. */
+const _acctModal215=acctModal;acctModal=function(mode){const m=mode||'new';if(m==='new'&&D.shop&&D.shop.studentOnly){try{closeModal();}catch(e){}return;}
+  const r=_acctModal215.apply(this,arguments);try{const host=$('modalHost');if(!host)return r;
+    host.querySelectorAll('.acc-lang').forEach(e=>e.remove());
+    const ty=$('aTy');if(ty){ty.querySelectorAll('option[value="student"]').forEach(o=>o.remove());ty.value=D.shop?(D.shop.kind==='home'?'family':'shop'):'shop';}
+    const s=D.shop||{};const set=(id,v)=>{const el=$(id);if(el&&!el.value)el.value=v||'';};
+    set('aNm',s.owner||(s.kind==='home'?s.name:''));set('aCt',s.city);if(s.kind!=='home')set('aSh',s.name);
+    ['aNm','aSh'].forEach(id=>{const el=$(id);if(el){const box=el.closest('div');if(box)box.hidden=true;}});
+    const g=ty&&ty.closest('.grid2');if(g)g.hidden=true;else{const c=$('aCt');if(c&&c.closest('div'))c.closest('div').hidden=true;}
+  }catch(e){}return r;};
+/* v0.21.5b force-hide the extra signup fields; children join ONLY with a parent's code (no self signup) */
+const _acctModal216=acctModal;acctModal=function(mode){const r=_acctModal216.apply(this,arguments);try{['aNm','aSh','aCt','aTy'].forEach(id=>{const el=$(id);if(!el)return;const g=el.closest('.grid2')||el.closest('div');if(g)g.style.display='none';});}catch(e){}return r;};
+Object.assign(FD.roman,{stuT:'Bachon ki parhai (parent ke code se)',stuD:'Bachay ka AI Ustad. Ammi/Abbu apne Jugnu account se code banayenge, bachay ke phone par woh code likhein.'});
+Object.assign(FD.ur,{stuT:'بچوں کی پڑھائی (والدین کے کوڈ سے)',stuD:'بچے کا اے آئی استاد۔ امی/ابو اپنے جگنو اکاؤنٹ سے کوڈ بنائیں گے، بچے کے فون پر وہ کوڈ لکھیں۔'});
+Object.assign(FD.ps,{stuT:'د ماشومانو زده کړه (د مور او پلار په کوډ)',stuD:'د ماشوم AI استاد. مور/پلار به د خپل جګنو اکاونټ نه کوډ جوړ کړي، د ماشوم په تلیفون کې یې ولیکئ.'});
+Object.assign(FD.en,{stuT:'Children\'s study (with a parent\'s code)',stuD:'The child\'s AI Ustad. A parent makes a code from their Jugnu account; type it on the child\'s phone.'});
+const KJ={roman:{h:'Ammi/Abbu ka code likhein',n:'Code ammi/abbu ke Jugnu se milta hai: Settings → Bachay → "+ Bachay ka account banayein".'},ur:{h:'امی/ابو کا کوڈ لکھیں',n:'کوڈ امی/ابو کے جگنو سے ملتا ہے: Settings ← بچے ← "+ بچے کا اکاؤنٹ بنائیں"۔'},ps:{h:'د مور/پلار کوډ ولیکئ',n:'کوډ د مور/پلار له جګنو څخه ترلاسه کېږي: Settings ← ماشومان ← "+ د ماشوم اکاونټ جوړ کړئ".'},en:{h:'Enter your parent\'s code',n:'A parent gets the code in their Jugnu: Settings → Children → "+ Create a child account".'}};
+const _render217=render;render=function(){_render217();try{if(!D.shop&&S.startMode==='stu'){const f=$('fdStuForm');if(f){f.style.display='none';const pg=f.closest('.page');const h=pg&&pg.querySelector('h1');const l=D.lang||'roman';if(h)h.textContent='📚 '+(KJ[l]||KJ.roman).h;
+  if(pg&&!pg.querySelector('.d2kjn'))h.insertAdjacentHTML('afterend',`<p class="note d2kjn" dir="auto">${esc((KJ[l]||KJ.roman).n)}</p>`);const j=document.querySelector('.d2join');if(j&&pg&&j.previousElementSibling!==pg){pg.after(j);}if(j){j.style.marginTop='0';}}}}catch(e){}};
 
 </script>
