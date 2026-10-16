@@ -1150,7 +1150,7 @@ function settingsView(){
     <button class="btn ghost full" data-act="pasteRestore">${esc(t('bkRestoreP'))}</button></div>
    ${fbCardHTML()}
    ${voiceSettingsHTML()}
-   <div class="page stack"><h2 style="margin-top:0">${esc(t('danger'))}</h2><button class="btn danger full" data-act="wipe">${esc(t('wipe'))}</button><p class="note">Jugnu · ConceptAI · v0.21.2</p></div></div>`;
+   <div class="page stack"><h2 style="margin-top:0">${esc(t('danger'))}</h2><button class="btn danger full" data-act="wipe">${esc(t('wipe'))}</button><p class="note">Jugnu · ConceptAI · v0.21.3</p></div></div>`;
 }
 function pilotView(){
   const now=Date.now(),wk=7*86400000;
@@ -3018,7 +3018,7 @@ function lRedact(s){s=String(s||'');const ns=new Set();(D.customers||[]).forEach
   [...ns].sort((a,b)=>b.length-a.length).forEach(n=>{const e=n.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');s=s.replace(new RegExp(e,'gi'),'[NAME]');});
   return s.replace(/(\+?\d[\d\s-]{8,}\d)/g,'[PHONE]').replace(/PK\d{2}[A-Z0-9]{8,}/gi,'[IBAN]').slice(0,600);}
 function lOK(){return !!(D&&D.shop&&D.learn&&!isStudent()&&!D.shop.studentOnly);}
-function lPush(kind,sample){if(!lOK())return;try{const q=JSON.parse(localStorage.getItem(LQ_KEY)||'[]');q.push({kind,lang:D.lang,mode:isHome()?'home':'shop',app_version:'0.21.2',sample});localStorage.setItem(LQ_KEY,JSON.stringify(q.slice(-200)));}catch(e){}lFlush();}
+function lPush(kind,sample){if(!lOK())return;try{const q=JSON.parse(localStorage.getItem(LQ_KEY)||'[]');q.push({kind,lang:D.lang,mode:isHome()?'home':'shop',app_version:'0.21.3',sample});localStorage.setItem(LQ_KEY,JSON.stringify(q.slice(-200)));}catch(e){}lFlush();}
 let lBusy=false;
 async function lFlush(){if(lBusy||!lOK()||navigator.onLine===false)return;let q;try{q=JSON.parse(localStorage.getItem(LQ_KEY)||'[]');}catch(e){q=[];}if(!q.length)return;lBusy=true;
   try{const r=await sbFetch(SB_URL+'/rest/v1/learn_samples',{method:'POST',headers:{apikey:SB_KEY,'content-type':'application/json',Prefer:'return=minimal'},body:JSON.stringify(q.slice(0,50))},15000);
@@ -3351,5 +3351,15 @@ const _render213=render;render=function(){_render213();try{if(S.screen==='settin
 document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('[data-act="d2Honor"]');if(!b)return;e.preventDefault();e.stopImmediatePropagation();D.honor=b.dataset.id;save();try{markDirty();}catch(x){}render();},true);
 if(Array.isArray(SP_PK)&&!SP_PK.includes('honor'))SP_PK.push('honor');
 const _msgHTML213=msgHTML;msgHTML=function(m){if(m&&m.who==='ai'&&typeof m.text==='string'){const t2=d2Address(m.text,m.l);if(t2!==m.text)m=Object.assign({},m,{text:t2});}return _msgHTML213.call(this,m);};
+
+/* v0.21.3 Ask at signup how Jugnu should address the user (Sahab / Sahiba / ji) */
+const HQ={roman:'Jugnu aap ko kaise bulaye?',ur:'جگنو آپ کو کیسے بلائے؟',ps:'جګنو تاسو ته څنګه ووایي؟',en:'How should Jugnu address you?'};
+function honorPickHTML(){const l=D.lang||'roman';const cur=D.honor||'sahab';
+  return `<div class="d2hq"><label>${esc(HQ[l]||HQ.roman)}</label><div class="seg" role="radiogroup">${['sahab','sahiba','ji'].map(k=>`<button type="button" data-act="d2HonorPick" data-id="${k}" aria-pressed="${cur===k}">${esc(HN[k][l])}</button>`).join('')}</div></div>`;}
+const _render214=render;render=function(){_render214();try{['fdHomeForm','setupForm'].forEach(id=>{const f=$(id);if(f&&!f.querySelector('.d2hq')&&!(D.shop&&D.shop.studentOnly)){const sb=f.querySelector('button[type=submit]');if(sb)sb.insertAdjacentHTML('beforebegin',honorPickHTML());}});}catch(e){}};
+document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('[data-act="d2HonorPick"]');if(!b)return;e.preventDefault();e.stopImmediatePropagation();D.honor=b.dataset.id;
+  b.parentNode.querySelectorAll('button').forEach(x=>x.setAttribute('aria-pressed',String(x===b)));},true);
+const _addr215=d2Address;d2Address=function(t,l){t=_addr215(t,l);if(typeof t!=='string'||!D.shop||D.shop.studentOnly||!d2First())return t;const h=d2Honor(l);if(t.includes(h))return t;
+  return t.replace(/^(Assalam o alaikum|Assalam-o-Alaikum|السلام علیکم|Hello|Hi)!/i,'$1 '+h+'!');};
 
 </script>
