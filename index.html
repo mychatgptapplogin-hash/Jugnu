@@ -1145,7 +1145,7 @@ function settingsView(){
     <button class="btn ghost full" data-act="pasteRestore">${esc(t('bkRestoreP'))}</button></div>
    ${fbCardHTML()}
    ${voiceSettingsHTML()}
-   <div class="page stack"><h2 style="margin-top:0">${esc(t('danger'))}</h2><button class="btn danger full" data-act="wipe">${esc(t('wipe'))}</button><p class="note">Jugnu · ConceptAI · v0.20.2</p></div></div>`;
+   <div class="page stack"><h2 style="margin-top:0">${esc(t('danger'))}</h2><button class="btn danger full" data-act="wipe">${esc(t('wipe'))}</button><p class="note">Jugnu · ConceptAI · v0.20.3</p></div></div>`;
 }
 function pilotView(){
   const now=Date.now(),wk=7*86400000;
@@ -3013,7 +3013,7 @@ function lRedact(s){s=String(s||'');const ns=new Set();(D.customers||[]).forEach
   [...ns].sort((a,b)=>b.length-a.length).forEach(n=>{const e=n.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');s=s.replace(new RegExp(e,'gi'),'[NAME]');});
   return s.replace(/(\+?\d[\d\s-]{8,}\d)/g,'[PHONE]').replace(/PK\d{2}[A-Z0-9]{8,}/gi,'[IBAN]').slice(0,600);}
 function lOK(){return !!(D&&D.shop&&D.learn&&!isStudent()&&!D.shop.studentOnly);}
-function lPush(kind,sample){if(!lOK())return;try{const q=JSON.parse(localStorage.getItem(LQ_KEY)||'[]');q.push({kind,lang:D.lang,mode:isHome()?'home':'shop',app_version:'0.20.2',sample});localStorage.setItem(LQ_KEY,JSON.stringify(q.slice(-200)));}catch(e){}lFlush();}
+function lPush(kind,sample){if(!lOK())return;try{const q=JSON.parse(localStorage.getItem(LQ_KEY)||'[]');q.push({kind,lang:D.lang,mode:isHome()?'home':'shop',app_version:'0.20.3',sample});localStorage.setItem(LQ_KEY,JSON.stringify(q.slice(-200)));}catch(e){}lFlush();}
 let lBusy=false;
 async function lFlush(){if(lBusy||!lOK()||navigator.onLine===false)return;let q;try{q=JSON.parse(localStorage.getItem(LQ_KEY)||'[]');}catch(e){q=[];}if(!q.length)return;lBusy=true;
   try{const r=await sbFetch(SB_URL+'/rest/v1/learn_samples',{method:'POST',headers:{apikey:SB_KEY,'content-type':'application/json',Prefer:'return=minimal'},body:JSON.stringify(q.slice(0,50))},15000);
@@ -3195,5 +3195,12 @@ const _render22=render;render=function(){if(d2NoUstad()&&S.screen==='ustad'){S.s
   const nav=document.querySelector('#tabHost .tabs');const u=nav&&nav.querySelector('.utab');if(u&&!(D.shop&&D.shop.studentOnly)){u.remove();nav.style.setProperty('grid-template-columns','repeat(4,minmax(0,1fr))','important');}};
 const _go22=go;go=function(s,o){if(s==='ustad'&&D.shop&&!D.shop.studentOnly)s='jugnu';return _go22(s,o);};
 try{if(d2NoUstad()){S.screen='jugnu';render();}}catch(e){}
+/* v0.20.3 no switching between Munshi/Saathi and Ustad anywhere: the profile list shows only this app's own people */
+modeSwitchHTML=function(){return '';};
+goUstad=function(){};
+const _profM23=profilesModal;profilesModal=function(){_profM23();const so=!!(D.shop&&D.shop.studentOnly);const host=document.getElementById('modalHost');if(!host)return;
+  host.querySelectorAll('[data-act="pickProf"]').forEach(b=>{const p=(D.profiles||[]).find(x=>x.id===b.dataset.id);if(p&&(so?p.type!=='student':p.type==='student'))b.closest('.prow').remove();});
+  host.querySelectorAll('[data-act="linkStu"],[data-act="setPin"]').forEach(e=>e.remove());if(!so)host.querySelectorAll('[data-act="addStu"],.note').forEach(e=>{if(!e.closest('.pacc'))e.remove();});};
+document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('[data-act="pickProf"]');if(!b)return;const p=(D.profiles||[]).find(x=>x.id===b.dataset.id);const so=!!(D.shop&&D.shop.studentOnly);if(p&&(so?p.type!=='student':p.type==='student')){e.preventDefault();e.stopImmediatePropagation();}},true);
 
 </script>
