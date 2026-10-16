@@ -513,6 +513,19 @@ body.d2.night{background:#EFEAE2}
 .d2cats{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
 .d2cats button{border:1px solid var(--line);background:#FFFFFF;color:var(--ink);border-radius:999px;padding:6px 12px;min-height:40px;font:inherit;font-size:14px;cursor:pointer}
 .d2cats button[aria-pressed="true"]{background:var(--mTint);border-color:var(--cover2);color:var(--cover);font-weight:700}
+/* v0.20.1 voice bubble */
+body.d2 .jmsg.d2vn{display:inline-flex;align-items:center;gap:8px;min-width:120px;padding:10px 14px}
+body.d2 .d2vn .vstar{width:20px;height:20px;fill:#10131A;animation:d2tw 1.4s ease-in-out infinite;flex:none}
+body.d2 .d2vn .vb{display:inline-flex;align-items:center;gap:3px;height:22px}
+body.d2 .d2vn .vb i{display:block;width:3px;border-radius:2px;background:#10131A;height:6px}
+body.d2 .d2vn.busy .vb i{animation:d2bar 1s ease-in-out infinite}
+body.d2 .d2vn .vb i:nth-child(2){animation-delay:.12s;height:12px}body.d2 .d2vn .vb i:nth-child(3){animation-delay:.24s;height:18px}body.d2 .d2vn .vb i:nth-child(4){animation-delay:.36s;height:10px}body.d2 .d2vn .vb i:nth-child(5){animation-delay:.48s;height:16px}body.d2 .d2vn .vb i:nth-child(6){animation-delay:.6s;height:8px}body.d2 .d2vn .vb i:nth-child(7){animation-delay:.72s;height:13px}
+body.d2 .d2vn.done .vb i{opacity:.75}
+body.d2 .d2vn .vt{font-size:14px;font-weight:700;color:#10131A;background:linear-gradient(90deg,#10131A 30%,#5B6670 50%,#10131A 70%);background-size:200% 100%;-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;animation:d2sh 1.6s linear infinite}
+@keyframes d2tw{0%,100%{transform:scale(.8) rotate(0);opacity:.7}50%{transform:scale(1.15) rotate(45deg);opacity:1}}
+@keyframes d2bar{0%,100%{transform:scaleY(.4)}50%{transform:scaleY(1.3)}}
+@keyframes d2sh{0%{background-position:100% 0}100%{background-position:-100% 0}}
+@media (prefers-reduced-motion:reduce){body.d2 .d2vn *{animation:none!important}}
 
 </style>
 
@@ -1132,7 +1145,7 @@ function settingsView(){
     <button class="btn ghost full" data-act="pasteRestore">${esc(t('bkRestoreP'))}</button></div>
    ${fbCardHTML()}
    ${voiceSettingsHTML()}
-   <div class="page stack"><h2 style="margin-top:0">${esc(t('danger'))}</h2><button class="btn danger full" data-act="wipe">${esc(t('wipe'))}</button><p class="note">Jugnu · ConceptAI · v0.20.0</p></div></div>`;
+   <div class="page stack"><h2 style="margin-top:0">${esc(t('danger'))}</h2><button class="btn danger full" data-act="wipe">${esc(t('wipe'))}</button><p class="note">Jugnu · ConceptAI · v0.20.1</p></div></div>`;
 }
 function pilotView(){
   const now=Date.now(),wk=7*86400000;
@@ -1664,7 +1677,7 @@ async function examMark(ans){const p=activeP(),l=detectLang(ans)||D.lang;const E
 Subject: ${SUBJ[E.sub]?SUBJ[E.sub].en:E.sub}. The questions were:
 ${E.qs.map((x,i)=>`Q${i+1} (${x.m} marks): ${x.q}`).join('\n')}
 Student's answer (it may say which question, like "Q2"; if not, choose the question it answers): """${ans.slice(0,2500)}"""
-Mark it the way the board marking scheme would: key points, correct terms, steps for numericals. Be encouraging but honest.
+Mark it the way the board marking scheme would: key points, correct terms, steps for numericals. Be honest first and kind second. Use praise words (shabash, well done, good, zabardast) only when the answer earns at least 60 percent of the marks; for a weak or wrong answer, start with what is missing or wrong, kindly, with no praise.
 Write "feedback" and "model" in ${LNAME[l]}; technical terms may stay as in the textbook. Feedback: at most 3 short lines on what was good and what was missing. Model: a short ideal answer. No dashes.
 Reply with only JSON: {"q":2,"marks":1,"out_of":2,"feedback":"","model":""}`;
   const r=await exAI(prompt);jBusy=false;
@@ -2047,7 +2060,7 @@ Rules:
 - This is a conversation, not a lookup. Read the recent chat and first react to what the student just said, like a real, caring teacher (for example: "Achha, chalo isay aur aasaan tareeqe se dekhte hain"). Never sound robotic or repeat yourself word for word.
 - If the student says they did not understand: explain again more simply, in a different way, with a new everyday Pakistani example (bazaar, cricket, roti, rickshaw).
 - If the student says your answer is wrong: re-check it carefully step by step. If you were wrong, say so honestly in one line and give the correct answer. If you were right, kindly show why, without making them feel bad.
-- If the student gives their own answer, check it: praise what is right and gently fix what is wrong.
+- If the student gives their own answer, first decide honestly if it is fully correct, partly correct or wrong. Only if it is fully correct may you praise (Shabash, well done). If it is partly correct, say exactly which part is right and which part is wrong. If it is wrong, say clearly in the first line that it is not correct (for example: Ye jawab sahi nahi), kindly, without any praise words like shabash, bohat khoob, zabardast, good or well done, then give the right answer and why.
 - Teach, do not just hand over answers: explain step by step in simple words, give one small example, and for homework give a hint first and ask the student to try.
 - When you teach a concept, end with one short question to check understanding.
 - Keep it short: at most 6 short lines. No emojis. No dashes.
@@ -3000,7 +3013,7 @@ function lRedact(s){s=String(s||'');const ns=new Set();(D.customers||[]).forEach
   [...ns].sort((a,b)=>b.length-a.length).forEach(n=>{const e=n.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');s=s.replace(new RegExp(e,'gi'),'[NAME]');});
   return s.replace(/(\+?\d[\d\s-]{8,}\d)/g,'[PHONE]').replace(/PK\d{2}[A-Z0-9]{8,}/gi,'[IBAN]').slice(0,600);}
 function lOK(){return !!(D&&D.shop&&D.learn&&!isStudent()&&!D.shop.studentOnly);}
-function lPush(kind,sample){if(!lOK())return;try{const q=JSON.parse(localStorage.getItem(LQ_KEY)||'[]');q.push({kind,lang:D.lang,mode:isHome()?'home':'shop',app_version:'0.20.0',sample});localStorage.setItem(LQ_KEY,JSON.stringify(q.slice(-200)));}catch(e){}lFlush();}
+function lPush(kind,sample){if(!lOK())return;try{const q=JSON.parse(localStorage.getItem(LQ_KEY)||'[]');q.push({kind,lang:D.lang,mode:isHome()?'home':'shop',app_version:'0.20.1',sample});localStorage.setItem(LQ_KEY,JSON.stringify(q.slice(-200)));}catch(e){}lFlush();}
 let lBusy=false;
 async function lFlush(){if(lBusy||!lOK()||navigator.onLine===false)return;let q;try{q=JSON.parse(localStorage.getItem(LQ_KEY)||'[]');}catch(e){q=[];}if(!q.length)return;lBusy=true;
   try{const r=await sbFetch(SB_URL+'/rest/v1/learn_samples',{method:'POST',headers:{apikey:SB_KEY,'content-type':'application/json',Prefer:'return=minimal'},body:JSON.stringify(q.slice(0,50))},15000);
@@ -3112,5 +3125,63 @@ handleVoice=async function(blob){
 Object.assign(T.roman,{go:'Send'});Object.assign(T.en,{go:'Send'});Object.assign(T.ur,{go:'بھیجیں'});Object.assign(T.ps,{go:'ولېږئ'});
 const _render20=render;render=function(){_render20();try{document.querySelectorAll('#jIn,#quick').forEach(i=>{if(!i.hasAttribute('enterkeyhint')||i.getAttribute('enterkeyhint')!=='send')i.setAttribute('enterkeyhint','send');});
   document.querySelectorAll('.d2go').forEach(b=>b.setAttribute('aria-label',t('go')));}catch(e){}};
+
+/* v0.20.1 (a) Voice bubble: no mic, no time. While Jugnu works it shows a twinkling star and moving sound bars; after, a small still waveform. */
+Object.assign(VT.roman,{proc:'Jugnu sun raha hai'});Object.assign(VT.ur,{proc:'جگنو سن رہا ہے'});Object.assign(VT.ps,{proc:'جګنو اوري'});Object.assign(VT.en,{proc:'Jugnu is listening'});
+function d2VoiceHTML(m){const l=m.l||D.lang;const bars='<span class="vb"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span>';
+  const star='<svg class="vstar" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 1.5c.6 4.9 2.6 7.9 9 10.5-6.4 2.6-8.4 5.6-9 10.5-.6-4.9-2.6-7.9-9-10.5 6.4-2.6 8.4-5.6 9-10.5z"/></svg>';
+  return `<div class="jmsg jme d2vn ${m.vdone?'done':'busy'}" dir="${RTL(l)?'rtl':'ltr'}" aria-label="${esc(vt('vn',l))}">${m.vdone?bars:star+bars+'<span class="vt">'+esc(vt('proc',l))+'</span>'}</div>`;}
+const _msgHTML21=msgHTML;msgHTML=function(m){return m&&m.voice?d2VoiceHTML(m):_msgHTML21.apply(this,arguments);};
+const _uMsgHTML21=uMsgHTML;uMsgHTML=function(m){return m&&m.voice?d2VoiceHTML(m):_uMsgHTML21.apply(this,arguments);};
+const _handleVoice21=handleVoice;handleVoice=async function(blob){d2RecT0=0;try{await _handleVoice21(blob);}finally{try{const ch=isStudent()?uChat():S.chat;ch.forEach(m=>{if(m.voice&&!m.vdone)m.vdone=1;});save();isStudent()?renderU():renderChat();}catch(e){}}};
+
+/* v0.20.1 (b) AI Saathi chips: home questions with home answers, never shop ones. Chip cache resets when the mode changes. */
+const HC={roman:{month:'Is mahine ka hisaab',top:'Kharcha kahan zyada hua?',lene:'Kis ne mujhe paise dene hain?',dene:'Main ne kis ko dene hain?',bills:'Is mahine ke bill',save:'Bachat ka mashwara do',com:'Committee ka haal',
+   aMonth:'Is mahine: aamdani Rs {i}, kharcha Rs {e}. {r}',aSave:'Bachat Rs {n}. Shabash!',aOver:'Kharcha aamdani se Rs {n} zyada hai.',aNoInc:'Aamdani abhi likhi nahi gayi.',aTop:'Is mahine sab se zyada kharcha:\n{l}',aNone:'Is mahine abhi koi kharcha nahi likha.',
+   aLene:'In logon ne aap ko dene hain:\n{l}',aLeneNo:'Abhi kisi ne aap ko paise nahi dene.',aDene:'Aap ne in ko dene hain:\n{l}',aDeneNo:'Aap ne kisi ko kuch nahi dena.',aBills:'Is mahine ke bill: Rs {n}\n{l}',aBillsNo:'Is mahine abhi koi bill nahi likha. Likhein: "bijli ka bill 4500".',
+   dont:'Ji, samajh nahi aaya. Aise likhwaiye: "bijli ka bill 4500" ya "Ahmed ko 2000 udhaar diye", ya poochiye: "is mahine ka kharcha".',quickPh:'Likhein: doodh 300, bijli ka bill 4500'},
+ ur:{month:'اس مہینے کا حساب',top:'خرچہ کہاں زیادہ ہوا؟',lene:'کس نے مجھے پیسے دینے ہیں؟',dene:'میں نے کس کو دینے ہیں؟',bills:'اس مہینے کے بل',save:'بچت کا مشورہ دو',com:'کمیٹی کا حال',
+   aMonth:'اس مہینے: آمدنی Rs {i}، خرچہ Rs {e}۔ {r}',aSave:'بچت Rs {n}۔ شاباش!',aOver:'خرچہ آمدنی سے Rs {n} زیادہ ہے۔',aNoInc:'آمدنی ابھی لکھی نہیں گئی۔',aTop:'اس مہینے سب سے زیادہ خرچہ:\n{l}',aNone:'اس مہینے ابھی کوئی خرچہ نہیں لکھا۔',
+   aLene:'ان لوگوں نے آپ کو دینے ہیں:\n{l}',aLeneNo:'ابھی کسی نے آپ کو پیسے نہیں دینے۔',aDene:'آپ نے ان کو دینے ہیں:\n{l}',aDeneNo:'آپ نے کسی کو کچھ نہیں دینا۔',aBills:'اس مہینے کے بل: Rs {n}\n{l}',aBillsNo:'اس مہینے ابھی کوئی بل نہیں لکھا۔ لکھیں: "بجلی کا بل 4500"۔',
+   dont:'جی، سمجھ نہیں آیا۔ ایسے لکھوائیے: "بجلی کا بل 4500" یا "احمد کو 2000 ادھار دیے"، یا پوچھیے: "اس مہینے کا خرچہ"۔',quickPh:'لکھیں: دودھ 300، بجلی کا بل 4500'},
+ ps:{month:'د دې میاشتې حساب',top:'لګښت چېرته زیات شو؟',lene:'چا ما ته پیسې راکول دي؟',dene:'ما چا ته ورکول دي؟',bills:'د دې میاشتې بلونه',save:'د سپما مشوره راکړه',com:'د کمېټۍ حال',
+   aMonth:'دا میاشت: عاید Rs {i}، لګښت Rs {e}. {r}',aSave:'سپما Rs {n}. شاباس!',aOver:'لګښت له عاید څخه Rs {n} زیات دی.',aNoInc:'عاید لا نه دی لیکل شوی.',aTop:'دا میاشت تر ټولو زیات لګښت:\n{l}',aNone:'دا میاشت لا هېڅ لګښت نه دی لیکل شوی.',
+   aLene:'دوی تاسو ته پیسې درکول دي:\n{l}',aLeneNo:'اوس څوک تاسو ته پیسې نه درکوي.',aDene:'تاسو دوی ته ورکول دي:\n{l}',aDeneNo:'تاسو چا ته څه نه ورکوئ.',aBills:'د دې میاشتې بلونه: Rs {n}\n{l}',aBillsNo:'دا میاشت لا هېڅ بل نه دی لیکل شوی. ولیکئ: "د برېښنا بل 4500".',
+   dont:'بښنه، پوه نشوم. داسې ولیکئ: "د برېښنا بل 4500" یا "احمد ته 2000 پور ورکړل"، یا وپوښتئ: "د دې میاشتې لګښت".',quickPh:'ولیکئ: شیدې 300، د برېښنا بل 4500'},
+ en:{month:'This month\'s summary',top:'Where did I spend most?',lene:'Who owes me money?',dene:'Whom do I owe?',bills:'This month\'s bills',save:'Give me a saving tip',com:'Committee status',
+   aMonth:'This month: income Rs {i}, spending Rs {e}. {r}',aSave:'Saved Rs {n}. Well done!',aOver:'Spending is Rs {n} more than income.',aNoInc:'No income written yet.',aTop:'Most spending this month:\n{l}',aNone:'No spending written this month yet.',
+   aLene:'These people owe you:\n{l}',aLeneNo:'Nobody owes you money right now.',aDene:'You owe:\n{l}',aDeneNo:'You do not owe anyone.',aBills:'Bills this month: Rs {n}\n{l}',aBillsNo:'No bills written this month yet. Write: "electricity bill 4500".',
+   dont:'Sorry, I did not get that. Say it like: "electricity bill 4500" or "gave Ahmed 2000", or ask: "this month\'s spending".',quickPh:'Write: milk 300, electricity bill 4500'}};
+function hc(k,l){l=l||D.lang;return (HC[l]&&HC[l][k])||HC.roman[k];}
+const D2_ORIG_HX={};
+const HC_PH={roman:'Likhein ya bolein: doodh 300, bijli ka bill 4500',ur:'لکھیں یا بولیں: دودھ 300، بجلی کا بل 4500',ps:'ولیکئ یا ووایاست: شیدې 300، د برېښنا بل 4500',en:'Type or say: milk 300, electricity bill 4500'};
+function d2HomeExtra(){const home=isHome();['roman','ur','ps','en'].forEach(l=>{if(J[l]){if(!('p'+l in D2_ORIG_HX))D2_ORIG_HX['p'+l]=J[l].ph;J[l].ph=home?HC_PH[l]:D2_ORIG_HX['p'+l];}if(J[l]){if(!('j'+l in D2_ORIG_HX))D2_ORIG_HX['j'+l]=J[l].dont;J[l].dont=home?hc('dont',l):D2_ORIG_HX['j'+l];}
+  if(T[l]){if(!('t'+l in D2_ORIG_HX))D2_ORIG_HX['t'+l]=T[l].quickPh;T[l].quickPh=home?hc('quickPh',l):D2_ORIG_HX['t'+l];}});}
+function d2Mon(){return todayISO().slice(0,7);}
+function d2HomeAnswer(k,l){const mon=d2Mon();const me=D.entries.filter(e=>String(e.date||'').slice(0,7)===mon);const C=id=>cust(id)||{};
+  const line=(n,a)=>'• '+n+': Rs '+num(Math.abs(a));
+  if(k==='month'){const e=me.filter(x=>x.type==='expense').reduce((s,x)=>s+x.amount,0),i=me.filter(x=>x.type==='sale').reduce((s,x)=>s+x.amount,0);
+    const r=!i?hc('aNoInc',l):(i>=e?fill(hc('aSave',l),{n:num(i-e)}):fill(hc('aOver',l),{n:num(e-i)}));return{text:fill(hc('aMonth',l),{i:num(i),e:num(e),r}),mood:i&&e>i?'sad':(i>e?'happy':null)};}
+  if(k==='top'||k==='bills'){const g={};me.filter(x=>x.type==='expense').forEach(x=>{const n=C(x.cid).name||'?';if(k==='bills'&&!/bill|bijli|gas|paani|pani|water|internet|mobile|bil|بل|بجلی|گیس|برېښنا/i.test(n+' '+(x.note||'')))return;g[n]=(g[n]||0)+x.amount;});
+    const L=Object.entries(g).sort((a,b)=>b[1]-a[1]);if(!L.length)return{text:hc(k==='top'?'aNone':'aBillsNo',l)};
+    const tot=L.reduce((s,x)=>s+x[1],0);return{text:k==='top'?fill(hc('aTop',l),{l:L.slice(0,4).map(x=>line(x[0],x[1])).join('\n')}):fill(hc('aBills',l),{n:num(tot),l:L.map(x=>line(x[0],x[1])).join('\n')})};}
+  if(k==='lene'||k==='dene'){const P=D.customers.filter(c=>c.type!=='expense'&&c.type!=='sales').map(c=>({c,b:balance(c.id)})).filter(x=>k==='lene'?x.b>0:x.b<0).sort((a,b)=>Math.abs(b.b)-Math.abs(a.b));
+    if(!P.length)return{text:hc(k==='lene'?'aLeneNo':'aDeneNo',l)};return{text:fill(hc(k==='lene'?'aLene':'aDene',l),{l:P.slice(0,5).map(x=>line(nameFor(x.c,l),x.b)).join('\n')})};}
+  return null;}
+const _jChips21=jugnuChipList;jugnuChipList=function(){if(!isHome())return _jChips21();const l=D.lang;const d=new Date().getDate();
+  const L=[{k:'month',b:d>=25?2.2:1.4},{k:'top',b:1.3},{k:'lene',b:1},{k:'dene',b:.9},{k:'bills',b:d<=10?1.8:.8}];if(aiOn())L.push({k:'save',b:1.1});if((D.committees||[]).length)L.push({k:'com',b:1});
+  return L.map(x=>({k:'h_'+x.k,c:'h_'+x.k,b:x.b,t:hc(x.k,l),q:hc(x.k,l),act:x.k==='save'||x.k==='com'?'jAsk':'d2hAsk'}));};
+let d2ChipMode='';
+const _smart21=smartChipsHTML;smartChipsHTML=function(kind){const m=isStudent()?'u':(isHome()?'h':'s');if(m!==d2ChipMode){d2ChipMode=m;try{CHIP_CACHE={};}catch(e){}}return _smart21(kind);};
+document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('[data-act="d2hAsk"]');if(!b)return;e.preventDefault();e.stopImmediatePropagation();
+  const k=String(b.dataset.k||'').replace(/^h_/,'');const l=D.lang;const a=d2HomeAnswer(k,l);if(!a){jSend(b.dataset.q);return;}
+  jPush({who:'me',text:b.dataset.q,l});jPush({who:'ai',text:a.text,l,mood:a.mood||'happy'});},true);
+const _render21=render;render=function(){d2HomeExtra();_render21();};
+
+/* v0.20.1 (c) Honest feedback: never open a correction with praise. If an Ustad reply says the answer is wrong, a leading "Shabash / Well done / Good" is removed. */
+const D2_PRAISE=/^\s*((shabash|shaabash|bohat khoob|bohot khoob|bahut khoob|zabardast|wah|waah|kamaal|well done|good job|great job|great|good|excellent|very good|nice|achha kiya|bilkul sahi|شاباش|بہت خوب|زبردست|واہ|کمال|شاباس|ډېر ښه)[\s!.,،۔]*)+([^\n.!۔]*?(koshish|try|attempt|کوشش|هڅه)[^\n.!۔]*[.!۔]\s*)?/i;
+const D2_WRONG=/(sahi nahi|sahih nahi|theek nahi|ghalat|galat|durust nahi|not correct|incorrect|wrong|not right|sahi jawab (ye|yeh|hai)|correct answer is|right answer is|صحیح نہیں|درست نہیں|غلط|ٹھیک نہیں|صحیح جواب|سم نه دی|غلط دی|سم ځواب)/i;
+function d2Honest(t){t=String(t||'');if(!D2_WRONG.test(t)||!D2_PRAISE.test(t))return t;let s=t.replace(D2_PRAISE,'');s=s.replace(/^[^\s!,.،۔]{1,20}[!,،]\s*/,'').replace(/^(lekin|magar|par|but|however|لیکن|مگر|خو)[\s,،]+/i,'');return s.length>8?s.charAt(0).toUpperCase()+s.slice(1):t;}
+const _uPush22=uPush;uPush=function(m){if(m&&m.who==='ai'&&typeof m.text==='string'&&!m.quiz&&!m.mcq&&!(m.text.startsWith(et('right'))||m.text.startsWith(ft('qRight',m.l||D.lang)))){m.text=d2Honest(m.text);if(D2_WRONG.test(m.text)&&!m.mood)m.mood='idle';}return _uPush22.apply(this,arguments);};
 
 </script>
