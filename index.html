@@ -526,6 +526,11 @@ body.d2 .d2vn .vt{font-size:14px;font-weight:700;color:#10131A;background:linear
 @keyframes d2bar{0%,100%{transform:scaleY(.4)}50%{transform:scaleY(1.3)}}
 @keyframes d2sh{0%{background-position:100% 0}100%{background-position:-100% 0}}
 @media (prefers-reduced-motion:reduce){body.d2 .d2vn *{animation:none!important}}
+/* v0.21 spaces toggle */
+.d2space{display:inline-flex;gap:4px;margin-top:4px;background:rgba(255,255,255,.9);border-radius:999px;padding:3px}
+.d2space button{border:none;border-radius:999px;padding:4px 10px;min-height:30px;font:inherit;font-size:13px;font-weight:700;background:transparent;color:#10131A;cursor:pointer}
+.d2space button[aria-pressed="true"]{background:#10131A;color:#FFFFFF;cursor:default}
+.d2spbtn{font-size:20px}
 
 </style>
 
@@ -1145,7 +1150,7 @@ function settingsView(){
     <button class="btn ghost full" data-act="pasteRestore">${esc(t('bkRestoreP'))}</button></div>
    ${fbCardHTML()}
    ${voiceSettingsHTML()}
-   <div class="page stack"><h2 style="margin-top:0">${esc(t('danger'))}</h2><button class="btn danger full" data-act="wipe">${esc(t('wipe'))}</button><p class="note">Jugnu · ConceptAI · v0.20.3</p></div></div>`;
+   <div class="page stack"><h2 style="margin-top:0">${esc(t('danger'))}</h2><button class="btn danger full" data-act="wipe">${esc(t('wipe'))}</button><p class="note">Jugnu · ConceptAI · v0.21.0</p></div></div>`;
 }
 function pilotView(){
   const now=Date.now(),wk=7*86400000;
@@ -3013,7 +3018,7 @@ function lRedact(s){s=String(s||'');const ns=new Set();(D.customers||[]).forEach
   [...ns].sort((a,b)=>b.length-a.length).forEach(n=>{const e=n.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');s=s.replace(new RegExp(e,'gi'),'[NAME]');});
   return s.replace(/(\+?\d[\d\s-]{8,}\d)/g,'[PHONE]').replace(/PK\d{2}[A-Z0-9]{8,}/gi,'[IBAN]').slice(0,600);}
 function lOK(){return !!(D&&D.shop&&D.learn&&!isStudent()&&!D.shop.studentOnly);}
-function lPush(kind,sample){if(!lOK())return;try{const q=JSON.parse(localStorage.getItem(LQ_KEY)||'[]');q.push({kind,lang:D.lang,mode:isHome()?'home':'shop',app_version:'0.20.3',sample});localStorage.setItem(LQ_KEY,JSON.stringify(q.slice(-200)));}catch(e){}lFlush();}
+function lPush(kind,sample){if(!lOK())return;try{const q=JSON.parse(localStorage.getItem(LQ_KEY)||'[]');q.push({kind,lang:D.lang,mode:isHome()?'home':'shop',app_version:'0.21.0',sample});localStorage.setItem(LQ_KEY,JSON.stringify(q.slice(-200)));}catch(e){}lFlush();}
 let lBusy=false;
 async function lFlush(){if(lBusy||!lOK()||navigator.onLine===false)return;let q;try{q=JSON.parse(localStorage.getItem(LQ_KEY)||'[]');}catch(e){q=[];}if(!q.length)return;lBusy=true;
   try{const r=await sbFetch(SB_URL+'/rest/v1/learn_samples',{method:'POST',headers:{apikey:SB_KEY,'content-type':'application/json',Prefer:'return=minimal'},body:JSON.stringify(q.slice(0,50))},15000);
@@ -3202,5 +3207,117 @@ const _profM23=profilesModal;profilesModal=function(){_profM23();const so=!!(D.s
   host.querySelectorAll('[data-act="pickProf"]').forEach(b=>{const p=(D.profiles||[]).find(x=>x.id===b.dataset.id);if(p&&(so?p.type!=='student':p.type==='student'))b.closest('.prow').remove();});
   host.querySelectorAll('[data-act="linkStu"],[data-act="setPin"]').forEach(e=>e.remove());if(!so)host.querySelectorAll('[data-act="addStu"],.note').forEach(e=>{if(!e.closest('.pacc'))e.remove();});};
 document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('[data-act="pickProf"]');if(!b)return;const p=(D.profiles||[]).find(x=>x.id===b.dataset.id);const so=!!(D.shop&&D.shop.studentOnly);if(p&&(so?p.type!=='student':p.type==='student')){e.preventDefault();e.stopImmediatePropagation();}},true);
+
+/* ===== v0.21.0 One person, separate spaces: Dukaan and Ghar in one account (never mixed). Kids get their own Ustad with a parent code. ===== */
+const KT={roman:{shop:'Dukaan',home:'Ghar',spT:'Aap ke hisaab',spN:'Dukaan aur ghar ka hisaab bilkul alag rehta hai, dono aik hi account mein.',addHome:'+ Ghar ka hisaab bhi rakhein',addShop:'+ Dukaan ka hisaab bhi rakhein',goHome:'🏠 Ghar ke hisaab par jayein',goShop:'🏪 Dukaan ke hisaab par jayein',
+  kT:'Bachay (AI Ustad)',kN:'Bachay ka Ustad un ke apne phone par alag chalta hai. Yahan sirf un ki parhai ki report nazar aati hai. Un ki baat cheet private rehti hai.',kNeedAcc:'Bachay jorne ke liye pehle apna account banayein (phone number se).',kAdd:'+ Bachay ka account banayein',kName:'Bachay ka naam',kCls:'Jamaat',kMake:'Code banayein',
+  kCodeT:'{n} ka code',kHow:'Bachay ke phone par Jugnu kholein → "Parhai" chunein → "Parent ka code hai?" mein ye code likhein. Code 7 din chalega aur sirf aik dafa.',kShare:'WhatsApp par bhejein',kWait:'Abhi nahi jura',kCodeL:'Code',kNew:'Naya code',kRep:'Report',kNoRep:'Abhi report nahi aayi',kDays:'Is hafte parhai: {d} din',kQuiz:'Quiz: {q}',kAsk:'Sawal pooche: {a}',kLast:'Aakhri dafa: {t}',kStrong:'Achay mazmoon',kWeak:'Mehnat chahiye',kNone:'Abhi koi quiz nahi diya',kFail:'Ho nahi saka. Internet check karein aur dobara koshish karein.',kMax:'Ziada se ziada 5 bachay.',
+  jHave:'Parent ka code hai?',jHint:'Ammi/Abbu ne jo 6 number ka code diya, woh likhein',jBtn:'Code se judein',jBad:'Code ghalat ya purana hai. Ammi/Abbu se naya code lein.',jOk:'Jur gaye! Ab Ammi/Abbu aap ki parhai ki report dekh sakenge.',jLinked:'Ammi/Abbu se jura hua ✓',jLinkT:'Ammi/Abbu se judein',kMsg:'Jugnu Ustad: {n} ka parent code {c}\n1) Jugnu kholein: {u}\n2) "Parhai" chunein\n3) "Parent ka code hai?" mein {c} likhein'},
+ ur:{shop:'دکان',home:'گھر',spT:'آپ کے حساب',spN:'دکان اور گھر کا حساب بالکل الگ رہتا ہے، دونوں ایک ہی اکاؤنٹ میں۔',addHome:'+ گھر کا حساب بھی رکھیں',addShop:'+ دکان کا حساب بھی رکھیں',goHome:'🏠 گھر کے حساب پر جائیں',goShop:'🏪 دکان کے حساب پر جائیں',
+  kT:'بچے (اے آئی استاد)',kN:'بچے کا استاد ان کے اپنے فون پر الگ چلتا ہے۔ یہاں صرف ان کی پڑھائی کی رپورٹ نظر آتی ہے۔ ان کی بات چیت پرائیویٹ رہتی ہے۔',kNeedAcc:'بچے جوڑنے کے لیے پہلے اپنا اکاؤنٹ بنائیں (فون نمبر سے)۔',kAdd:'+ بچے کا اکاؤنٹ بنائیں',kName:'بچے کا نام',kCls:'جماعت',kMake:'کوڈ بنائیں',
+  kCodeT:'{n} کا کوڈ',kHow:'بچے کے فون پر جگنو کھولیں ← "پڑھائی" چنیں ← "والدین کا کوڈ ہے؟" میں یہ کوڈ لکھیں۔ کوڈ 7 دن چلے گا اور صرف ایک دفعہ۔',kShare:'واٹس ایپ پر بھیجیں',kWait:'ابھی نہیں جڑا',kCodeL:'کوڈ',kNew:'نیا کوڈ',kRep:'رپورٹ',kNoRep:'ابھی رپورٹ نہیں آئی',kDays:'اس ہفتے پڑھائی: {d} دن',kQuiz:'کوئز: {q}',kAsk:'سوال پوچھے: {a}',kLast:'آخری دفعہ: {t}',kStrong:'اچھے مضمون',kWeak:'محنت چاہیے',kNone:'ابھی کوئی کوئز نہیں دیا',kFail:'ہو نہیں سکا۔ انٹرنیٹ چیک کریں اور دوبارہ کوشش کریں۔',kMax:'زیادہ سے زیادہ 5 بچے۔',
+  jHave:'والدین کا کوڈ ہے؟',jHint:'امی/ابو نے جو 6 نمبر کا کوڈ دیا، وہ لکھیں',jBtn:'کوڈ سے جڑیں',jBad:'کوڈ غلط یا پرانا ہے۔ امی/ابو سے نیا کوڈ لیں۔',jOk:'جڑ گئے! اب امی/ابو آپ کی پڑھائی کی رپورٹ دیکھ سکیں گے۔',jLinked:'امی/ابو سے جڑا ہوا ✓',jLinkT:'امی/ابو سے جڑیں',kMsg:'جگنو استاد: {n} کا کوڈ {c}\n1) جگنو کھولیں: {u}\n2) "پڑھائی" چنیں\n3) "والدین کا کوڈ ہے؟" میں {c} لکھیں'},
+ ps:{shop:'دوکان',home:'کور',spT:'ستاسو حسابونه',spN:'د دوکان او کور حساب بېل پاتې کېږي، دواړه په یوه اکاونټ کې.',addHome:'+ د کور حساب هم وساتئ',addShop:'+ د دوکان حساب هم وساتئ',goHome:'🏠 د کور حساب ته لاړ شئ',goShop:'🏪 د دوکان حساب ته لاړ شئ',
+  kT:'ماشومان (AI استاد)',kN:'د ماشوم استاد د هغه په خپل تلیفون جلا چلېږي. دلته یوازې د زده کړې راپور ښکاري. خبرې یې شخصي پاتې کېږي.',kNeedAcc:'د ماشوم د نښلولو لپاره لومړی خپل اکاونټ جوړ کړئ (د تلیفون شمېرې سره).',kAdd:'+ د ماشوم اکاونټ جوړ کړئ',kName:'د ماشوم نوم',kCls:'ټولګی',kMake:'کوډ جوړ کړئ',
+  kCodeT:'د {n} کوډ',kHow:'د ماشوم په تلیفون جګنو پرانیزئ ← "زده کړه" وټاکئ ← "د مور او پلار کوډ لرې؟" کې دا کوډ ولیکئ. کوډ 7 ورځې او یوازې یو ځل کار کوي.',kShare:'په واټس اپ یې ولېږئ',kWait:'لا نه دی نښلول شوی',kCodeL:'کوډ',kNew:'نوی کوډ',kRep:'راپور',kNoRep:'لا راپور نه دی راغلی',kDays:'دا اونۍ زده کړه: {d} ورځې',kQuiz:'کوئز: {q}',kAsk:'پوښتنې: {a}',kLast:'وروستی ځل: {t}',kStrong:'ښه مضمونونه',kWeak:'زیار ته اړتیا',kNone:'لا هېڅ کوئز نه دی ورکړی',kFail:'ونشو. انټرنېټ وګورئ او بیا هڅه وکړئ.',kMax:'تر ټولو زیات 5 ماشومان.',
+  jHave:'د مور او پلار کوډ لرې؟',jHint:'مور/پلار چې کوم 6 عددي کوډ درکړی، هغه ولیکه',jBtn:'په کوډ سره ونښلئ',jBad:'کوډ غلط یا زوړ دی. له مور/پلار نوی کوډ واخله.',jOk:'ونښلول شو! اوس مور/پلار ستا د زده کړې راپور لیدلی شي.',jLinked:'له مور/پلار سره نښلول شوی ✓',jLinkT:'له مور/پلار سره ونښلئ',kMsg:'جګنو استاد: د {n} کوډ {c}\n1) جګنو پرانیزئ: {u}\n2) "زده کړه" وټاکئ\n3) {c} ولیکئ'},
+ en:{shop:'Shop',home:'Home',spT:'Your accounts',spN:'Shop and home accounts stay completely separate, both in one login.',addHome:'+ Also keep home accounts',addShop:'+ Also keep shop accounts',goHome:'🏠 Go to home accounts',goShop:'🏪 Go to shop accounts',
+  kT:'Children (AI Ustad)',kN:'A child\'s Ustad runs separately on their own phone. Here you only see their study report. Their chats stay private.',kNeedAcc:'To add children, first create your account (with your phone number).',kAdd:'+ Create a child account',kName:'Child\'s name',kCls:'Class',kMake:'Make code',
+  kCodeT:'{n}\'s code',kHow:'On the child\'s phone open Jugnu → choose "Study" → type this code under "Have a parent code?". The code works for 7 days, one time only.',kShare:'Send on WhatsApp',kWait:'Not joined yet',kCodeL:'Code',kNew:'New code',kRep:'Report',kNoRep:'No report yet',kDays:'Studied this week: {d} days',kQuiz:'Quizzes: {q}',kAsk:'Questions asked: {a}',kLast:'Last active: {t}',kStrong:'Strong subjects',kWeak:'Needs work',kNone:'No quizzes yet',kFail:'Could not do that. Check internet and try again.',kMax:'Up to 5 children.',
+  jHave:'Have a parent code?',jHint:'Type the 6 digit code your parent gave you',jBtn:'Join with code',jBad:'Wrong or old code. Ask your parent for a new one.',jOk:'Joined! Your parent can now see your study report.',jLinked:'Linked to parent ✓',jLinkT:'Link to parent',kMsg:'Jugnu Ustad: {n}\'s parent code {c}\n1) Open Jugnu: {u}\n2) Choose "Study"\n3) Type {c} under "Have a parent code?"'}};
+function kt(k,l){l=l||D.lang;return (KT[l]&&KT[l][k])||KT.roman[k]||k;}
+const APP_URL='https://mychatgptapplogin-hash.github.io/Jugnu/';
+
+/* --- spaces --- */
+const SP_PK=['lang','uid','pin','plan','consent','learn','learnAsked','aiDay','kids','v'];
+function spKind(d){return d&&d.shop&&d.shop.kind==='home'?'home':'shop';}
+function spSnap(){const c=JSON.parse(JSON.stringify(D));delete c.alt;SP_PK.forEach(k=>{if(k!=='v')delete c[k];});return c;}
+function spCarry(nd){SP_PK.forEach(k=>{if(D[k]!==undefined)nd[k]=D[k];});return nd;}
+function spReset(){S.chat=[];S.screen='jugnu';S.cid=null;S.drafts={};S.startMode=null;try{CHIP_CACHE={};}catch(e){}d2ChipMode='';closeModal&&closeModal();render();}
+function spSwap(){if(!D.alt||!D.alt.shop)return;const cur=spSnap();const nd=spCarry(Object.assign(blank(),JSON.parse(JSON.stringify(D.alt))));nd.alt=cur;D=nd;save();try{markDirty();}catch(e){}spReset();}
+function spAdd(kind){if(D.alt||!D.shop||D.shop.studentOnly)return;const cur=spSnap();const nd=spCarry(blank());nd.alt=cur;D=nd;save();S.chat=[];S.screen='jugnu';try{closeModal();}catch(e){}S.startMode=kind==='home'?'home':'shop';render();}
+function spCancel(){if(D.shop||!D.alt)return false;const nd=spCarry(Object.assign(blank(),D.alt));D=nd;save();spReset();return true;}
+const _fdAction21=fdAction;fdAction=function(act){if(act==='fdBack'&&!D.shop&&D.alt&&spCancel())return true;return _fdAction21(act);};
+function spToggleHTML(){if(!D.alt||!D.shop||D.shop.studentOnly)return '';const k=spKind(D);
+  return `<div class="d2space" role="group" aria-label="${esc(kt('spT'))}"><button data-act="spSwapTo" aria-pressed="${k==='shop'}" ${k==='shop'?'disabled':''}>🏪 ${esc(kt('shop'))}</button><button data-act="spSwapTo" aria-pressed="${k==='home'}" ${k==='home'?'disabled':''}>🏠 ${esc(kt('home'))}</button></div>`;}
+
+/* --- server calls --- */
+async function sbRpc(fn,body,auth){const h={apikey:SB_KEY,'content-type':'application/json'};if(auth){const tk=await sbToken();if(!tk)throw{code:'auth'};h.Authorization='Bearer '+tk;}
+  const r=await sbFetch(SB_URL+'/rest/v1/rpc/'+fn,{method:'POST',headers:h,body:JSON.stringify(body||{})});const tx=await r.text();if(!r.ok)throw{code:'http_'+r.status,msg:tx};return tx?JSON.parse(tx):null;}
+async function kidsPull(){if(!accGet()||!online())return D.kids||[];try{const r=await sbRest('kids?select=id,name,cls,code,code_expires,joined_at,report,report_at&order=created_at');D.kids=r||[];save();}catch(e){}return D.kids||[];}
+function kRel(iso,l){if(!iso)return '';const d=Math.floor((Date.now()-Date.parse(iso))/86400000);const L={roman:['Aaj','Kal','{n} din pehle'],ur:['آج','کل','{n} دن پہلے'],ps:['نن','پرون','{n} ورځې مخکې'],en:['Today','Yesterday','{n} days ago']}[l]||['Today','Yesterday','{n} days ago'];return d<=0?L[0]:d===1?L[1]:L[2].replace('{n}',d);}
+
+/* --- parent side --- */
+function kidsSectionHTML(){if(!D.shop||D.shop.studentOnly)return '';const l=D.lang;
+  let h=`<div class="page stack d2kids"><h2 style="margin-top:0">👨‍👩‍👧 ${esc(kt('kT'))}</h2><p class="note">${esc(kt('kN'))}</p>`;
+  if(!accGet())return h+`<p class="warnbox" dir="auto">${esc(kt('kNeedAcc'))}</p><button class="btn full" data-act="accOpen">${esc(at('newA'))}</button></div>`;
+  (D.kids||[]).forEach(k=>{const rp=k.report||null;
+    const sub=k.joined_at?(rp?fill(kt('kDays'),{d:rp.days7||0})+' · '+fill(kt('kLast'),{t:kRel(k.report_at,l)}):kt('kNoRep')):(k.code?kt('kWait')+' · '+kt('kCodeL')+': '+k.code:kt('kWait'));
+    h+=`<div class="prow"><div class="pbtn" style="cursor:default"><span class="pav student">${esc((k.name||'?').charAt(0).toUpperCase())}</span><span><b dir="auto">${esc(k.name)}</b><small dir="auto">${esc(k.cls?clsLabel(k.cls,l):'')} ${esc(sub)}</small></span></div>${k.joined_at?`<button class="btn ghost sm" data-act="kidRep" data-id="${k.id}">${esc(kt('kRep'))}</button>`:''}<button class="btn ghost sm" data-act="kidCode" data-id="${k.id}">${esc(kt('kNew'))}</button></div>`;});
+  h+=(D.kids||[]).length<5?`<button class="btn full" data-act="kidAdd">${esc(kt('kAdd'))}</button>`:`<p class="note">${esc(kt('kMax'))}</p>`;
+  return h+'</div>';}
+function spacesSectionHTML(){if(!D.shop||D.shop.studentOnly)return '';const k=spKind(D);
+  const btn=D.alt?`<button class="btn full" data-act="spSwapTo">${esc(kt(k==='shop'?'goHome':'goShop'))}</button>`:`<button class="btn ghost full" data-act="${k==='shop'?'spAddHome':'spAddShop'}">${esc(kt(k==='shop'?'addHome':'addShop'))}</button>`;
+  return `<div class="page stack d2spaces"><h2 style="margin-top:0">${esc(kt('spT'))}</h2><p class="note">${esc(kt('spN'))}</p>${btn}</div>`;}
+function kidCodeModal(k,code){const l=D.lang;const msg=fill(kt('kMsg'),{n:k.name,c:code,u:APP_URL});
+  modal(`<h1 dir="auto">${esc(fill(kt('kCodeT'),{n:k.name}))}</h1><div class="linkcode num">${esc(code.slice(0,3)+' '+code.slice(3))}</div><p class="note" dir="auto">${esc(kt('kHow'))}</p>
+   <a class="btn wa full" href="https://wa.me/?text=${encodeURIComponent(msg)}" target="_blank" rel="noopener">${esc(kt('kShare'))}</a><button class="btn ghost full" data-act="closeModal">OK</button>`);}
+function kidAddModal(){const CL=['1','2','3','4','5','6','7','8','9','10','11','12','O','A'];
+  modal(`<h1 dir="auto">${esc(kt('kAdd').replace(/^\+\s*/,''))}</h1><form id="kidForm" class="stack"><div><label for="kN">${esc(kt('kName'))}</label><input id="kN" dir="auto" required maxlength="30"></div>
+   <div><label for="kC">${esc(kt('kCls'))}</label><select id="kC">${CL.map(c=>`<option value="${c}" ${c==='9'?'selected':''}>${esc(clsLabel(c,D.lang))}</option>`).join('')}</select></div>
+   <button class="btn full" type="submit">${esc(kt('kMake'))}</button><button class="btn ghost full" type="button" data-act="closeModal">${esc(t('cancel'))}</button></form>`);
+  const f=$('kidForm');f.onsubmit=async e=>{e.preventDefault();const n=cap($('kN').value);if(!n)return;const b=f.querySelector('button[type=submit]');b.disabled=true;
+    try{const r=await sbRpc('kid_create',{p_name:n,p_cls:$('kC').value},true);const row=Array.isArray(r)?r[0]:r;await kidsPull();kidCodeModal({name:n},row.code);if(S.screen==='settings')render();}
+    catch(x){b.disabled=false;toast(String(x&&x.msg||'').includes('too many')?kt('kMax'):kt('kFail'));}};}
+function kidRepModal(k){const l=D.lang;const rp=k.report||{};const subs=(rp.subs||[]);
+  const strong=subs.filter(x=>x.p>=70).map(x=>subName(x.k,l)),weak=subs.filter(x=>x.p<60).map(x=>subName(x.k,l));
+  const bars=subs.map(x=>`<div class="sbar"><span dir="auto">${esc(subName(x.k,l))}</span><span class="sb"><i style="width:${Math.max(4,Math.min(100,x.p))}%;background:${x.p>=70?'#0E7A5B':x.p>=60?'#B45309':'#B42318'}"></i></span><b class="num">${x.p}%</b></div>`).join('');
+  modal(`<h1 dir="auto">${esc(k.name)} · ${esc(kt('kRep'))}</h1><div class="stack">
+   <p dir="auto"><b>${esc(fill(kt('kDays'),{d:rp.days7||0}))}</b> / 7</p><p dir="auto">${esc(fill(kt('kQuiz'),{q:rp.quiz7||0}))} · ${esc(fill(kt('kAsk'),{a:rp.asked7||0}))}</p>
+   <p class="note" dir="auto">${esc(fill(kt('kLast'),{t:kRel(k.report_at,l)}))}</p>
+   ${bars||`<p class="note">${esc(kt('kNone'))}</p>`}
+   ${strong.length?`<p dir="auto"><b>${esc(kt('kStrong'))}:</b> ${esc(strong.join(', '))}</p>`:''}${weak.length?`<p dir="auto"><b>${esc(kt('kWeak'))}:</b> ${esc(weak.join(', '))}</p>`:''}
+   <button class="btn ghost full" data-act="closeModal">OK</button></div>`);}
+
+/* --- child side --- */
+function kidToken(){const a=new Uint8Array(24);crypto.getRandomValues(a);return Array.from(a,b=>b.toString(16).padStart(2,'0')).join('');}
+async function kidJoin(code){code=String(code||'').replace(/\D/g,'');if(code.length!==6)throw{code:'bad'};const tok=kidToken();
+  const r=await sbRpc('kid_join',{p_code:code,p_token:tok},false);const row=Array.isArray(r)?r[0]:r;if(!row||!row.id)throw{code:'bad'};return{id:row.id,token:tok,name:row.name,cls:row.cls};}
+function kidJoinHTML(){return `<div class="page stack d2join" style="margin-top:12px"><h2 style="margin-top:0" dir="auto">👨‍👩‍👧 ${esc(kt('jHave'))}</h2><form id="kidJoinForm" class="stack"><div><label for="kjC">${esc(kt('jHint'))}</label><input id="kjC" inputmode="numeric" maxlength="7" dir="ltr" placeholder="123 456" autocomplete="one-time-code"></div><button class="btn full" type="submit">${esc(kt('jBtn'))}</button></form></div>`;}
+function bindKidJoin(onOk){const f=$('kidJoinForm');if(!f||f.dataset.b)return;f.dataset.b='1';f.onsubmit=async e=>{e.preventDefault();const b=f.querySelector('button');b.disabled=true;
+  try{const k=await kidJoin($('kjC').value);onOk(k);}catch(x){b.disabled=false;toast(kt(x&&x.code==='bad'||String(x&&x.msg||'').includes('invalid')?'jBad':'kFail'));}};}
+function kidStudent(){try{return (D.profiles||[]).find(p=>p.type==='student');}catch(e){return null;}}
+let kidPushing=false;
+async function kidPush(force){const L=D.kidLink;if(!L||L.dead||kidPushing||!online())return;let last=0;try{last=+localStorage.getItem('jugnu_kid_push')||0;}catch(e){}
+  if(!force&&Date.now()-last<30*60000)return;const p=kidStudent();if(!p)return;kidPushing=true;
+  try{const w=weekSummary(p),st=stuStats(p),m30=todayISO(new Date(Date.now()-29*86400000));
+    const rep={v:1,name:p.name,cls:p.cls,days7:w.days,asked7:w.asked,quiz7:w.quizzes,subs:w.subs.slice(0,8),days30:st.days.filter(d=>d>=m30).length,last:st.days.slice(-1)[0]||null,recent:st.quizzes.slice(-5).map(q=>({s:q.sub,sc:q.score,t:q.total,d:q.d}))};
+    const ok=await sbRpc('kid_report',{p_id:L.id,p_token:L.token,p_report:rep},false);if(ok===false){L.dead=true;save();}try{localStorage.setItem('jugnu_kid_push',String(Date.now()));}catch(e){}}catch(e){}finally{kidPushing=false;}}
+function kidAdopt(k){const sp={id:uid(),type:'student',name:k.name,cls:k.cls||'9',created:Date.now(),stats:{days:[],asked:[],quizzes:[]},syl:{board:'kp',cls:k.cls||'9',medium:'en',group:'',exam:'',book:'',school:''}};
+  D.shop={name:'',owner:'',city:'',jc:'',ep:'',iban:'',created:Date.now(),studentOnly:true};D.profiles=[{id:'p0',type:'munshi',name:''},sp];D.active=sp.id;D.kidLink={id:k.id,token:k.token};save();
+  S.startMode=null;go('ustad');toast(kt('jOk'),true);setTimeout(()=>{kidPush(true);try{sylModal(sp.id);}catch(e){}},700);}
+function kidSettingsHTML(){if(!D.shop||!D.shop.studentOnly)return '';if(D.kidLink&&!D.kidLink.dead)return `<div class="page stack"><p dir="auto"><b>👨‍👩‍👧 ${esc(kt('jLinked'))}</b></p></div>`;
+  return kidJoinHTML().replace(esc(kt('jHave')),esc(kt('jLinkT')));}
+
+/* --- wire into screens --- */
+const _render21b=render;render=function(){_render21b();try{
+  if(!D.shop&&S.startMode==='stu'){const pg=document.querySelector('#fdStuForm');if(pg&&!document.getElementById('kidJoinForm')){pg.closest('.page').insertAdjacentHTML('afterend',kidJoinHTML());bindKidJoin(kidAdopt);}}
+  if(!D.shop&&D.alt){document.querySelectorAll('[data-act="accLogin"],[data-act="demo"],[data-act="fdStu"]').forEach(e=>e.remove());}
+  if(D.shop&&S.screen==='jugnu'&&D.alt&&!document.querySelector('.d2space')){const sub=document.querySelector('.jhero .jsub')||document.querySelector('.jhero .jname');if(sub)sub.insertAdjacentHTML('afterend',spToggleHTML());}
+  if(D.shop&&S.screen!=='jugnu'&&D.alt&&!D.shop.studentOnly){const hb=$('hbtns');if(hb&&!hb.querySelector('.d2spbtn')){const o=spKind(D)==='shop'?'home':'shop';hb.insertAdjacentHTML('afterbegin',`<button class="icon d2spbtn" data-act="spSwapTo" aria-label="${esc(kt(o==='home'?'goHome':'goShop'))}" title="${esc(kt(o==='home'?'goHome':'goShop'))}">${o==='home'?'🏠':'🏪'}</button>`);}}
+  if(S.screen==='progress'&&D.shop&&D.shop.studentOnly&&!document.querySelector('.d2join,.d2linked')){const app=$('app');if(app){app.insertAdjacentHTML('beforeend',kidSettingsHTML().replace('class="page stack"','class="page stack d2linked"'));bindKidJoin(k=>{if(kidStudent()){D.kidLink={id:k.id,token:k.token};save();toast(kt('jOk'),true);kidPush(true);render();}});}}
+  if(S.screen==='settings'&&D.shop){const first=document.querySelector('#app .page');
+    if(first&&!document.querySelector('.d2spaces,.d2kids,.d2join')){first.insertAdjacentHTML('afterend',D.shop.studentOnly?kidSettingsHTML():spacesSectionHTML()+kidsSectionHTML());bindKidJoin(k=>{const p=kidStudent();if(p){D.kidLink={id:k.id,token:k.token};save();toast(kt('jOk'),true);kidPush(true);render();}});}
+    if(!D.shop.studentOnly){document.querySelectorAll('[data-act="setPin"]').forEach(b=>{const r=b.closest('.tog');if(r)r.remove();});document.querySelectorAll('[data-act="profiles"]').forEach(b=>b.remove());}}
+ }catch(e){}};
+let d2KidsFetched=0;
+const _go21=go;go=function(s,o){const r=_go21(s,o);if(s==='settings'&&D.shop&&!D.shop.studentOnly&&accGet()&&Date.now()-d2KidsFetched>20000){d2KidsFetched=Date.now();kidsPull().then(()=>{if(S.screen==='settings'){const el=document.querySelector('.d2kids');if(el){el.outerHTML=kidsSectionHTML();}}});}return r;};
+document.addEventListener('click',async e=>{const b=e.target.closest&&e.target.closest('[data-act="spSwapTo"],[data-act="spAddHome"],[data-act="spAddShop"],[data-act="kidAdd"],[data-act="kidRep"],[data-act="kidCode"]');if(!b)return;e.preventDefault();e.stopImmediatePropagation();
+  const a=b.dataset.act;if(a==='spSwapTo'){if(!b.disabled)spSwap();return;}if(a==='spAddHome'){spAdd('home');return;}if(a==='spAddShop'){spAdd('shop');return;}if(a==='kidAdd'){kidAddModal();return;}
+  const k=(D.kids||[]).find(x=>x.id===b.dataset.id);if(!k)return;if(a==='kidRep'){kidRepModal(k);return;}
+  if(a==='kidCode'){b.disabled=true;try{const r=await sbRpc('kid_newcode',{p_id:k.id},true);const row=Array.isArray(r)?r[0]:r;await kidsPull();kidCodeModal(k,row.code);}catch(x){toast(kt('kFail'));}finally{b.disabled=false;}}},true);
+window.addEventListener('online',()=>{try{kidPush();}catch(e){}});
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden'){try{kidPush();}catch(e){}}});
+setTimeout(()=>{try{kidPush();}catch(e){}},4000);
 
 </script>
