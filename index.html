@@ -1145,7 +1145,7 @@ function settingsView(){
     <button class="btn ghost full" data-act="pasteRestore">${esc(t('bkRestoreP'))}</button></div>
    ${fbCardHTML()}
    ${voiceSettingsHTML()}
-   <div class="page stack"><h2 style="margin-top:0">${esc(t('danger'))}</h2><button class="btn danger full" data-act="wipe">${esc(t('wipe'))}</button><p class="note">Jugnu · ConceptAI · v0.20.1</p></div></div>`;
+   <div class="page stack"><h2 style="margin-top:0">${esc(t('danger'))}</h2><button class="btn danger full" data-act="wipe">${esc(t('wipe'))}</button><p class="note">Jugnu · ConceptAI · v0.20.2</p></div></div>`;
 }
 function pilotView(){
   const now=Date.now(),wk=7*86400000;
@@ -3013,7 +3013,7 @@ function lRedact(s){s=String(s||'');const ns=new Set();(D.customers||[]).forEach
   [...ns].sort((a,b)=>b.length-a.length).forEach(n=>{const e=n.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');s=s.replace(new RegExp(e,'gi'),'[NAME]');});
   return s.replace(/(\+?\d[\d\s-]{8,}\d)/g,'[PHONE]').replace(/PK\d{2}[A-Z0-9]{8,}/gi,'[IBAN]').slice(0,600);}
 function lOK(){return !!(D&&D.shop&&D.learn&&!isStudent()&&!D.shop.studentOnly);}
-function lPush(kind,sample){if(!lOK())return;try{const q=JSON.parse(localStorage.getItem(LQ_KEY)||'[]');q.push({kind,lang:D.lang,mode:isHome()?'home':'shop',app_version:'0.20.1',sample});localStorage.setItem(LQ_KEY,JSON.stringify(q.slice(-200)));}catch(e){}lFlush();}
+function lPush(kind,sample){if(!lOK())return;try{const q=JSON.parse(localStorage.getItem(LQ_KEY)||'[]');q.push({kind,lang:D.lang,mode:isHome()?'home':'shop',app_version:'0.20.2',sample});localStorage.setItem(LQ_KEY,JSON.stringify(q.slice(-200)));}catch(e){}lFlush();}
 let lBusy=false;
 async function lFlush(){if(lBusy||!lOK()||navigator.onLine===false)return;let q;try{q=JSON.parse(localStorage.getItem(LQ_KEY)||'[]');}catch(e){q=[];}if(!q.length)return;lBusy=true;
   try{const r=await sbFetch(SB_URL+'/rest/v1/learn_samples',{method:'POST',headers:{apikey:SB_KEY,'content-type':'application/json',Prefer:'return=minimal'},body:JSON.stringify(q.slice(0,50))},15000);
@@ -3183,5 +3183,17 @@ const D2_PRAISE=/^\s*((shabash|shaabash|bohat khoob|bohot khoob|bahut khoob|zaba
 const D2_WRONG=/(sahi nahi|sahih nahi|theek nahi|ghalat|galat|durust nahi|not correct|incorrect|wrong|not right|sahi jawab (ye|yeh|hai)|correct answer is|right answer is|صحیح نہیں|درست نہیں|غلط|ٹھیک نہیں|صحیح جواب|سم نه دی|غلط دی|سم ځواب)/i;
 function d2Honest(t){t=String(t||'');if(!D2_WRONG.test(t)||!D2_PRAISE.test(t))return t;let s=t.replace(D2_PRAISE,'');s=s.replace(/^[^\s!,.،۔]{1,20}[!,،]\s*/,'').replace(/^(lekin|magar|par|but|however|لیکن|مگر|خو)[\s,،]+/i,'');return s.length>8?s.charAt(0).toUpperCase()+s.slice(1):t;}
 const _uPush22=uPush;uPush=function(m){if(m&&m.who==='ai'&&typeof m.text==='string'&&!m.quiz&&!m.mcq&&!(m.text.startsWith(et('right'))||m.text.startsWith(ft('qRight',m.l||D.lang)))){m.text=d2Honest(m.text);if(D2_WRONG.test(m.text)&&!m.mood)m.mood='idle';}return _uPush22.apply(this,arguments);};
+
+/* v0.20.2 Ustad is its own app: never inside Munshi or Saathi. No switch, no Ustad chip or tab, no "add child", no combined signup.
+   A child uses Jugnu on their own phone and picks Parhai. (Parent code-link comes later.) Child data already saved is kept, just hidden. */
+d2Both=function(){return false;};
+function d2Owner(){try{ensureProfiles();return D.profiles.find(p=>p.type!=='student')||D.profiles[0];}catch(e){return null;}}
+function d2NoUstad(){if(!D.shop||D.shop.studentOnly)return false;if(D.shop.both){D.shop.both=false;save();}
+  if(isStudent()){const o=d2Owner();if(o){D.active=o.id;save();}return true;}return false;}
+const _render22=render;render=function(){if(d2NoUstad()&&S.screen==='ustad'){S.screen='jugnu';}_render22();
+  document.querySelectorAll('[data-act="fdBoth"],[data-act="addStu"],[data-act="modeU"],.ustchip,.modesw').forEach(e=>{if(D.shop&&D.shop.studentOnly&&e.matches('.modesw'))return;e.remove();});
+  const nav=document.querySelector('#tabHost .tabs');const u=nav&&nav.querySelector('.utab');if(u&&!(D.shop&&D.shop.studentOnly)){u.remove();nav.style.setProperty('grid-template-columns','repeat(4,minmax(0,1fr))','important');}};
+const _go22=go;go=function(s,o){if(s==='ustad'&&D.shop&&!D.shop.studentOnly)s='jugnu';return _go22(s,o);};
+try{if(d2NoUstad()){S.screen='jugnu';render();}}catch(e){}
 
 </script>
