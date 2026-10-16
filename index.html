@@ -1150,7 +1150,7 @@ function settingsView(){
     <button class="btn ghost full" data-act="pasteRestore">${esc(t('bkRestoreP'))}</button></div>
    ${fbCardHTML()}
    ${voiceSettingsHTML()}
-   <div class="page stack"><h2 style="margin-top:0">${esc(t('danger'))}</h2><button class="btn danger full" data-act="wipe">${esc(t('wipe'))}</button><p class="note">Jugnu · ConceptAI · v0.21.1</p></div></div>`;
+   <div class="page stack"><h2 style="margin-top:0">${esc(t('danger'))}</h2><button class="btn danger full" data-act="wipe">${esc(t('wipe'))}</button><p class="note">Jugnu · ConceptAI · v0.21.2</p></div></div>`;
 }
 function pilotView(){
   const now=Date.now(),wk=7*86400000;
@@ -3018,7 +3018,7 @@ function lRedact(s){s=String(s||'');const ns=new Set();(D.customers||[]).forEach
   [...ns].sort((a,b)=>b.length-a.length).forEach(n=>{const e=n.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');s=s.replace(new RegExp(e,'gi'),'[NAME]');});
   return s.replace(/(\+?\d[\d\s-]{8,}\d)/g,'[PHONE]').replace(/PK\d{2}[A-Z0-9]{8,}/gi,'[IBAN]').slice(0,600);}
 function lOK(){return !!(D&&D.shop&&D.learn&&!isStudent()&&!D.shop.studentOnly);}
-function lPush(kind,sample){if(!lOK())return;try{const q=JSON.parse(localStorage.getItem(LQ_KEY)||'[]');q.push({kind,lang:D.lang,mode:isHome()?'home':'shop',app_version:'0.21.1',sample});localStorage.setItem(LQ_KEY,JSON.stringify(q.slice(-200)));}catch(e){}lFlush();}
+function lPush(kind,sample){if(!lOK())return;try{const q=JSON.parse(localStorage.getItem(LQ_KEY)||'[]');q.push({kind,lang:D.lang,mode:isHome()?'home':'shop',app_version:'0.21.2',sample});localStorage.setItem(LQ_KEY,JSON.stringify(q.slice(-200)));}catch(e){}lFlush();}
 let lBusy=false;
 async function lFlush(){if(lBusy||!lOK()||navigator.onLine===false)return;let q;try{q=JSON.parse(localStorage.getItem(LQ_KEY)||'[]');}catch(e){q=[];}if(!q.length)return;lBusy=true;
   try{const r=await sbFetch(SB_URL+'/rest/v1/learn_samples',{method:'POST',headers:{apikey:SB_KEY,'content-type':'application/json',Prefer:'return=minimal'},body:JSON.stringify(q.slice(0,50))},15000);
@@ -3335,5 +3335,21 @@ const _render211=render;render=function(){_render211();try{if(S.screen==='progre
 document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('[data-act="d2Restart"]');if(!b)return;e.preventDefault();e.stopImmediatePropagation();
   if(!confirmSafe(rt('q')))return;const lang=D.lang;try{accSet(null);}catch(x){}try{localStorage.removeItem(KEY);}catch(x){}D=Object.assign(blank(),{lang});save();S.startMode=null;S.chat=[];S.screen='jugnu';render();},true);
 const _render212=render;render=function(){_render212();try{const s=document.querySelector('.fcard[data-act="fdStu"]'),h=document.querySelector('.fcard[data-act="fdHome"]');if(s&&h&&h.nextElementSibling!==s&&s.nextElementSibling===h)h.after(s);}catch(e){}};
+
+/* v0.21.2 Jugnu calls the user by name: "Arif Sahab" (or Sahiba / ji / just the name), instead of "Seth ji" / "sir". */
+const HN={sahab:{roman:'Sahab',ur:'صاحب',ps:'صاحب',en:'Sahab'},sahiba:{roman:'Sahiba',ur:'صاحبہ',ps:'صاحبه',en:'Sahiba'},ji:{roman:'ji',ur:'جی',ps:'جي',en:'ji'},name:{roman:'',ur:'',ps:'',en:''}};
+const HNT={roman:{t:'Jugnu aap ko kaise bulaye?',n:'Naam ke saath'},ur:{t:'جگنو آپ کو کیسے بلائے؟',n:'نام کے ساتھ'},ps:{t:'جګنو تاسو ته څنګه ووایي؟',n:'د نوم سره'},en:{t:'How should Jugnu address you?',n:'With your name'}};
+function d2First(){const s=D.shop||{};const n=String(s.owner||(s.kind==='home'?s.name:'')||'').trim();return n?n.split(/\s+/)[0]:'';}
+function d2Honor(l){l=l||D.lang||'roman';const f=D.honor||'sahab';const suf=(HN[f]||HN.sahab)[l]||'';const n=d2First();if(!n)return suf||(HN.sahab[l]);return suf?n+' '+suf:n;}
+function d2Address(t,l){if(typeof t!=='string'||!t||!D.shop||D.shop.studentOnly)return t;const h=d2Honor(l);
+  return t.replace(/Seth ji/g,h).replace(/seth ji/g,h).replace(/سیٹھ جی/g,h).replace(/مالک صاحب/g,h).replace(/\bsir\b/gi,h);}
+const _jPush212=jPush;jPush=function(m){if(m&&m.who==='ai'&&typeof m.text==='string')m.text=d2Address(m.text,m.l);return _jPush212.apply(this,arguments);};
+const _d2t212=d2t;d2t=function(k){const v=_d2t212(k);if(k==='greet'&&D.shop&&!D.shop.studentOnly&&d2First()){const h=esc(d2Honor());return v.replace(/<b>[^<]*<\/b>/,'<b>'+({ur:'السلام علیکم '+h+'!',ps:'السلام علیکم '+h+'!',en:'Hi '+h+',',roman:'Hi '+h+','}[D.lang||'roman'])+'</b>');}return v;};
+const _render213=render;render=function(){_render213();try{if(S.screen==='settings'&&D.shop&&!D.shop.studentOnly&&!document.querySelector('.d2honor')){const sp=document.querySelector('.d2spaces')||document.querySelector('#app .page');if(!sp)return;const l=D.lang||'roman';const n=d2First();const cur=D.honor||'sahab';
+  const opt=k=>{const s=(HN[k][l]||'');const lab=n?(s?n+' '+s:n):(s||'—');return `<button data-act="d2Honor" data-id="${k}" aria-pressed="${cur===k}">${esc(lab)}</button>`;};
+  sp.insertAdjacentHTML('afterend',`<div class="page stack d2honor"><h2 style="margin-top:0">${esc((HNT[l]||HNT.roman).t)}</h2><div class="seg">${opt('sahab')}${opt('sahiba')}${opt('ji')}${opt('name')}</div></div>`);}}catch(e){}};
+document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('[data-act="d2Honor"]');if(!b)return;e.preventDefault();e.stopImmediatePropagation();D.honor=b.dataset.id;save();try{markDirty();}catch(x){}render();},true);
+if(Array.isArray(SP_PK)&&!SP_PK.includes('honor'))SP_PK.push('honor');
+const _msgHTML213=msgHTML;msgHTML=function(m){if(m&&m.who==='ai'&&typeof m.text==='string'){const t2=d2Address(m.text,m.l);if(t2!==m.text)m=Object.assign({},m,{text:t2});}return _msgHTML213.call(this,m);};
 
 </script>
