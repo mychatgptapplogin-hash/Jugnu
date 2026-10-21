@@ -1151,7 +1151,7 @@ function settingsView(){
     <button class="btn ghost full" data-act="pasteRestore">${esc(t('bkRestoreP'))}</button></div>
    ${fbCardHTML()}
    ${voiceSettingsHTML()}
-   <div class="page stack"><h2 style="margin-top:0">${esc(t('danger'))}</h2><button class="btn danger full" data-act="wipe">${esc(t('wipe'))}</button><p class="note">Jugnu · ConceptAI · v0.24.1</p></div></div>`;
+   <div class="page stack"><h2 style="margin-top:0">${esc(t('danger'))}</h2><button class="btn danger full" data-act="wipe">${esc(t('wipe'))}</button><p class="note">Jugnu · ConceptAI · v0.24.2</p></div></div>`;
 }
 function pilotView(){
   const now=Date.now(),wk=7*86400000;
@@ -3605,10 +3605,10 @@ try{render();}catch(e){}
 
 
 /* v0.23.1 Front door: kids get their own signup (name + parent's code), and the shop setup gets a back button */
-const KS={roman:{btn:'👧 Bachon ka signup',sub:'Ammi/Abbu se mila code aur apna naam likhein',name:'Apna naam',or:'Bachay hain?'},
- ur:{btn:'👧 بچوں کا سائن اپ',sub:'امی/ابو سے ملا کوڈ اور اپنا نام لکھیں',name:'اپنا نام',or:'بچے ہیں؟'},
- ps:{btn:'👧 د ماشومانو سائن اپ',sub:'له مور/پلار نه ترلاسه شوی کوډ او خپل نوم ولیکئ',name:'خپل نوم',or:'ماشوم یاست؟'},
- en:{btn:'👧 Kids\' signup',sub:'Enter the code from your parent and your name',name:'Your name',or:'Are you a child?'}};
+const KS={roman:{btn:'👧 Bachon ka signup',sub:'Ammi/Abbu se mila code aur apna naam likhein',name:'Apna naam (agar chahein)',or:'Bachay hain?'},
+ ur:{btn:'👧 بچوں کا سائن اپ',sub:'امی/ابو سے ملا کوڈ اور اپنا نام لکھیں',name:'اپنا نام (اگر چاہیں)',or:'بچے ہیں؟'},
+ ps:{btn:'👧 د ماشومانو سائن اپ',sub:'له مور/پلار نه ترلاسه شوی کوډ او خپل نوم ولیکئ',name:'خپل نوم (که غواړئ)',or:'ماشوم یاست؟'},
+ en:{btn:'👧 Kids\' signup',sub:'Enter the code from your parent and your name',name:'Your name (optional)',or:'Are you a child?'}};
 function ks(k){return (KS[D.lang]&&KS[D.lang][k])||KS.roman[k];}
 const _render231=render;render=function(){_render231();try{if(D.shop||gateNeeded())return;
   const card=document.querySelector('.fcard[data-act="fdStu"]');
@@ -3616,7 +3616,7 @@ const _render231=render;render=function(){_render231();try{if(D.shop||gateNeeded
     const box=`<div class="d2kidsdoor"><p class="note" dir="auto" style="text-align:center;margin:6px 0 4px">${esc(ks('or'))}</p><button class="btn ghost full" data-act="fdStu" style="flex-direction:column;gap:0"><b dir="auto">${esc(ks('btn'))}</b><small dir="auto" style="font-weight:400">${esc(ks('sub'))}</small></button></div>`;
     const login=document.querySelector('#app [data-act="accLogin"]');if(login)login.insertAdjacentHTML('afterend',box);else if(grid)grid.insertAdjacentHTML('afterend',box);}
   if(S.startMode==='shop'){const f=$('setupForm');const pg=f&&f.closest('.page');if(pg&&!pg.querySelector('[data-act="fdBack"]')){pg.insertAdjacentHTML('afterbegin',`<button class="btn ghost sm" data-act="fdBack" type="button" style="align-self:flex-start">${esc(fd('back'))}</button>`);pg.querySelectorAll('.seg').forEach(s=>{if(s.querySelector('[data-lang]'))s.remove();});}}
-  if(S.startMode==='stu'){const jf=$('kidJoinForm');if(jf&&!$('kjN')){jf.insertAdjacentHTML('afterbegin',`<div><label for="kjN">${esc(ks('name'))}</label><input id="kjN" dir="auto" maxlength="30" required></div>`);}}
+  if(S.startMode==='stu'){const jf=$('kidJoinForm');if(jf&&!$('kjN')){jf.insertAdjacentHTML('afterbegin',`<div><label for="kjN">${esc(ks('name'))}</label><input id="kjN" dir="auto" maxlength="30"></div>`);}}
  }catch(e){}};
 const _kidAdopt231=kidAdopt;kidAdopt=function(k){const n=$('kjN')&&cap($('kjN').value.trim());if(n)k=Object.assign({},k,{name:n});return _kidAdopt231(k);};
 try{render();}catch(e){}
