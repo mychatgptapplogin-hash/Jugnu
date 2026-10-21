@@ -1,3 +1,4 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Jugnu</title>
@@ -578,7 +579,7 @@ const isRTL=()=>D.lang==='ur'||D.lang==='ps';
 /* ================= language ================= */
 const T={
  ur:{lene:'لینے ہیں',dene:'دینے ہیں',aaj:'آج کی وصولی',search:'نام سے تلاش کریں',entry:'+ نیا اندراج',quickL:'جلدی اندراج',quickPh:'لکھیں: احمد نے 2000 کا سامان لیا',go:'آگے',overdue:'پرانا ادھار (7 دن سے زیادہ)',all:'تمام کھاتے',todayL:'آج کے اندراج',
-   none:'ابھی کوئی کھاتہ نہیں۔ "+ نیا اندراج" دبائیں یا نمونے کی دکان دیکھیں۔',confirm:'ٹھیک لکھا؟',name:'نام',amount:'رقم (روپے)',type:'قسم',date:'تاریخ',noteL:'تفصیل (اختیاری)',saveB:'جی ہاں، محفوظ کریں',cancel:'نہیں',newName:'نیا نام: محفوظ کرتے ہی نیا کھاتہ بن جائے گا',
+   none:'ابھی کوئی کھاتہ نہیں۔ "+ نیا اندراج" دبائیں۔',confirm:'ٹھیک لکھا؟',name:'نام',amount:'رقم (روپے)',type:'قسم',date:'تاریخ',noteL:'تفصیل (اختیاری)',saveB:'جی ہاں، محفوظ کریں',cancel:'نہیں',newName:'نیا نام: محفوظ کرتے ہی نیا کھاتہ بن جائے گا',
    credit:'ادھار دیا (گاہک نے سامان لیا)',payment:'وصولی (رقم ملی)',goods:'مال آیا (سپلائر سے)',paid:'ادائیگی کی (سپلائر کو)',
    creditS:'ادھار',paymentS:'وصولی',goodsS:'مال آیا',paidS:'ادائیگی',expense:'خرچہ (دکان کا)',expenseS:'خرچہ',spent:'خرچ ہوئے',
    owesMe:'لینے ہیں',iOwe:'دینے ہیں',settled:'حساب برابر',days:'دن',remind:'واٹس ایپ پر یاد دہانی',addEntry:'اندراج کریں',ledger:'کھاتہ رجسٹر',back:'واپس',
@@ -594,7 +595,7 @@ const T={
    saved:'محفوظ ہو گیا',savedShop:'دکان محفوظ ہو گئی',bkNote:'حساب صرف اسی فون پر ہے۔ ہفتے میں ایک بار بیک اپ لیں اور خود کو واٹس ایپ کر دیں۔',csv:'کھاتہ CSV',bkFile:'بیک اپ فائل',bkCopy:'بیک اپ کاپی کریں',bkRestoreF:'بیک اپ فائل سے واپس لائیں',bkRestoreP:'کاپی کیا ہوا بیک اپ لگائیں',wipe:'سارا حساب حذف کریں',danger:'احتیاط',
    pilotNote:'فیلڈ ٹیم کے لیے: صرف گنتی، کوئی نام یا رقم نہیں۔',copyRep:'رپورٹ کاپی کریں',entries:'اندراج',tapRow:'کسی بھی سطر کو دبائیں: رسید، درستی یا حذف۔',nameAmt:'نام اور درست رقم لکھیں'},
  ps:{lene:'اخیستل دي',dene:'ورکول دي',aaj:'د نن وصولي',search:'په نوم ولټوئ',entry:'+ نوې لیکنه',quickL:'چټکه لیکنه',quickPh:'ولیکئ: احمد 2000 روپۍ پور واخیست',go:'مخکې',overdue:'زوړ پور (له 7 ورځو زیات)',all:'ټولې کهاتې',todayL:'د نن لیکنې',
-   none:'تراوسه هېڅ کهاته نشته. "+ نوې لیکنه" کېکاږئ یا د نمونې دوکان وګورئ.',confirm:'سم مو ولیکل؟',name:'نوم',amount:'رقم (روپۍ)',type:'ډول',date:'نېټه',noteL:'تفصیل (اختیاري)',saveB:'هو، خوندي یې کړئ',cancel:'نه',newName:'نوی نوم: د خوندي کولو سره به نوې کهاته جوړه شي',
+   none:'تراوسه هېڅ کهاته نشته. "+ نوې لیکنه" کېکاږئ.',confirm:'سم مو ولیکل؟',name:'نوم',amount:'رقم (روپۍ)',type:'ډول',date:'نېټه',noteL:'تفصیل (اختیاري)',saveB:'هو، خوندي یې کړئ',cancel:'نه',newName:'نوی نوم: د خوندي کولو سره به نوې کهاته جوړه شي',
    credit:'پور ورکړ (پېرودونکي سودا واخیسته)',payment:'وصولي (پیسې راغلې)',goods:'مال راغی (له سپلایر)',paid:'ادایګي وشوه (سپلایر ته)',
    creditS:'پور',paymentS:'وصولي',goodsS:'مال راغی',paidS:'ادایګي',expense:'لګښت (د دوکان)',expenseS:'لګښت',spent:'لګېدلي',
    owesMe:'اخیستل دي',iOwe:'ورکول دي',settled:'حساب برابر',days:'ورځې',remind:'په واټس اپ یادونه',addEntry:'لیکنه وکړئ',ledger:'د کهاتې راجستر',back:'شاته',
@@ -610,7 +611,7 @@ const T={
    saved:'خوندي شو',savedShop:'دوکان خوندي شو',bkNote:'حساب یوازې په همدې تلیفون کې دی. په اونۍ کې یو ځل بیک اپ واخلئ او ځان ته یې په واټس اپ ولېږئ.',csv:'کهاته CSV',bkFile:'بیک اپ فایل',bkCopy:'بیک اپ کاپي کړئ',bkRestoreF:'له بیک اپ فایل څخه بېرته راوړئ',bkRestoreP:'کاپي شوی بیک اپ ولګوئ',wipe:'ټول حساب ړنګ کړئ',danger:'پام',
    pilotNote:'د ساحوي ټیم لپاره: یوازې شمېر، هېڅ نوم یا رقم نه.',copyRep:'راپور کاپي کړئ',entries:'لیکنې',tapRow:'هره کرښه کېکاږئ: رسید، سمول یا ړنګول.',nameAmt:'نوم او سم رقم ولیکئ'},
  en:{lene:'To receive',dene:'To pay',aaj:'Collected today',search:'Search by name',entry:'+ New entry',quickL:'Quick entry',quickPh:'Type: Ahmed took goods for 2000',go:'Next',overdue:'Overdue (older than 7 days)',all:'All accounts',todayL:"Today's entries",
-   none:'No accounts yet. Tap "+ New entry" or view the demo shop.',confirm:'Is this right?',name:'Name',amount:'Amount (Rs)',type:'Type',date:'Date',noteL:'Details (optional)',saveB:'Yes, save',cancel:'No',newName:'New name: a new account is created when you save',
+   none:'No accounts yet. Tap "+ New entry".',confirm:'Is this right?',name:'Name',amount:'Amount (Rs)',type:'Type',date:'Date',noteL:'Details (optional)',saveB:'Yes, save',cancel:'No',newName:'New name: a new account is created when you save',
    credit:'Credit given (customer took goods)',payment:'Payment received',goods:'Goods received (from supplier)',paid:'Payment made (to supplier)',
    creditS:'Credit',paymentS:'Received',goodsS:'Goods in',paidS:'Paid out',expense:'Expense (shop)',expenseS:'Expense',spent:'spent',
    owesMe:'to receive',iOwe:'to pay',settled:'settled',days:'days',remind:'Remind on WhatsApp',addEntry:'Add entry',ledger:'Ledger',back:'Back',
@@ -626,7 +627,7 @@ const T={
    saved:'Saved',savedShop:'Shop saved',bkNote:'Your accounts live only on this phone. Back up once a week and send it to yourself on WhatsApp.',csv:'Ledger CSV',bkFile:'Backup file',bkCopy:'Copy backup',bkRestoreF:'Restore from backup file',bkRestoreP:'Paste a copied backup',wipe:'Delete all accounts',danger:'Careful',
    pilotNote:'For the field team: counts only, no names or amounts.',copyRep:'Copy report',entries:'entries',tapRow:'Tap any row for receipt, edit or delete.',nameAmt:'Write a name and a valid amount'},
  roman:{lene:'Lene hain',dene:'Dene hain',aaj:'Aaj ki wasooli',search:'Naam se dhoondein',entry:'+ Naya indraaj',quickL:'Jaldi indraaj',quickPh:'Likhein: Ahmed ne 2000 ka saman liya',go:'Aage',overdue:'Purana udhaar (7 din se zyada)',all:'Tamam khaate',todayL:'Aaj ke indraaj',
-   none:'Abhi koi khata nahi. "+ Naya indraaj" dabayein ya demo dukaan dekhein.',confirm:'Theek likha?',name:'Naam',amount:'Raqam (Rs)',type:'Qism',date:'Tareekh',noteL:'Tafseel (optional)',saveB:'Ji haan, save karein',cancel:'Nahi',newName:'Naya naam: save karte hi naya khata ban jayega',
+   none:'Abhi koi khata nahi. "+ Naya indraaj" dabayein.',confirm:'Theek likha?',name:'Naam',amount:'Raqam (Rs)',type:'Qism',date:'Tareekh',noteL:'Tafseel (optional)',saveB:'Ji haan, save karein',cancel:'Nahi',newName:'Naya naam: save karte hi naya khata ban jayega',
    credit:'Udhaar diya (gaahak ne saman liya)',payment:'Wasooli (raqam mili)',goods:'Maal aaya (supplier se)',paid:'Adaigi ki (supplier ko)',
    creditS:'Udhaar',paymentS:'Wasooli',goodsS:'Maal aaya',paidS:'Adaigi',expense:'Kharcha (dukaan ka)',expenseS:'Kharcha',spent:'kharch hue',
    owesMe:'lene hain',iOwe:'dene hain',settled:'hisaab barabar',days:'din',remind:'WhatsApp pe yaad dihaani',addEntry:'Indraaj karein',ledger:'Khata register',back:'Wapis',
@@ -791,7 +792,7 @@ function looseJSON(t){if(t&&typeof t==='object')return t;t=String(t||'').trim();
 async function aiJSON(prompt,model){
   if(SAMPLE)return SAMPLE.json(prompt,{modelTier:'quick',cache:false});
   const ctl=new AbortController();const tm=setTimeout(()=>ctl.abort(),model?35000:25000);
-  try{const r=await fetch(AI_URL,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(model?{prompt,model}:{prompt}),signal:ctl.signal});
+  try{const r=await fetch(AI_URL,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(Object.assign(model?{prompt,model}:{prompt},limMeta())),signal:ctl.signal});
     if(!r.ok)throw{code:'http_'+r.status};const j=await r.json();return looseJSON(j.text);}finally{clearTimeout(tm);}
 }
 function joinL(arr,l){return arr.join(l==='ur'||l==='ps'?'، ':', ');}
@@ -1150,7 +1151,7 @@ function settingsView(){
     <button class="btn ghost full" data-act="pasteRestore">${esc(t('bkRestoreP'))}</button></div>
    ${fbCardHTML()}
    ${voiceSettingsHTML()}
-   <div class="page stack"><h2 style="margin-top:0">${esc(t('danger'))}</h2><button class="btn danger full" data-act="wipe">${esc(t('wipe'))}</button><p class="note">Jugnu · ConceptAI · v0.21.5</p></div></div>`;
+   <div class="page stack"><h2 style="margin-top:0">${esc(t('danger'))}</h2><button class="btn danger full" data-act="wipe">${esc(t('wipe'))}</button><p class="note">Jugnu · ConceptAI · v0.24.1</p></div></div>`;
 }
 function pilotView(){
   const now=Date.now(),wk=7*86400000;
@@ -1336,13 +1337,12 @@ async function askAI(q,l,mode){
     const td=todayISO();const aaj=D.entries.filter(e=>e.type==='payment'&&e.date===td).reduce((s,e)=>s+e.amount,0);
     const led=D.customers.map(c=>{const b=balance(c.id);return `- ${c.name} | ${c.type} | ${b>0?'owes the shop Rs '+num(b):b<0?'the shop owes Rs '+num(b):'settled'} | oldest unpaid: ${oldestUnpaidDays(c.id)} days`;}).join('\n')||'(no accounts yet)';
     const hist=S.chat.slice(-11,-1).map(m=>(m.who==='me'?'Shopkeeper: ':'Jugnu: ')+m.text).join('\n');
-    const prompt=`${isHome()?'You are Jugnu, a Pakistani AI assistant who keeps the personal and family hisaab kitaab of this person: money lent to or borrowed from relatives and friends (lena dena), home expenses, committee (BC) and saving. Give practical personal money advice for a Pakistani household when asked. Talk like a trusted, sensible family elder friend, not a shopkeeper. Never call him Seth ji. In the ledger below, "customer" means someone who owes him and "supplier" means someone he owes.':''}You are Jugnu, a Pakistani AI assistant who works as the munshi (trusted bookkeeper and advisor) of a small shop. You understand Urdu in Urdu script, Roman Urdu, Pashto and English.
-You help with: the shop's khata, practical business advice for small Pakistani shops (personalise it with the ledger numbers below), everyday questions, and friendly chat.
+    const prompt=`${jIdentity(mode)}
 Rules:
-- Reply ONLY in ${LNAME[l]}, the same language and script the shopkeeper just used. Address him as "${ADDR[l]}".
+- Reply ONLY in ${LNAME[l]}, the same language and script the shopkeeper just used. ${lRule(l)} Address him as "${ADDR[l]}".
 - Talk like an experienced, respectful human munshi having a real conversation: first respond to what he actually said (agree, answer, or ask one short question if unclear), then help. Warm, practical, simple words. Never sound like a robot or repeat a template. No emojis. No dashes.
 - If he says you made a mistake or something is wrong, admit it simply and tell him you will fix it (the app shows the fix buttons).
-- Length: ${mode==='advice'&&!isHome()?'Answer like an experienced retail business consultant who knows Pakistani bazaars and talks to the owner face to face. First, in one or two lines, explain what HIS numbers below suggest (for example sales down compared with last month, too much udhaar stuck, expenses rising), and if there is not enough data say so honestly. Then give 3 or 4 short numbered steps, each practical, low cost and doable this week in a Pakistani market (stock and display, WhatsApp catalogue and status, Raast QR, small bundles and deals, collecting old udhaar, timing, loyal customers). End with one short question to understand his shop better (for example what he sells or which hours are slow) if you do not know it':'at most 3 short sentences'}.
+- Length: ${mode==='advice'&&!isHome()?'Answer like an experienced retail business consultant who knows Pakistani bazaars and talks to the owner face to face. First, in one or two lines, explain what HIS numbers below suggest (for example sales down compared with last month, too much udhaar stuck, expenses rising), and if there is not enough data say so honestly. Then give 3 or 4 short numbered steps, each practical, low cost and doable this week in a Pakistani market (stock and display, WhatsApp catalogue and status, Raast QR, small bundles and deals, collecting old udhaar, timing, loyal customers). End with one short question to understand his shop better (for example what he sells or which hours are slow) if you do not know it':mode==='general'?GEN_LEN:'at most 3 short sentences'}.
 - Use ONLY the numbers in the ledger below. Never invent a balance.
 - Medical, legal or religious ruling questions: give only a short, general, safe answer and advise him to ask a doctor, a lawyer or a mufti. Never give medicine doses. Money or investment questions: say it is general information, not financial advice.
 - If his message records a transaction, fill "entry" with name, amount (rupees, integer) and type: "credit" (customer took goods on udhaar), "payment" (customer paid the shop), "goods" (supplier delivered stock), "paid" (shop paid a supplier), "expense" (shop cost like electricity bill, rent, salary, fuel; then name is the cost). Put items or reason in "note". Do NOT say it is saved: the app shows a confirm card.
@@ -1476,7 +1476,7 @@ const FORM=[
  [/rectangle|triangle|area|raqba|رقبہ|مستطیل|مثلث/,'Rectangle area = length × width\nTriangle area = ½ × base × height']
 ];
 const FORM_NAMES='Pythagoras, Quadratic, Circle, (a+b)², Speed, Force, Ohm, Density, Work/Power, Energy, Photosynthesis, Pressure, Area';
-const STU_CAP=20;
+let STU_CAP=10;
 const RXU={
  care:/(suicide|khudkushi|khud kushi|mar jana chahta|marna chahta|marna chahti|kill myself|self harm|خودکشی|مرنا چاہت|ځان وژن)/,
  off:/(girl ?friend|boy ?friend|i love you|love you|pyar|ishq|romance|date karo|sexy|\bsex|nude|porn|kiss|shadi karo|gun|pistol|bomb|drugs|nasha|cigarette|گرل فرینڈ|بوائے فرینڈ|عشق|پیار|نشہ|مینه|عشق)/,
@@ -1630,7 +1630,7 @@ function levelRule(p){const c=sylOf(p).cls;const n=+c;
   return 'Level rules for this student: no calculus of any kind (no derivatives, integrals, or rates like a = 4t or v = 3t²), no variable acceleration, no projectile at an angle, no topics from higher classes. Every question must give all the information needed and have one clear answer.';}
 async function exAI(prompt,effort){let r=null;try{r=await aiJSONx(prompt,'@cf/openai/gpt-oss-120b',effort||'low');}catch(e){r=null;}return r;}
 async function aiJSONx(prompt,model,effort){if(SAMPLE)return aiJSON(prompt,model);evt('ai');const ctl=new AbortController();const tm=setTimeout(()=>ctl.abort(),60000);
-  try{const r=await fetch(AI_URL,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({prompt,model,effort}),signal:ctl.signal});if(!r.ok)throw{code:'http_'+r.status};const j=await r.json();return looseJSON(j.text);}finally{clearTimeout(tm);}}
+  try{const r=await fetch(AI_URL,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(Object.assign({prompt,model,effort},limMeta())),signal:ctl.signal});if(!r.ok)throw{code:'http_'+r.status};const j=await r.json();return looseJSON(j.text);}finally{clearTimeout(tm);}}
 async function exVerify(list,p,sub){
   const pr=`You are checking a multiple choice test before it is given to a Pakistani student. The student: ${sylPrompt(p)} Subject: ${SUBJ[sub]?SUBJ[sub].en:sub}.
 Solve every question yourself, carefully and independently, writing the short working in "work" (for physics use g = 10 m/s² unless the question gives another value). Then give the index (0 to 3) of the option that is exactly correct. Give -1 if no option is exactly correct, if more than one option is correct, if information is missing or unclear, or if the question breaks these level rules: ${levelRule(p)}
@@ -1974,7 +1974,7 @@ async function shrinkImage(file,max){max=max||1280;const url=URL.createObjectURL
   let w=img.naturalWidth,h=img.naturalHeight;const k=Math.min(1,max/Math.max(w,h));w=Math.round(w*k);h=Math.round(h*k);const c=document.createElement('canvas');c.width=w;c.height=h;const g=c.getContext('2d');g.fillStyle='#fff';g.fillRect(0,0,w,h);g.drawImage(img,0,0,w,h);
   const full=c.toDataURL('image/jpeg',0.8);const tc=document.createElement('canvas');const tk=Math.min(1,220/Math.max(w,h));tc.width=Math.round(w*tk);tc.height=Math.round(h*tk);tc.getContext('2d').drawImage(c,0,0,tc.width,tc.height);return{full,thumb:tc.toDataURL('image/jpeg',0.7)};}finally{URL.revokeObjectURL(url);}}
 async function visionAI(img,prompt){const ctl=new AbortController();const tm=setTimeout(()=>ctl.abort(),60000);
-  try{const r=await fetch(AI_URL+'vision',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({image:img,prompt}),signal:ctl.signal});if(!r.ok)return null;const j=await r.json();const t=String(j.text||'');const m=t.match(/\{[\s\S]*\}/);if(!m)return null;try{return JSON.parse(m[0]);}catch(e){return null;}}catch(e){return null;}finally{clearTimeout(tm);}}
+  try{const r=await fetch(AI_URL+'vision',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(Object.assign({image:img,prompt},limMeta())),signal:ctl.signal});if(!r.ok)return null;const j=await r.json();const t=String(j.text||'');const m=t.match(/\{[\s\S]*\}/);if(!m)return null;try{return JSON.parse(m[0]);}catch(e){return null;}}catch(e){return null;}finally{clearTimeout(tm);}}
 const PHOTO_PROMPT="You are the munshi (bookkeeper) of a Pakistani shop or household. Look at the photo. It may be a printed bill or receipt from a supplier or shop, a handwritten udhaar slip, a page of a handwritten khata register (Urdu, Pashto, Roman Urdu or English, with names and amounts), a JazzCash or Easypaisa or bank payment screenshot, or something else.\nExisting accounts: {{ACCTS}}\nList EVERY money entry you can read, one per person and amount.\n- \"name\": the person or business. If it matches an existing account (even spelled differently or in another script), copy that exact account name, but only when it is clearly the same person or business; never put a different name on an existing account just because it is the same type. For a supplier bill, the supplier or shop name on the bill.\n- \"said\": the name exactly as written in the photo.\n- \"type\": credit = a customer took goods or cash on udhaar; payment = money received from a customer; goods = a supplier gave stock to the shop on credit (a supplier bill); paid = the shop paid a supplier (a paid bill or a payment screenshot sent to a supplier); expense = a shop or home cost (electricity, gas, rent, fuel, salary bill).\n- \"amount\": the total in rupees as an integer for that entry (for a bill use the grand total, not each line).\n- \"date\": YYYY-MM-DD if a date is clearly written, else \"\".\n- \"note\": a few words, for example main items or bill number, in {{LANG}}.\n- If a number or name is unclear, still include your best reading and add \"(?)\" in the note.\n- \"kind\": receipt, bill, khata_page, payment_screenshot, homework or other.\n- \"summary\": one short sentence in {{LANG}} saying what the photo is and what you found.\nIf there is no money information, return an empty list and say what the photo shows in the summary.\nReply with only JSON: {\"kind\":\"\",\"entries\":[{\"name\":\"\",\"said\":\"\",\"type\":\"\",\"amount\":0,\"date\":\"\",\"note\":\"\"}],\"summary\":\"\"}";
 function cleanEntries(r,l){const out=[];for(const e of (r&&Array.isArray(r.entries)?r.entries:[]).slice(0,25)){if(!e)continue;
   const ty=['credit','payment','goods','paid','expense','sale'].includes(e.type)?e.type:null;const amt=Math.round(Number(String(e.amount).replace(/[^\d.]/g,'')));if(!ty||!(amt>=1&&amt<1e9))continue;
@@ -2460,7 +2460,7 @@ document.addEventListener('click',async e=>{
     case 'home':S.cid=null;go('home',{draft:null});break;
     case 'settings':go('settings');break;
     case 'pilot':go('pilot');break;
-    case 'demo':loadDemo();break;
+    case 'demo':break;
     case 'newEntry':S.cid=null;go('entry',{draft:null});break;
     case 'openCust':if(id)go('customer',{cid:id,draft:null});else go('home');break;
     case 'addFor':{const c=cust(S.cid);go('entry',{draft:{name:c.name,amount:'',type:c.type==='supplier'?'goods':'credit',date:todayISO(),note:''}});break;}
@@ -2492,7 +2492,7 @@ document.addEventListener('click',async e=>{
     case 'rmPin':D.pin=null;save();closeModal();toast(ft('pinOff'));render();break;
     case 'linkStu':linkModal(id);break;
     case 'rmStu':if(isStudent())break;D.profiles=D.profiles.filter(p=>p.id!==id);if(D.active===id)D.active='p0';save();closeModal();render();break;
-    case 'togPlan':D.plan=D.plan==='family'?'free':'family';save();render();break;
+    case 'togPlan':break;
     case 'togConsent':D.consent=!D.consent;save();render();break;
     case 'uAsk':uSend(el.dataset.q);break;
     case 'uAns':{const [mi,o]=String(id).split(':').map(Number);uAnswerPick(mi,o);break;}
@@ -2707,7 +2707,7 @@ Object.assign(J.en,{sameQ:'By "{n}", do you mean {m}?',idOwes:'owes',idWeOwe:'we
 /* ===== v0.12 accounts, cloud backup, usage counts, feedback, owner's brain (Supabase, plain fetch) ===== */
 const SB_URL='https://otctbjuosvefhziuudmy.supabase.co';
 const SB_KEY='sb_publishable_V4TmfCm7NLsJ1bF2gdEpMw_8x3QZIgC';
-const APP_VER='0.12';
+const APP_VER='0.22';
 const ACC_KEY='jugnu_account_v1',EVQ_KEY='jugnu_evq',BRAIN_KEY='jugnu_brain';
 const AC={
  roman:{outClear:'Logout aur is phone se hisaab hatao',outClearQ:'Pehle cloud mein backup hoga, phir is phone se sara hisaab hat jayega. Dobara login karne par wapis aa jayega. Theek hai?',outClearNet:'Hisaab hatane se pehle backup zaroori hai. Internet chalu kar ke dobara koshish karein.',outClearDone:'Logout ho gaya aur hisaab is phone se hata diya gaya. Cloud mein mehfooz hai.',accSec:'Account',jwin:'Jugnu ki screen',dark:'Dark',light:'Light',acc:'Account',accT:'Apna account banayein',accWhy:'Hisaab cloud mein mehfooz rahega. Phone gum ho ya naya le lein, login karte hi sab wapis.',newA:'Naya account',login:'Login',mob:'Mobile number',pin:'PIN (4 se 6 hindse)',pinHint:'Ye PIN yaad rakhein. Is se doosre phone par login hoga.',nm:'Aapka naam',cty:'Shehar',typ:'Aap kaun hain?',tShop:'Dukaandar',tStu:'Student',tFam:'Ghar / family',tOth:'Koi aur',shopN:'Dukaan ka naam (agar hai)',make:'Account banao',doLogin:'Login karo',later:'Abhi nahi',wait:'Ruk jayein…',badPh:'Mobile number theek nahi. Misaal: 03001234567',badPin:'PIN 4 se 6 hindson ka ho.',exists:'Is number ka account pehle se hai. PIN daal kar login karein.',wrong:'Number ya PIN ghalat hai.',noNet:'Is ke liye internet chahiye.',fail:'Abhi nahi ho saka. Thori der baad koshish karein.',ok:'Account tayyar! Hisaab ab cloud mein mehfooz hota rahega.',in:'Login ho gaya.',logged:'Logged in',synced:'Aakhri backup',never:'abhi nahi hua',syncNow:'Abhi backup karo',logout:'Logout',outQ:'Logout karein? Is phone ka hisaab yahin rahega.',restored:'Cloud se hisaab wapis aa gaya.',choose:'Do hisaab mil gaye. Kaunsa rakhna hai?',usePhone:'Is phone wala',useCloud:'Cloud wala',entries:'entries',fb:'Raaye / Shikayat',fbPh:'Jo acha laga, jo bura laga, ya koi naya idea likhein…',fbSend:'Bhejein',fbOk:'Shukriya! Aapki baat pohanch gayi.',fbLogin:'Raaye bhejne ke liye pehle account banayein.',have:'Pehle se account hai? Login karein',other:'Ye phone pehle kisi aur account par tha. Us ka hisaab is phone par alag mehfooz kar diya.'},
@@ -2794,7 +2794,7 @@ function acctModal(mode){
     if(!online())return show('noNet');go.disabled=true;go.textContent=at('wait');err.hidden=true;
     try{
       if(m==='new'){const r=await sbFetch(SB_URL+'/functions/v1/signup',{method:'POST',headers:{apikey:SB_KEY,'content-type':'application/json'},body:JSON.stringify({phone:ph,pin,name:$('aNm').value,city:$('aCt').value,user_type:$('aTy').value,shop_name:$('aSh').value,app_version:APP_VER})},25000);
-        const j=await r.json().catch(()=>({}));if(!r.ok){if(j.error==='exists'){acctModal('login');$('aPh').value=ph;$('aErr').textContent=at('exists');$('aErr').hidden=false;return;}show('fail');go.disabled=false;go.textContent=at('make');return;}}
+        const j=await r.json().catch(()=>({}));if(!r.ok){if(j.error==='exists'){const lr0=await sbLogin(ph,pin);if(lr0.err){acctModal('login');$('aPh').value=ph;$('aErr').textContent=at('exists');$('aErr').hidden=false;return;}evt('signin');await afterLogin(false);return;}show('fail');go.disabled=false;go.textContent=at('make');return;}}
       const lr=await sbLogin(ph,pin);if(lr.err){show(lr.err);go.disabled=false;go.textContent=m==='new'?at('make'):at('doLogin');return;}
       evt('signin');await afterLogin(m==='new');
     }catch(e2){show('fail');go.disabled=false;go.textContent=m==='new'?at('make'):at('doLogin');}
@@ -3018,7 +3018,7 @@ function lRedact(s){s=String(s||'');const ns=new Set();(D.customers||[]).forEach
   [...ns].sort((a,b)=>b.length-a.length).forEach(n=>{const e=n.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');s=s.replace(new RegExp(e,'gi'),'[NAME]');});
   return s.replace(/(\+?\d[\d\s-]{8,}\d)/g,'[PHONE]').replace(/PK\d{2}[A-Z0-9]{8,}/gi,'[IBAN]').slice(0,600);}
 function lOK(){return !!(D&&D.shop&&D.learn&&!isStudent()&&!D.shop.studentOnly);}
-function lPush(kind,sample){if(!lOK())return;try{const q=JSON.parse(localStorage.getItem(LQ_KEY)||'[]');q.push({kind,lang:D.lang,mode:isHome()?'home':'shop',app_version:'0.21.5',sample});localStorage.setItem(LQ_KEY,JSON.stringify(q.slice(-200)));}catch(e){}lFlush();}
+function lPush(kind,sample){if(!lOK())return;try{const q=JSON.parse(localStorage.getItem(LQ_KEY)||'[]');q.push({kind,lang:D.lang,mode:isHome()?'home':'shop',app_version:'0.22.0',sample});localStorage.setItem(LQ_KEY,JSON.stringify(q.slice(-200)));}catch(e){}lFlush();}
 let lBusy=false;
 async function lFlush(){if(lBusy||!lOK()||navigator.onLine===false)return;let q;try{q=JSON.parse(localStorage.getItem(LQ_KEY)||'[]');}catch(e){q=[];}if(!q.length)return;lBusy=true;
   try{const r=await sbFetch(SB_URL+'/rest/v1/learn_samples',{method:'POST',headers:{apikey:SB_KEY,'content-type':'application/json',Prefer:'return=minimal'},body:JSON.stringify(q.slice(0,50))},15000);
@@ -3333,7 +3333,7 @@ function rt(k){return (RT[D.lang]&&RT[D.lang][k])||RT.roman[k];}
 const _render211=render;render=function(){_render211();try{if(S.screen==='progress'&&D.shop&&D.shop.studentOnly&&!document.querySelector('.d2out')){const a=accGet();const app=$('app');if(!app)return;
   app.insertAdjacentHTML('beforeend',`<div class="page stack d2out"><h2 style="margin-top:0">${esc(rt('t'))}</h2>${a?`<p class="note num">+${esc(a.phone)}</p><button class="btn ghost full" data-act="accOut">${esc(at('logout'))}</button>`:''}<button class="btn danger full" data-act="d2Restart">${esc(rt('restart'))}</button></div>`);}}catch(e){}};
 document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('[data-act="d2Restart"]');if(!b)return;e.preventDefault();e.stopImmediatePropagation();
-  if(!confirmSafe(rt('q')))return;const lang=D.lang;try{accSet(null);}catch(x){}try{localStorage.removeItem(KEY);}catch(x){}D=Object.assign(blank(),{lang});save();S.startMode=null;S.chat=[];S.screen='jugnu';render();},true);
+  if(!confirmSafe(rt('q')))return;const lang=D.lang;try{localStorage.removeItem(KEY);}catch(x){}D=Object.assign(blank(),{lang});save();S.startMode=null;S.chat=[];S.screen='jugnu';render();},true);
 const _render212=render;render=function(){_render212();try{const s=document.querySelector('.fcard[data-act="fdStu"]'),h=document.querySelector('.fcard[data-act="fdHome"]');if(s&&h&&h.nextElementSibling!==s&&s.nextElementSibling===h)h.after(s);}catch(e){}};
 
 /* v0.21.2 Jugnu calls the user by name: "Arif Sahab" (or Sahiba / ji / just the name), instead of "Seth ji" / "sir". */
@@ -3387,4 +3387,378 @@ const KJ={roman:{h:'Ammi/Abbu ka code likhein',n:'Code ammi/abbu ke Jugnu se mil
 const _render217=render;render=function(){_render217();try{if(!D.shop&&S.startMode==='stu'){const f=$('fdStuForm');if(f){f.style.display='none';const pg=f.closest('.page');const h=pg&&pg.querySelector('h1');const l=D.lang||'roman';if(h)h.textContent='📚 '+(KJ[l]||KJ.roman).h;
   if(pg&&!pg.querySelector('.d2kjn'))h.insertAdjacentHTML('afterend',`<p class="note d2kjn" dir="auto">${esc((KJ[l]||KJ.roman).n)}</p>`);const j=document.querySelector('.d2join');if(j&&pg&&j.previousElementSibling!==pg){pg.after(j);}if(j){j.style.marginTop='0';}}}}catch(e){}};
 
+/* ===== v0.22.0 Pilot freemium: every feature free with a daily limit (resets 12 am Pakistan time).
+   Typed khata entries, receipts and statements stay unlimited, and so does everything offline.
+   Hitting a limit shows a sleepy Jugnu and a "tell me when Plus arrives" button; every tap is logged.
+   The owner can change any limit from the brain table: lim_ai, lim_voice, lim_photo, lim_file, lim_remind, lim_ustad, lim_kids. ===== */
+var LIM={voice:false,feat:''};
+const LIM_KEY='jugnu_limits_v1';
+const LIM_DEF={ai:10,voice:3,photo:2,file:1,remind:5,ustad:10,kids:1};
+const LMT={
+ roman:{f:{ai:'AI sawal',voice:'voice notes',photo:'photos',file:'files',remind:'WhatsApp reminders',ustad:'Ustad sawal',kids:'bachay'},
+  title:'Aaj ki free had poori',hit:'Aaj ke free {n} {f} poore ho gaye. Raat 12 baje phir naye mil jayenge.',free:'Khata likhna, raseed aur goshwara hamesha free aur bina had ke hain.',quizFree:'Quiz aur formulas abhi bhi chalte hain.',plus:'Jugnu Plus jald aa raha hai: sab kuch be hisaab.',
+  kidsHit:'Free mein 1 bacha jor sakte hain. Zyada bachon ke liye Jugnu Plus jald aa raha hai.',btn:'🔔 Mujhe batana jab Plus aaye',thx:'Shukriya! Jugnu Plus aate hi sab se pehle aap ko bataenge.',have:'Aap ka naam list mein pehle se hai ✓',
+  needAcc:'Aap ko batane ke liye aap ka number chahiye. Account bana lein, phir dobara dabayein.',left:'Aaj {n} {f} baqi',bar:'Aaj free baqi',sleepy:'aaj ke liye thak gaya',
+  info:'Pilot mein Jugnu free hai, roz ki had ke saath. Had har raat 12 baje nayi ho jati hai.\nPlus mein: be hisaab AI sawal, voice notes, photos, files aur reminders, aur zyada bachay. Qeemat jald.'},
+ ur:{f:{ai:'اے آئی سوال',voice:'وائس نوٹ',photo:'تصویریں',file:'فائلیں',remind:'واٹس ایپ یاد دہانیاں',ustad:'استاد سوال',kids:'بچے'},
+  title:'آج کی مفت حد پوری',hit:'آج کے مفت {n} {f} پورے ہو گئے۔ رات 12 بجے پھر نئے مل جائیں گے۔',free:'کھاتہ لکھنا، رسید اور گوشوارہ ہمیشہ مفت اور بغیر حد کے ہیں۔',quizFree:'کوئز اور فارمولے ابھی بھی چلتے ہیں۔',plus:'جگنو پلس جلد آ رہا ہے: سب کچھ بے حساب۔',
+  kidsHit:'مفت میں 1 بچہ جوڑ سکتے ہیں۔ زیادہ بچوں کے لیے جگنو پلس جلد آ رہا ہے۔',btn:'🔔 پلس آئے تو مجھے بتانا',thx:'شکریہ! جگنو پلس آتے ہی سب سے پہلے آپ کو بتائیں گے۔',have:'آپ کا نام فہرست میں پہلے سے ہے ✓',
+  needAcc:'آپ کو بتانے کے لیے آپ کا نمبر چاہیے۔ اکاؤنٹ بنا لیں، پھر دوبارہ دبائیں۔',left:'آج {n} {f} باقی',bar:'آج مفت باقی',sleepy:'آج کے لیے تھک گیا',
+  info:'پائلٹ میں جگنو مفت ہے، روز کی حد کے ساتھ۔ حد ہر رات 12 بجے نئی ہو جاتی ہے۔\nپلس میں: بے حساب اے آئی سوال، وائس نوٹ، تصویریں، فائلیں اور یاد دہانیاں، اور زیادہ بچے۔ قیمت جلد۔'},
+ ps:{f:{ai:'AI پوښتنې',voice:'غږیز پیغامونه',photo:'عکسونه',file:'فایلونه',remind:'د واټس اپ یادونې',ustad:'د استاد پوښتنې',kids:'ماشومان'},
+  title:'د نن وړیا حد پوره شو',hit:'د نن وړیا {n} {f} پوره شول. د شپې په 12 بجو بیا نوي درکول کېږي.',free:'کهاته لیکل، رسید او حساب تل وړیا او بې حده دي.',quizFree:'کوئز او فارمولونه اوس هم چلېږي.',plus:'جګنو پلس ژر راځي: هر څه بې حده.',
+  kidsHit:'په وړیا توګه 1 ماشوم نښلولی شئ. د ډېرو ماشومانو لپاره جګنو پلس ژر راځي.',btn:'🔔 چې پلس راشي خبر مې کړه',thx:'مننه! چې جګنو پلس راشي، تر ټولو لومړی به تاسو خبر کړو.',have:'ستاسو نوم دمخه په لیست کې دی ✓',
+  needAcc:'د خبرولو لپاره ستاسو شمېره پکار ده. اکاونټ جوړ کړئ، بیا یې بیا کېکاږئ.',left:'نن {n} {f} پاتې',bar:'نن وړیا پاتې',sleepy:'د نن لپاره ستړی شوم',
+  info:'په پیلوټ کې جګنو وړیا دی، د ورځې د حد سره. حد هره شپه په 12 بجو نوی کېږي.\nپه پلس کې: بې حده AI پوښتنې، غږیز پیغامونه، عکسونه، فایلونه او یادونې، او ډېر ماشومان. بیه ژر.'},
+ en:{f:{ai:'AI messages',voice:'voice notes',photo:'photos',file:'files',remind:'WhatsApp reminders',ustad:'Ustad questions',kids:'children'},
+  title:"Today's free limit reached",hit:"Today's {n} free {f} are used up. New ones arrive at 12 midnight.",free:'Writing the khata, receipts and statements are always free, with no limit.',quizFree:'Quizzes and formulas still work.',plus:'Jugnu Plus is coming soon: everything unlimited.',
+  kidsHit:'You can link 1 child for free. Jugnu Plus, coming soon, adds more children.',btn:'🔔 Tell me when Plus arrives',thx:'Thank you! You will be among the first to know when Jugnu Plus arrives.',have:'You are already on the list ✓',
+  needAcc:'We need your number to tell you. Create your account, then tap again.',left:'{n} {f} left today',bar:'Free today',sleepy:'tired for today',
+  info:'Jugnu is free during the pilot, with a daily limit. Limits reset every night at 12.\nPlus gives unlimited AI messages, voice notes, photos, files and reminders, and more children. Price coming soon.'}};
+function lm(k,l){l=l||D.lang||'roman';return (LMT[l]&&LMT[l][k])||LMT.roman[k]||'';}
+function lmF(f,l){l=l||D.lang||'roman';return ((LMT[l]||LMT.roman).f||{})[f]||LMT.roman.f[f]||f;}
+function limDay(){return new Date(Date.now()+5*3600000).toISOString().slice(0,10);}
+function limCap(f){const b=parseInt(brainVal('lim_'+f),10);return b>=0?b:LIM_DEF[f];}
+function limGet(){let o={};try{o=JSON.parse(localStorage.getItem(LIM_KEY)||'{}')||{};}catch(e){o={};}if(o.d!==limDay())o={d:limDay(),c:{}};o.c=o.c||{};return o;}
+function limLeft(f){if(isPaid())return 99;return Math.max(0,limCap(f)-(limGet().c[f]||0));}
+function limUse(f){try{const o=limGet();o.c[f]=(o.c[f]||0)+1;localStorage.setItem(LIM_KEY,JSON.stringify(o));}catch(e){}evt('use_'+f);limBarRefresh();
+  if(isPaid())return;const n=limLeft(f);if(f!=='ai'||n<=3)toast(fill(lm('left'),{n,f:lmF(f)}));}
+/* sent with every AI call so the worker can count per user and feature (server-side safety net) */
+function limJid(){try{const a=accGet();if(a&&a.uid)return a.uid;let d=localStorage.getItem('jugnu_dev_id');if(!d){d='d_'+uid()+uid();localStorage.setItem('jugnu_dev_id',d);}return d;}catch(e){return '';}}
+function limMeta(){try{return{jid:limJid(),plan:isPaid()?'plus':'free',feat:(typeof LIM!=='undefined'&&LIM&&LIM.feat)||(isStudent()?'ustad':'ai')};}catch(e){return{};}}
+/* sleepy Jugnu: closed eyes and floating z's */
+document.head.insertAdjacentHTML('beforeend',`<style>
+.ff .esl,.ff .zz{opacity:0;transition:opacity .25s}
+.ffw.sleepy .eo,.ffw.sleepy .eh,.ffw.sleepy .es,.ffw.sleepy .ex{opacity:0}
+.ffw.sleepy .esl{opacity:1}
+.ffw.sleepy .halo{animation:none;opacity:.4}
+.ffw.sleepy .core{filter:brightness(.85) saturate(.85)}
+.ffw.sleepy .float{animation-duration:6s}
+.ffw.sleepy .wL,.ffw.sleepy .wR{animation-duration:3.2s}
+.ffw.sleepy .zz{animation:limZ 2.4s ease-in-out infinite}
+.ffw.sleepy .zz2{animation-delay:1.2s}
+@keyframes limZ{0%{opacity:0;transform:translateY(4px)}40%{opacity:1}100%{opacity:0;transform:translateY(-10px)}}
+.limbar{display:flex;flex-wrap:wrap;gap:2px 12px;align-items:center;justify-content:center;width:100%;border:none;background:#EFEAE2;color:#3B4A54;font:inherit;font-size:12.5px;line-height:1.5;padding:3px 10px 1px;cursor:pointer;flex-shrink:0}
+.limbar b{color:#10131A}
+.limbar .z{opacity:.45}
+.limbar .lplus{font-weight:700;color:var(--cover2)}
+.limcard{text-align:center}
+.limff{width:110px;height:110px;display:block;margin:0 auto;background:#10131A;border-radius:50%;border:3px solid #FFD21F;padding:6px}
+.limtx{white-space:pre-line;text-align:start;line-height:1.7}
+@media (prefers-reduced-motion:reduce){.ffw.sleepy .zz{animation:none;opacity:1}}
+</style>`);
+const LIM_EYES='<g class="esl"><path d="M83 117 Q 89.5 123, 96 117 M104 117 Q 110.5 123, 117 117" fill="none" stroke="#2A1404" stroke-width="5" stroke-linecap="round"/></g><text class="zz" x="132" y="92" font-family="Sora,sans-serif" font-weight="700" font-size="17" fill="#8FE3FF">z</text><text class="zz zz2" x="146" y="76" font-family="Sora,sans-serif" font-weight="700" font-size="12" fill="#8FE3FF">z</text>';
+const _ffSVGL=ffSVG;ffSVG=function(){const s=_ffSVGL();const i=s.lastIndexOf('</g></g></svg>');return i<0?s:s.slice(0,i)+LIM_EYES+s.slice(i);};
+function limSleepy(){try{D2M.last={mood:'sleepy',t:Date.now()};clearTimeout(D2M.tm);jState('sleepy');D2M.tm=setTimeout(()=>{D2M.last=null;if(!jBusy)jState('idle');},7000);}catch(e){}}
+['roman','ur','ps','en'].forEach(l=>{const L=LMT[l];
+  if(J[l]){J[l].sleepy=L.sleepy;J[l].phLimit=fill(L.hit,{n:String(limCap('photo')),f:L.f.photo})+'\n'+L.plus;J[l].phPlusB=L.btn;}
+  if(FS[l])FS[l].cap=fill(L.hit,{n:'{c}',f:L.f.ustad})+' '+L.quizFree+'\n'+L.plus;});
+/* the limit message: in the chat when the user is chatting, otherwise as a small card */
+function limText(f,l){if(f==='kids')return lm('kidsHit',l);return fill(lm('hit',l),{n:limCap(f),f:lmF(f,l)})+'\n'+lm(isStudent()?'quizFree':'free',l)+'\n'+lm('plus',l);}
+function limitCard(f){evt('limit_'+f);const l=D.lang||'roman';const tx=limText(f,l);const btns=[{act:'plusNotify',id:f,label:lm('btn',l)}];
+  if(D.shop&&(S.screen==='jugnu'||S.screen==='ustad')&&$('jChat')){closeModal();(isStudent()?uPush:jPush)({who:'ai',text:tx,btns,l});limSleepy();return;}
+  modal(`<div class="limcard stack"><span class="ffw sleepy limff">${ffSVG()}</span><h1 dir="auto">${esc(lm('title',l))}</h1><p dir="auto" class="limtx">${esc(tx)}</p><button class="btn gold full" data-act="plusNotify" data-id="${esc(f)}">${esc(lm('btn',l))}</button><button class="btn ghost full" data-act="closeModal">OK</button></div>`);}
+function plusInfo(){const l=D.lang||'roman';evt('plus_info');
+  modal(`<div class="limcard stack"><span class="ffw happy limff">${ffSVG()}</span><h1>Jugnu Plus</h1><p dir="auto" class="limtx">${esc(lm('info',l))}</p>${D.plusWant?`<p class="note" dir="auto">${esc(lm('have',l))}</p>`:`<button class="btn gold full" data-act="plusNotify" data-id="info">${esc(lm('btn',l))}</button>`}<button class="btn ghost full" data-act="closeModal">OK</button></div>`);}
+async function plusNotify(f){evt('plus_tap');evt('plus_tap_'+f);const l=D.lang||'roman';
+  if(D.plusWant){closeModal();toast(lm('have',l),true);return;}
+  const a=accGet();
+  if(!a&&!isStudent()){closeModal();toast(lm('needAcc',l));setTimeout(()=>acctModal('new'),500);return;}
+  D.plusWant={at:Date.now(),f};save();closeModal();toast(lm('thx',l),true);limBarRefresh();
+  if(a){try{await sbRest('feedback',{method:'POST',body:{user_id:a.uid,message:'PLUS_INTEREST '+f,app_version:APP_VER},prefer:'return=minimal'});}catch(e){}evFlush();}}
+/* counters under the chat suggestions */
+function limBarHTML(){if(!D.shop||isPaid())return '';const l=D.lang||'roman';
+  const it=isStudent()?[['ustad','💬',Math.max(0,STU_CAP-aiQuota().n)],['voice','🎤',limLeft('voice')],['photo','📷',limLeft('photo')]]:[['ai','💬',limLeft('ai')],['voice','🎤',limLeft('voice')],['photo','📷',limLeft('photo')],['file','📄',limLeft('file')]];
+  return `<button type="button" class="limbar" data-act="plusInfo"><span>${esc(lm('bar',l))}:</span>${it.map(([k,i,n])=>`<span class="${n?'':'z'}" title="${esc(lmF(k,l))}"><span aria-hidden="true">${i}</span> <span class="sr">${esc(lmF(k,l))}</span><b class="num">${n}</b></span>`).join('')}<span class="lplus">Plus ›</span></button>`;}
+function limBarRefresh(){try{const el=document.querySelector('.limbar');if(!el)return;const h=limBarHTML();if(h)el.outerHTML=h;else el.remove();}catch(e){}}
+/* AI chat (Munshi / Saathi): one per answered question. Entries, corrections and offline answers never count. */
+const _askAIL=askAI;askAI=async function(q,l,mode){if(isPaid()||isStudent()||LIM.voice)return _askAIL.apply(this,arguments);
+  if(limLeft('ai')<=0)return{text:'',kind:'limit'};const r=await _askAIL.apply(this,arguments);if(r)limUse('ai');return r;};
+const _jHandleL=jHandle;jHandle=function(a,q,l){if(a&&a.kind==='limit'){limitCard('ai');return;}return _jHandleL.apply(this,arguments);};
+const _jMoreL=jMore;jMore=function(l){if(!isPaid()&&!jBusy&&limLeft('ai')<=0){limitCard('ai');return;}return _jMoreL.apply(this,arguments);};
+/* voice notes: counted only when they were understood; on-phone offline Pashto is never counted */
+const _hvL=handleVoice;handleVoice=async function(blob){if(online()&&AI_URL&&!isPaid()&&limLeft('voice')<=0){limitCard('voice');return;}
+  LIM.voice=true;LIM.feat='voice';try{return await _hvL.apply(this,arguments);}finally{LIM.voice=false;LIM.feat='';}};
+const _trL=transcribe;transcribe=async function(){const r=await _trL.apply(this,arguments);if(r&&LIM.voice&&online()&&!isPaid())limUse('voice');return r;};
+/* photos and files (bills, homework, PDF, Word) */
+const _pfL=photoFlow;photoFlow=function(file){const img=!!file&&/^image\//.test(String(file.type||''))&&!/\.(pdf|docx?|txt|csv)$/i.test(String(file.name||''));const f=img?'photo':'file';
+  if(file&&online()&&AI_URL&&!isPaid()&&limLeft(f)<=0){limitCard(f);return;}
+  LIM.feat=isStudent()?'ustad':f;const r=_pfL.apply(this,arguments);Promise.resolve(r).finally(()=>{LIM.feat='';});return r;};
+photoLeft=function(){return isPaid()?99:limLeft('photo');};
+photoUse=function(){limUse('photo');};
+const _d2AIJL=d2AIJ;d2AIJ=async function(){const r=await _d2AIJL.apply(this,arguments);if(r&&!isPaid())limUse('file');return r;};
+/* WhatsApp reminders: counted when the WhatsApp button is tapped */
+const _drL=doRemind;doRemind=function(c){if(c&&phone92(c.phone)&&!isPaid()&&limLeft('remind')<=0){limitCard('remind');return;}
+  const r=_drL.apply(this,arguments);try{const w=$('waGo');if(w&&!isPaid())w.addEventListener('click',()=>limUse('remind'),{once:true});}catch(e){}return r;};
+/* Ustad: the existing daily cap (now 10) gets the Plus button and the sleepy face */
+const _uPushL=uPush;uPush=function(m){try{if(m&&m.who==='ai'&&typeof m.text==='string'&&!m.btns&&m.text===fill(ft('cap',m.l||D.lang),{c:STU_CAP})){evt('limit_ustad');m.btns=[{act:'plusNotify',id:'ustad',label:lm('btn',m.l)}];setTimeout(limSleepy,0);}}catch(e){}
+  const r=_uPushL.apply(this,arguments);limBarRefresh();return r;};
+const _jPushL=jPush;jPush=function(m){const r=_jPushL.apply(this,arguments);limBarRefresh();return r;};
+/* buttons: Plus notify, Plus info, the old photo Plus button, and the children limit */
+window.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('[data-act="plusNotify"],[data-act="plusInfo"],[data-act="phPlus"],[data-act="kidAdd"]');if(!b)return;const a=b.dataset.act;
+  if(a==='kidAdd'){if(isPaid()||(D.kids||[]).length<limCap('kids'))return;e.preventDefault();e.stopImmediatePropagation();limitCard('kids');return;}
+  e.preventDefault();e.stopImmediatePropagation();if(a==='plusInfo'){plusInfo();return;}plusNotify(a==='phPlus'?'photo':(b.dataset.id||'ai'));},true);
+/* the demo "Family plan" switch and the demo shop are removed completely */
+try{if(D.plan==='family'&&!D.planGrant){D.plan='free';save();}}catch(e){}
+if(Array.isArray(SP_PK)&&!SP_PK.includes('plusWant'))SP_PK.push('plusWant');
+const _renderL=render;render=function(){try{STU_CAP=limCap('ustad');}catch(e){}_renderL();try{
+  document.querySelectorAll('[data-act="togPlan"]').forEach(b=>{const r=b.closest('.tog');if(r)r.remove();});
+  if(D.shop&&(S.screen==='jugnu'||S.screen==='ustad')&&!document.querySelector('.limbar')){const c=document.querySelector('.jhome .jchips');const h=limBarHTML();if(c&&h)c.insertAdjacentHTML('afterend',h);}
+ }catch(e){}};
+try{render();}catch(e){}
+
+/* v0.22.1 no demo anywhere: demo shop loader disabled, demo buttons and the Family plan (demo) row removed */
+loadDemo=function(){};
+const _renderND=render;render=function(){_renderND();try{document.querySelectorAll('[data-act="demo"]').forEach(e=>e.remove());document.querySelectorAll('[data-act="togPlan"]').forEach(b=>{const r=b.closest('.tog');if(r)r.remove();else b.remove();});}catch(e){}};
+try{render();}catch(e){}
+
+/* v0.22.2 One account for everything. Same phone + PIN = same account, whether the user taps "new" or "login".
+   Dukaan and Ghar live in that one account as two spaces: logging in from a new space pulls the other one
+   from the cloud instead of asking to choose and losing one. Starting a new space while logged in also pulls the cloud first. */
+const OA={roman:'Pehle se account hai? Wohi number aur PIN likhein, sara hisaab wapis aa jayega.',ur:'پہلے سے اکاؤنٹ ہے؟ وہی نمبر اور پن لکھیں، سارا حساب واپس آ جائے گا۔',ps:'مخکې اکاونټ لرئ؟ هماغه شمېره او پن ولیکئ، ټول حساب به بېرته راشي.',en:'Already have an account? Enter the same number and PIN and everything comes back.'};
+function spStrip(d){const c=JSON.parse(JSON.stringify(d));delete c.alt;SP_PK.forEach(k=>{if(k!=='v')delete c[k];});return c;}
+const _afterLogin0=afterLogin;
+afterLogin=async function(isNew){const a=accGet();if(!a)return;
+  if(!D.shop||D.shop.studentOnly||(D.uid&&D.uid!==a.uid))return _afterLogin0.apply(this,arguments);
+  let c=null,cerr=false;try{c=await cloudGet(a.uid);}catch(e){cerr=true;}const cd=c&&c.data;
+  if(cerr){if(!window.__oaAuto)return _afterLogin0.apply(this,arguments);a.dirty=false;accSet(a);return;}
+  if(!cd||!cd.shop||cd.shop.studentOnly)return _afterLogin0.apply(this,arguments);
+  const lk=spKind(D),ck=spKind(cd),ca=cd.alt&&cd.alt.shop?spKind(cd.alt):null;
+  const fin=msg=>{closeModal();render();toast(msg,true);};
+  if(ck===lk||ca===lk){
+    if(hasData(D))return _afterLogin0.apply(this,arguments);
+    adoptData(cd);a.dirty=false;a.lastSync=Date.now();accSet(a);
+    if(ck!==lk&&D.alt&&D.alt.shop){spSwap();}
+    fin(at('restored'));return;}
+  /* the cloud has the other space only: keep this new space and add the cloud one beside it */
+  D.alt=spStrip(cd);['lang','honor','plusWant','kids','consent','learn'].forEach(k=>{if(D[k]===undefined&&cd[k]!==undefined)D[k]=cd[k];});
+  D.uid=a.uid;save0();a.dirty=true;accSet(a);await syncPush(true);fin(at('restored'));};
+/* a new space set up while already logged in: pull the cloud before anything is pushed over it */
+let oaHad=!!(D&&D.shop);
+const _renderOA=render;render=function(){_renderOA();try{const has=!!D.shop;
+  if(has&&!oaHad&&!D.shop.studentOnly&&!D.alt&&accGet()&&online()){const a=accGet();a.dirty=false;accSet(a);clearTimeout(syncTm);setTimeout(async()=>{window.__oaAuto=true;try{await afterLogin(false);}finally{window.__oaAuto=false;}},50);}
+  oaHad=has;}catch(e){}};
+/* the account card says plainly that an existing number logs straight in */
+const _acctModalOA=acctModal;acctModal=function(mode){const r=_acctModalOA.apply(this,arguments);try{const pin=$('aPin');if(pin&&!document.querySelector('.oaNote')){const l=D.lang||'roman';pin.closest('div').insertAdjacentHTML('afterend',`<p class="note oaNote" dir="auto" style="font-weight:700">${esc(OA[l]||OA.roman)}</p>`);}}catch(e){}return r;};
+
+/* v0.22.3 Logout always easy to find and always works.
+   (1) The Account card is the first thing in Settings, with the phone number and a big Logout button.
+   (2) "Are you sure?" is an in-app card, not a browser pop-up (many phones and in-app browsers silently block those). */
+const LO={roman:{y:'Haan',n:'Nahi',t:'Pakka?'},ur:{y:'ہاں',n:'نہیں',t:'پکا؟'},ps:{y:'هو',n:'نه',t:'ډاډه یاست؟'},en:{y:'Yes',n:'No',t:'Are you sure?'}};
+function lo(k){return (LO[D.lang]||LO.roman)[k];}
+const _confirmSafeLO=confirmSafe;confirmSafe=function(q){if(window.__cfOK){window.__cfOK=false;return true;}return _confirmSafeLO(q);};
+const LO_Q={accOut:()=>at('outQ'),accOutClear:()=>at('outClearQ'),d2Restart:()=>rt('q')};
+window.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('[data-act="accOut"],[data-act="accOutClear"],[data-act="d2Restart"],[data-act="loYes"]');if(!b)return;
+  const a=b.dataset.act;if(window.__cfRun)return;e.preventDefault();e.stopImmediatePropagation();
+  if(a==='loYes'){const act=b.dataset.id;closeModal();const t=document.createElement('button');t.dataset.act=act;t.hidden=true;document.body.appendChild(t);window.__cfOK=true;window.__cfRun=true;try{t.click();}finally{window.__cfRun=false;window.__cfOK=false;t.remove();}return;}
+  modal(`<h1 dir="auto">${esc(lo('t'))}</h1><p dir="auto">${esc((LO_Q[a]||(()=>''))())}</p><div class="row"><button class="btn ${a==='accOut'?'':'danger'}" data-act="loYes" data-id="${a}" style="flex:1">${esc(lo('y'))}</button><button class="btn ghost" data-act="closeModal" style="flex:1">${esc(lo('n'))}</button></div>`);},true);
+const _renderLO=render;render=function(){_renderLO();try{if(S.screen!=='settings')return;const ac=document.querySelector('#app .acc-card');const first=document.querySelector('#app .page');
+  if(ac&&first&&first!==ac&&first.nextElementSibling!==ac)first.after(ac);
+  const out=ac&&ac.querySelector('[data-act="accOut"]');if(out){out.classList.remove('ghost');out.textContent='⎋ '+at('logout');}}catch(e){}};
+
+/* v0.23.0 Login is required before using Jugnu. One screen: name, mobile, city, PIN.
+   New number = new account; an existing number with its PIN logs straight in and brings back all its hisaab.
+   Needs internet once; after that Jugnu stays logged in and works offline. Children skip it: they join with a parent's code. */
+const GT={roman:{t:'Jugnu mein khush aamdeed',s:'Shuru karne ke liye apni maloomat likhein. Pehle se account hai to wohi number aur PIN likhein, sara hisaab wapis aa jayega.',nm:'Aap ka naam',ph:'Mobile number',ct:'Shehar',pin:'PIN (4 se 6 hindse)',pinH:'Ye PIN yaad rakhein. Doosre phone par isi se login hoga.',go:'Aage',net:'Pehli dafa internet chahiye. Internet chalu kar ke dobara koshish karein.',needNm:'Apna naam likhein.',needCt:'Apna shehar likhein.',wrongPin:'Is number ka account pehle se hai, lekin PIN ghalat hai.',kid:'📚 Bachay ke liye? Ammi/Abbu ka code yahan likhein'},
+ ur:{t:'جگنو میں خوش آمدید',s:'شروع کرنے کے لیے اپنی معلومات لکھیں۔ پہلے سے اکاؤنٹ ہے تو وہی نمبر اور پن لکھیں، سارا حساب واپس آ جائے گا۔',nm:'آپ کا نام',ph:'موبائل نمبر',ct:'شہر',pin:'پن (4 سے 6 ہندسے)',pinH:'یہ پن یاد رکھیں۔ دوسرے فون پر اسی سے لاگ ان ہوگا۔',go:'آگے',net:'پہلی دفعہ انٹرنیٹ چاہیے۔ انٹرنیٹ چالو کر کے دوبارہ کوشش کریں۔',needNm:'اپنا نام لکھیں۔',needCt:'اپنا شہر لکھیں۔',wrongPin:'اس نمبر کا اکاؤنٹ پہلے سے ہے، لیکن پن غلط ہے۔',kid:'📚 بچے کے لیے؟ امی/ابو کا کوڈ یہاں لکھیں'},
+ ps:{t:'جګنو ته ښه راغلاست',s:'د پیل لپاره خپل معلومات ولیکئ. که مخکې اکاونټ لرئ، هماغه شمېره او پن ولیکئ، ټول حساب به بېرته راشي.',nm:'ستاسو نوم',ph:'موبایل شمېره',ct:'ښار',pin:'پن (۴ تر ۶ عددونه)',pinH:'دا پن په یاد ولرئ. په بل تلیفون به پرې ننوځئ.',go:'مخکې',net:'لومړی ځل انټرنېټ پکار دی. انټرنېټ چالان کړئ او بیا هڅه وکړئ.',needNm:'خپل نوم ولیکئ.',needCt:'خپل ښار ولیکئ.',wrongPin:'د دې شمېرې اکاونټ شته، خو پن غلط دی.',kid:'📚 د ماشوم لپاره؟ د مور/پلار کوډ دلته ولیکئ'},
+ en:{t:'Welcome to Jugnu',s:'Enter your details to start. Already have an account? Use the same number and PIN and all your hisaab comes back.',nm:'Your name',ph:'Mobile number',ct:'City',pin:'PIN (4 to 6 digits)',pinH:'Remember this PIN. You will use it to log in on another phone.',go:'Continue',net:'The first time needs internet. Turn on internet and try again.',needNm:'Enter your name.',needCt:'Enter your city.',wrongPin:'This number already has an account, but the PIN is wrong.',kid:'📚 For a child? Enter the parent\'s code here'}};
+function gt(k){return (GT[D.lang]||GT.roman)[k];}
+function gateNeeded(){if(!D.lang||accGet())return false;if(D.shop&&D.shop.studentOnly)return false;if(!D.shop&&S.startMode==='stu')return false;return true;}
+function gateView(){const me=D.me||{};const s=D.shop||{};
+  return `<div class="page stack gate"><div class="d2greet"><span class="ffw happy">${ffSVG()}</span><div class="d2bub" dir="auto"><b>${esc(gt('t'))}</b></div></div>
+   <p class="soft small" dir="auto">${esc(gt('s'))}</p>${langButtons()}
+   <form id="gateForm" class="stack" novalidate>
+    <div><label for="gNm">${esc(gt('nm'))}</label><input id="gNm" dir="auto" autocomplete="name" maxlength="40" required value="${esc(me.name||s.owner||'')}"></div>
+    <div><label for="gPh">${esc(gt('ph'))}</label><input id="gPh" inputmode="tel" autocomplete="tel" dir="ltr" placeholder="03001234567" required></div>
+    <div><label for="gCt">${esc(gt('ct'))}</label><input id="gCt" dir="auto" autocomplete="address-level2" maxlength="40" required value="${esc(me.city||s.city||'')}"></div>
+    <div><label for="gPin">${esc(gt('pin'))}</label><input id="gPin" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="6" dir="ltr" autocomplete="current-password" required><p class="note">${esc(gt('pinH'))}</p></div>
+    <p class="warnbox" id="gErr" hidden dir="auto"></p>
+    <button class="btn full" type="submit" id="gGo">${esc(gt('go'))}</button></form>
+   <button class="btn ghost full" type="button" data-act="gateKid">${esc(gt('kid'))}</button></div>`;}
+function bindGate(){const f=$('gateForm');if(!f)return;
+  f.onsubmit=async e=>{e.preventDefault();const err=$('gErr'),go=$('gGo');const show=m=>{err.textContent=m;err.hidden=false;go.disabled=false;go.textContent=gt('go');};
+    const nm=cap($('gNm').value||''),ct=cap($('gCt').value||''),ph=normPK($('gPh').value),pin=$('gPin').value.trim();
+    if(!nm)return show(gt('needNm'));if(!ph)return show(at('badPh'));if(!ct)return show(gt('needCt'));if(!/^\d{4,6}$/.test(pin))return show(at('badPin'));
+    if(!online())return show(gt('net'));
+    go.disabled=true;go.textContent=at('wait');err.hidden=true;D.me={name:nm,city:ct};save0();
+    try{let lr=await sbLogin(ph,pin);let isNew=false;
+      if(lr.err){const s0=D.shop||{};
+        const r=await sbFetch(SB_URL+'/functions/v1/signup',{method:'POST',headers:{apikey:SB_KEY,'content-type':'application/json'},body:JSON.stringify({phone:ph,pin,name:nm,city:ct,user_type:s0.kind==='home'?'family':'shop',shop_name:s0.kind==='home'?'':(s0.name||''),app_version:APP_VER})},25000);
+        const j=await r.json().catch(()=>({}));
+        if(!r.ok)return show(j.error==='exists'?gt('wrongPin'):at('fail'));
+        lr=await sbLogin(ph,pin);if(lr.err)return show(at('fail'));isNew=true;}
+      evt('signin');if(isNew)evt('signup');
+      try{const a=accGet();await sbRest('profiles?id=eq.'+a.uid,{method:'PATCH',body:{name:nm,city:ct},prefer:'return=minimal'});}catch(x){}
+      await afterLogin(isNew);render();
+    }catch(x){show(at('fail'));}};}
+/* fill the shop / home setup form with the name and city already given */
+function gatePrefill(){const me=D.me;if(!me)return;[['sOwner',me.name],['sCity',me.city],['fhN',me.name],['fhC',me.city]].forEach(([id,v])=>{const el=$(id);if(el&&!el.value&&v)el.value=v;});}
+const _renderGT=render;render=function(){_renderGT();try{
+  if(gateNeeded()){document.body.classList.remove('night','jlight');$('app').innerHTML=gateView();$('tabHost').innerHTML='';$('fabHost').innerHTML='';const hb=$('hbtns');if(hb)hb.innerHTML='';bindGate();return;}
+  if(accGet())document.querySelectorAll('#app [data-act="accLogin"]').forEach(e=>e.remove());
+  gatePrefill();}catch(e){}};
+window.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('[data-act="gateKid"]');if(!b)return;e.preventDefault();e.stopImmediatePropagation();S.startMode='stu';render();},true);
+/* the old optional sign-up pop-ups are no longer needed */
+acctPrompt=function(){};
+try{render();}catch(e){}
+
+
+/* v0.23.1 Front door: kids get their own signup (name + parent's code), and the shop setup gets a back button */
+const KS={roman:{btn:'👧 Bachon ka signup',sub:'Ammi/Abbu se mila code aur apna naam likhein',name:'Apna naam',or:'Bachay hain?'},
+ ur:{btn:'👧 بچوں کا سائن اپ',sub:'امی/ابو سے ملا کوڈ اور اپنا نام لکھیں',name:'اپنا نام',or:'بچے ہیں؟'},
+ ps:{btn:'👧 د ماشومانو سائن اپ',sub:'له مور/پلار نه ترلاسه شوی کوډ او خپل نوم ولیکئ',name:'خپل نوم',or:'ماشوم یاست؟'},
+ en:{btn:'👧 Kids\' signup',sub:'Enter the code from your parent and your name',name:'Your name',or:'Are you a child?'}};
+function ks(k){return (KS[D.lang]&&KS[D.lang][k])||KS.roman[k];}
+const _render231=render;render=function(){_render231();try{if(D.shop||gateNeeded())return;
+  const card=document.querySelector('.fcard[data-act="fdStu"]');
+  if(card&&!S.startMode&&!D.alt){const grid=card.parentElement;card.remove();
+    const box=`<div class="d2kidsdoor"><p class="note" dir="auto" style="text-align:center;margin:6px 0 4px">${esc(ks('or'))}</p><button class="btn ghost full" data-act="fdStu" style="flex-direction:column;gap:0"><b dir="auto">${esc(ks('btn'))}</b><small dir="auto" style="font-weight:400">${esc(ks('sub'))}</small></button></div>`;
+    const login=document.querySelector('#app [data-act="accLogin"]');if(login)login.insertAdjacentHTML('afterend',box);else if(grid)grid.insertAdjacentHTML('afterend',box);}
+  if(S.startMode==='shop'){const f=$('setupForm');const pg=f&&f.closest('.page');if(pg&&!pg.querySelector('[data-act="fdBack"]')){pg.insertAdjacentHTML('afterbegin',`<button class="btn ghost sm" data-act="fdBack" type="button" style="align-self:flex-start">${esc(fd('back'))}</button>`);pg.querySelectorAll('.seg').forEach(s=>{if(s.querySelector('[data-lang]'))s.remove();});}}
+  if(S.startMode==='stu'){const jf=$('kidJoinForm');if(jf&&!$('kjN')){jf.insertAdjacentHTML('afterbegin',`<div><label for="kjN">${esc(ks('name'))}</label><input id="kjN" dir="auto" maxlength="30" required></div>`);}}
+ }catch(e){}};
+const _kidAdopt231=kidAdopt;kidAdopt=function(k){const n=$('kjN')&&cap($('kjN').value.trim());if(n)k=Object.assign({},k,{name:n});return _kidAdopt231(k);};
+try{render();}catch(e){}
+
+
+/* v0.23.2 Line icons instead of emojis. Every emoji the app shows is swapped for a matching vector icon
+   (same color as the text, scales with it). Unknown emojis are removed. What the user types stays as typed. */
+const ICP={
+ book:'<path d="M2 4h6a4 4 0 0 1 4 4v13a3 3 0 0 0-3-3H2z"/><path d="M22 4h-6a4 4 0 0 0-4 4v13a3 3 0 0 1 3-3h7z"/>',
+ note:'<path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><path d="M14 3v6h6M8 13h8M8 17h5"/>',
+ home:'<path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/>',
+ store:'<path d="M3 9l1.5-5h15L21 9"/><path d="M3 9a3 3 0 0 0 6 0 3 3 0 0 0 6 0 3 3 0 0 0 6 0"/><path d="M5 11v9h14v-9M10 20v-5h4v5"/>',
+ bell:'<path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/>',
+ child:'<circle cx="12" cy="7" r="4"/><path d="M5 21a7 7 0 0 1 14 0"/>',
+ family:'<circle cx="8" cy="7" r="3"/><circle cx="17" cy="9" r="2.4"/><path d="M2 20a6 6 0 0 1 12 0M14 20a4 4 0 0 1 8 0"/>',
+ moon:'<path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/>',
+ sun:'<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>',
+ warn:'<path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4M12 17h.01"/>',
+ file:'<path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><path d="M14 3v6h6"/>',
+ mic:'<rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 10a7 7 0 0 0 14 0M12 17v4M8 21h8"/>',
+ search:'<circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/>',
+ pen:'<path d="M17 3a2.8 2.8 0 0 1 4 4L7.5 20.5 2 22l1.5-5.5z"/>',
+ trash:'<path d="M3 6h18M8 6V4h8v2M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6M10 11v6M14 11v6"/>',
+ undo:'<path d="M9 14 4 9l5-5"/><path d="M4 9h11a5 5 0 0 1 0 10h-3"/>',
+ calc:'<rect x="4" y="2" width="16" height="20" rx="2"/><path d="M8 6h8M8 11h.01M12 11h.01M16 11h.01M8 15h.01M12 15h.01M16 15h.01M8 19h.01M12 19h.01M16 19h.01"/>',
+ chat:'<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>',
+ cam:'<path d="M14.5 4h-5L7.5 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3.5z"/><circle cx="12" cy="13" r="3.5"/>',
+ lock:'<rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/>',
+ bulb:'<path d="M9 18h6M10 22h4"/><path d="M12 2a7 7 0 0 0-4 12.7V16h8v-1.3A7 7 0 0 0 12 2z"/>',
+ star:'<path d="m12 2 3.1 6.3 6.9 1-5 4.9 1.2 6.8L12 17.8 5.8 21l1.2-6.8-5-4.9 6.9-1z"/>',
+ out:'<path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/>',
+ x:'<path d="M18 6 6 18M6 6l12 12"/>'};
+const ICM={'📚':'book','📘':'book','📖':'book','📝':'note','🏠':'home','🏡':'home','🏪':'store','🏬':'store','🔔':'bell','👧':'child','🧒':'child','👦':'child','👨‍👩‍👧':'family','👨‍👩‍👧‍👦':'family','☾':'moon','🌙':'moon','☀':'sun','⚠':'warn','📄':'file','📎':'file','🎤':'mic','🎙':'mic','🔎':'search','🔍':'search','✎':'pen','✏':'pen','🗑':'trash','↶':'undo','🧮':'calc','💬':'chat','📷':'cam','📸':'cam','🔒':'lock','💡':'bulb','⭐':'star','⎋':'out','✕':'x','❌':'x'};
+const ICRX=/(?:\p{Extended_Pictographic}|[☾⎋✕↶✎])(?:️|[\u{1F3FB}-\u{1F3FF}])?(?:‍\p{Extended_Pictographic}️?)*/gu;
+const ICKEEP=/^[✓✔→←↑↓↔©®™#*0-9]$/;
+document.head.insertAdjacentHTML('beforeend','<style>.ic{width:1.15em;height:1.15em;display:inline-block;vertical-align:-.2em;flex-shrink:0;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.fic .ic{width:30px;height:30px;stroke-width:1.7}.fic .ic+.ic{margin-inline-start:4px}</style>');
+function icSVG(n){return `<svg class="ic" viewBox="0 0 24 24" aria-hidden="true">${ICP[n]}</svg>`;}
+function icSkip(el){return !el||el.closest('input,textarea,script,style,svg,.jme,[contenteditable="true"]');}
+function icText(tn){const s=tn.nodeValue;ICRX.lastIndex=0;if(!ICRX.test(s))return;const p=tn.parentElement;if(icSkip(p))return;
+  ICRX.lastIndex=0;let out='',last=0,m,any=false;
+  while((m=ICRX.exec(s))){const e=m[0],base=e.replace(/[️\u{1F3FB}-\u{1F3FF}]/gu,'');if(ICKEEP.test(base))continue;
+    out+=esc(s.slice(last,m.index));const k=ICM[base]||ICM[e];out+=k?icSVG(k):'';last=m.index+e.length;any=true;}
+  if(!any)return;out+=esc(s.slice(last));out=out.replace(/^(<svg[^]*?<\/svg>)\s+/,'$1 ');
+  if(!out.replace(/<svg[^]*?<\/svg>/g,'').trim()&&!/<svg/.test(out)){tn.nodeValue='';return;}
+  const t=document.createElement('template');t.innerHTML=out;p.replaceChild(t.content,tn);}
+function icAttr(el){['placeholder','title','aria-label'].forEach(a=>{const v=el.getAttribute&&el.getAttribute(a);if(v&&ICRX.test(v)){ICRX.lastIndex=0;const n=v.replace(ICRX,x=>ICKEEP.test(x.replace(/️/g,''))?x:'').replace(/\s{2,}/g,' ').trim();el.setAttribute(a,n);}ICRX.lastIndex=0;});}
+function icScan(root){if(!root)return;if(root.nodeType===3){icText(root);return;}if(root.nodeType!==1||icSkip(root))return;
+  icAttr(root);root.querySelectorAll('[placeholder],[title],[aria-label]').forEach(icAttr);
+  const w=document.createTreeWalker(root,NodeFilter.SHOW_TEXT);const list=[];while(w.nextNode())list.push(w.currentNode);list.forEach(icText);}
+try{icScan(document.body);new MutationObserver(ms=>{for(const m of ms){if(m.type==='characterData')icText(m.target);else m.addedNodes.forEach(icScan);}}).observe(document.body,{childList:true,subtree:true,characterData:true});}catch(e){}
+
+
+/* v0.23.3 Preview mode. Inside the Claude preview page the app cannot reach the login server, so signup there always failed.
+   On any address other than the real site, the login screen shows a "try without login" button. The real site is unchanged. */
+const TM_REAL=/(^|\.)github\.io$|(^|\.)conceptai\.live$|^localhost$|^127\.0\.0\.1$/.test(location.hostname);
+const TMT={roman:'Test ke liye bina login dekhein (sirf preview)',ur:'ٹیسٹ کے لیے بغیر لاگ ان دیکھیں (صرف پریویو)',ps:'د ازموینې لپاره بې له ننوتلو وګورئ (یوازې پریویو)',en:'Try without login (preview only)'};
+const _gateNeededTM=gateNeeded;gateNeeded=function(){if(!TM_REAL&&D.testMode)return false;return _gateNeededTM();};
+const _renderTM=render;render=function(){_renderTM();try{if(TM_REAL||D.testMode)return;const f=$('gateForm');if(f&&!document.querySelector('[data-act="tmSkip"]')){f.insertAdjacentHTML('afterend',`<button class="btn ghost full" type="button" data-act="tmSkip">${esc(TMT[D.lang]||TMT.roman)}</button>`);}}catch(e){}};
+window.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('[data-act="tmSkip"]');if(!b)return;e.preventDefault();e.stopImmediatePropagation();D.testMode=true;save();render();},true);
+try{render();}catch(e){}
+
+
+/* v0.24.0 (1) Language lock: Jugnu replies in the language the user chose and typed. Urdu words that Pashto also uses
+   (dukaan, malik) no longer flip a reply to Pashto, and Roman Urdu is no longer mistaken for English.
+   If an AI reply still comes back in the wrong language, it is asked again once.
+   (2) Expert answers: general questions go to the AI. Munshi answers as a Pakistani business consultant,
+   Saathi as a Pakistani home and family expert. */
+const L_PS_CH=/[ټډړښږځڅېۍګ]/,L_AR=/[؀-ۿ]/;
+const L_PSW=['د','راته','ووایه','ووایئ','زما','ستا','کړه','راکړه','یم','نن','واخیست','راکړل','څنګه','څومره','مننه','دی','ده','دې','کوم','ولې','هو','نه','ورکړ','ښه','لپاره','سره','ته','کې','یې','شو','شوه'];
+const L_RW=/\b(ne|ka|ki|ke|ko|se|hai|hain|hoon|hun|ho|tha|thi|the|diye|diya|liya|liye|udhaar|udhar|kitna|kitni|kitne|kis|aaj|kal|baqaya|sab|zyada|ziada|wasooli|hisaab|hisab|bhai|ji|kya|kia|karo|kar|karna|karein|karun|dena|lena|purana|kul|shukriya|salam|bhejo|yaad|aap|ap|tum|kaun|kon|haal|hal|kaise|kaisay|kaisa|kese|kyun|kyon|chal|raha|rahi|rahe|theek|thik|batao|bataein|bataen|mashwara|dukaan|dukan|acha|achha|nahi|nahin|nai|mera|meri|mere|mujhe|hum|hamara|dein|wala|wali|waqt|paisa|paise|raqam|ghar|kaam|kam|aur|lekin|magar|agar|phir|bhi|abhi|bohat|bahut|zara|chahiye|chahta|chahti|sakta|sakti|sakte|gaya|gayi|hota|hoti|kab|kahan|yahan|wahan|koi|kuch|apna|apni|bachon|bacha|sahab|bijli|mehnga|sasta)\b/gi;
+const L_EW=/\b(the|is|are|was|were|my|your|how|what|why|which|when|where|who|can|could|should|would|will|please|i|you|to|do|does|did|for|in|of|and|with|this|that|it|have|has|best|good|need|want|tell|explain|about|from|get|make|business|shop|home)\b/gi;
+function lScore(t){const s=String(t||'');return{r:(s.match(L_RW)||[]).length,e:(s.match(L_EW)||[]).length};}
+detectLang=function(text){const t=String(text||'');const pref=D.lang||'roman';
+  if(L_PS_CH.test(t))return 'ps';
+  if(L_AR.test(t)){if(pref==='ps')return 'ps';const ws=t.split(/[\s،؟?!.۔]+/);const n=ws.filter(w=>L_PSW.includes(w)).length;return n>=2?'ps':'ur';}
+  if(/[a-z]/i.test(t)){const {r,e}=lScore(t);
+    if(pref==='en')return (r>=2&&r>e)?'roman':'en';
+    return (e>=3&&r===0)?'en':'roman';}
+  return pref;};
+const L_RULE={roman:'Write Urdu words in English letters (example: "Ji, aap ka hisaab theek hai. Kal tak 2000 baqi hain."). Do NOT reply in English sentences, and do NOT use Urdu script.',
+ ur:'Write in Urdu (Nastaliq) script only. Do NOT use Pashto words or Pashto letters (ټ ډ ړ ښ ږ ځ څ ې ګ), and no English sentences.',
+ ps:'Write in Pashto only (Pashto words and script). Do NOT switch to Urdu.',
+ en:'Write in simple English only.'};
+let L_STRICT=false;
+function lRule(l){return (L_RULE[l]||'')+(L_STRICT?' IMPORTANT: your last reply was in the wrong language. Reply again in '+LNAME[l]+' only.':'');}
+function lReplyOK(txt,l){const s=String(txt||'');if(!s.trim())return true;const ar=L_AR.test(s);
+  if(l==='ur')return ar&&!L_PS_CH.test(s);
+  if(l==='ps')return ar;
+  if(l==='en')return !ar;
+  if(l==='roman'){if(ar)return false;const {r,e}=lScore(s);return !(e>=4&&r<=1);}
+  return true;}
+const SHOP_EXPERT=`You are Jugnu, a Pakistani AI assistant who is the munshi (trusted bookkeeper) of this shop and also an expert Pakistani business consultant with 20 years of experience in Pakistani bazaars and small businesses. You understand Urdu in Urdu script, Roman Urdu, Pashto and English.
+You help with: the shop's khata (use the ledger below), and ANY business question a Pakistani shopkeeper or small business owner may ask: selling more, pricing and margins, stock and wholesale markets, cash flow and udhaar control, staff, marketing on WhatsApp, Facebook, TikTok and Daraz, Raast, JazzCash and Easypaisa merchant accounts, bank accounts and SME loans (SMEDA, bank SME finance, government youth loan schemes), FBR basics (NTN, filer and non filer, sales tax, POS for big retailers), SECP registration, trade licences, food authority rules, rent agreements, starting a new business or a second branch, importing and online selling. Also everyday general questions and friendly chat.
+Give real, practical, Pakistan specific answers with local examples, the way a senior consultant talks to a shop owner face to face.`;
+const HOME_EXPERT=`You are Jugnu, a Pakistani AI assistant who keeps this person's personal and family hisaab kitaab (money lent to or borrowed from relatives and friends, home expenses, committee or BC, saving) and who is also an expert on Pakistani home and family life. You understand Urdu in Urdu script, Roman Urdu, Pashto and English. Talk like a trusted, sensible family elder friend, never like a shopkeeper. Never call the user Seth ji. In the ledger below, "customer" means someone who owes the user and "supplier" means someone the user owes.
+You help with: the personal ledger below, and ANY home question a Pakistani family may ask: monthly budget and saving, committees, utility bills (electricity from WAPDA companies or K-Electric, gas from SNGPL or SSGC, how to read and reduce a bill, wrong bill complaints, solar and net metering), NADRA (CNIC, B form, FRC), passport, school admissions and fees, rent and property basics, wedding and Eid planning, kitchen and household tips, home repairs, savings options (National Savings, bank and Islamic banking accounts, Roshan Digital), online shopping and safety from scams. Also everyday general questions and friendly chat.
+Give real, practical, Pakistan specific answers with local examples.`;
+const GEN_LEN=`Answer the question fully like an expert: start with the direct answer in one line, then up to 5 short numbered practical steps or points specific to Pakistan. For rules, fees, tax rates and deadlines that change, say it is the usual practice and ask the user to confirm from the official office or website (for example FBR, NADRA, the electricity company). Never make up exact numbers you are not sure of. Keep it under 120 words`;
+function jIdentity(mode){return isHome()?HOME_EXPERT:SHOP_EXPERT;}
+/* general questions: a real question with no ledger words and no person from the khata goes to the AI */
+const G_LEDGER=/(udha?a?r|wasoo?l|hisa+b|kha+ta|baqa?ya|baqi|baaqi|balance|\blena\b|\bdena\b|\blene\b|\bdene\b|diye|liye|\bsale\b|sales|bikri|galla|kharch|expense|kameti|committee|\bbc\b|report|goshwara|statement|remind|yaad|owes?\b|indraaj|entry|raseed|receipt|ادھار|وصول|حساب|کھات|بقایا|باقی|خرچ|سیل|بکری|گلہ|کمیٹی|رسید|پور|کهات|لګښت|خرڅلاو)/i;
+const G_Q=/[?؟]|\b(kaise|kaisay|kese|kyun|kyon|kya|kia|kab|kahan|kaun|kon|konsa|kaunsa|kitna|kitni|how|what|why|which|when|where|who|can|should|batao|bataein|bataen|samjhao|tell|explain|tareeqa|tariqa|mashwara|chahiye)\b|کیسے|کیوں|کیا|کب|کہاں|کون|بتائیں|بتاؤ|سمجھا|طریقہ|مشورہ|څنګه|ولې|څه|کله|چېرته|څوک|راته ووایه/i;
+function isGeneralQ(t){const s=' '+toAsciiDigits(String(t||'')).toLowerCase()+' ';if(/\d{3,}/.test(s))return false;try{if(nameInText(t))return false;}catch(e){}
+  if(G_LEDGER.test(s))return false;return G_Q.test(s)&&words(t).length>=3;}
+let G_MODE=false;
+const _jaG=jugnuAnswer;jugnuAnswer=function(text,l){const r=_jaG.apply(this,arguments);
+  try{if(r&&!r.entry&&!r.action&&!r.cid&&r.kind!=='idea'&&r.kind!=='com'&&r.kind!=='fam'&&r.kind!=='talk'&&aiOn()&&isGeneralQ(text)){G_MODE=true;return{text:jt('dont',l||detectLang(text))};}}catch(e){}
+  try{if(r&&r.kind==='idea'&&aiOn()&&isGeneralQ(text)&&!/(improve|increase|grow|barh|badh|sale|bik|gaa?hak|customer|munafa|profit|loss|nuqsan|nuksan|marketing|competition|muqabla|بڑھ|منافع|نقصان|گاہک|بک|ګټه|زیان|پېرودونک)/i.test(text)){G_MODE=true;return{text:jt('dont',l||detectLang(text))};}}catch(e){}
+  G_MODE=false;return r;};
+const _askAIG=askAI;askAI=async function(q,l,mode){if(G_MODE&&mode==='chat')mode='general';if(isHome()&&mode==='advice')mode='general';G_MODE=false;
+  let r=await _askAIG.call(this,q,l,mode);
+  if(r&&r.text&&!lReplyOK(r.text,l)){L_STRICT=true;try{const r2=await _askAIG.call(this,q,l,mode);if(r2&&r2.text&&lReplyOK(r2.text,l))r=r2;}finally{L_STRICT=false;}}
+  return r;};
+
+
+/* v0.24.1 Strict scope. Jugnu only works in its own field: Munshi = the khata and business, Saathi = the personal hisaab and home and family life.
+   (1) An on-phone filter politely refuses politics, sectarian topics, adult content, abuse, fraud and unrelated big jobs (code, essays)
+       without spending an AI question, and says plainly that it cannot know live prices, rates, scores or news.
+   (2) The AI itself is told to refuse anything outside the field in one polite line and bring the talk back. Each refusal is counted (no text) for the pilot review. */
+const SC_RX={
+ pol:/\b(pti|pml-?n|ppp|jui|jui-?f|mqm|tlp|\banp\b|imran khan|nawaz sharif|shehbaz|shahbaz sharif|maryam nawaz|bilawal|zardari|fazl ?ur ?rehman|election|elections|intikhab|intekhab|siyasat|siyasi|siyasatdan|politic\w*|prime minister kaun|vote kis ko|dharna|inquilab)\b|سیاست|سیاسی|الیکشن|انتخابات|عمران خان|نواز شریف|شہباز|مریم نواز|بلاول|زرداری|ووٹ کس|دھرنا|ټاکنې|سياست/i,
+ sect:/\b(shia|sunni|wahabi|wahhabi|deobandi|barelvi|ahmadi|qadiani|mirzai|kafir|kaafir|firqa|firqay|takfir)\b|شیعہ|سنی|وہابی|دیوبندی|بریلوی|احمدی|قادیانی|مرزائی|کافر|فرقہ|فرقے/i,
+ adult:/\b(sex|sexy|porn|xxx|nude|nangi|nanga|chudai|bf video|hot girl|girlfriend banao|dating)\b|سیکس|ننگی|فحش/i,
+ abuse:/\b(harami|haramzada|kanjar|kameena|kamina|bhenchod|bhen ?chod|madarchod|gandu|chutiya|fuck|bitch)\b|حرامی|حرامزادہ|کنجر|کمینہ/i,
+ fraud:/\b(fake bill|fake raseed|jaali|jali bill|nakli raseed|nakli bill|tax chori|tax chur\w*|black money|kala dhan|hack|hacking|password tor\w*|otp chura\w*|chori kaise|scam kaise|dhoka kaise|smuggl\w*|ganja|charas|nasha kahan)\b|جعلی|نقلی رسید|ٹیکس چوری|ہیک|چوری کیسے|دھوکہ کیسے|چرس/i,
+ job:/\b(code likh\w*|write (a |the )?code|python|javascript|html code|program likh\w*|essay likh\w*|write (an |a )?essay|mazmoon likh\w*|assignment likh\w*|poem likh\w*|write (a )?poem|shayari likh\w*|story likh\w*|write (a )?story|thesis|cv likh\w*|resume likh\w*)\b|مضمون لکھ|کوڈ لکھ|شاعری لکھ|کہانی لکھ/i,
+ live:/\b(dollar rate|dollar ka rate|aaj ka rate|gold rate|sone ka rate|sona rate|petrol price|petrol ki qeemat|petrol rate|diesel rate|score|match kaun|match result|live match|khabar|khabrein|news|taaza|weather today|aaj mausam|share price|stock market|psx|bitcoin price|crypto price)\b|ڈالر ریٹ|ڈالر کا ریٹ|سونے کا ریٹ|پیٹرول کی قیمت|سکور|میچ|خبر|خبریں|تازہ/i};
+const SC_T={
+ roman:{no:'Maaf kijiye, ye mere kaam ka mozu nahi. Main {m} ke liye hoon. Batayein, is mein kya madad karun?',live:'Main aaj ka taaza rate, score ya khabar nahi jaanta, ye kisi bharosemand khabar ki website ya app par check karein. Hisaab ya {m} mein koi kaam ho to batayein.',abuse:'Aisi zabaan na istemal karein, please. Main {m} mein madad ke liye haazir hoon.',mShop:'aap ke hisaab aur karobar',mHome:'aap ke ghar ke hisaab aur ghar ke maamlaat'},
+ ur:{no:'معاف کیجیے، یہ میرے کام کا موضوع نہیں۔ میں {m} کے لیے ہوں۔ بتائیں، اس میں کیا مدد کروں؟',live:'میں آج کا تازہ ریٹ، سکور یا خبر نہیں جانتا، یہ کسی بھروسے مند خبر کی ویب سائٹ یا ایپ پر دیکھیں۔ حساب یا {m} میں کوئی کام ہو تو بتائیں۔',abuse:'براہ کرم ایسی زبان استعمال نہ کریں۔ میں {m} میں مدد کے لیے حاضر ہوں۔',mShop:'آپ کے حساب اور کاروبار',mHome:'آپ کے گھر کے حساب اور گھریلو معاملات'},
+ ps:{no:'بښنه غواړم، دا زما د کار موضوع نه ده. زه د {m} لپاره یم. ووایئ، په دې کې څه مرسته وکړم؟',live:'زه د نن ورځې تازه نرخ، سکور یا خبر نه پېژنم، دا په یوه باوري خبري ویب پاڼه یا اپ کې وګورئ. که په حساب یا {m} کې کار وي، ووایئ.',abuse:'مهرباني وکړئ داسې ژبه مه کاروئ. زه په {m} کې د مرستې لپاره حاضر یم.',mShop:'ستاسو حساب او کاروبار',mHome:'ستاسو د کور حساب او کورنیو چارو'},
+ en:{no:'Sorry, that is outside what I do. I am here for {m}. How can I help with that?',live:'I do not know today\'s live rates, scores or news. Please check a trusted news website or app. If you need help with {m}, tell me.',abuse:'Please do not use such language. I am here to help with {m}.',mShop:'your hisaab and business',mHome:'your home hisaab and family matters'}};
+function scT(k,l){const L=SC_T[l]||SC_T.roman;return fill(L[k],{m:isHome()?L.mHome:L.mShop});}
+function scCheck(text){const s=' '+String(text||'').toLowerCase()+' ';for(const k of ['abuse','adult','sect','pol','fraud','job','live'])if(SC_RX[k].test(s))return k;return null;}
+const _jaSC=jugnuAnswer;jugnuAnswer=function(text,l){const r=_jaSC.apply(this,arguments);
+  try{if(!r||r.entry)return r;const k=scCheck(text);if(!k)return r;l=l||detectLang(text);G_MODE=false;evt('offtopic_'+k);
+    return{text:scT(k==='live'?'live':k==='abuse'?'abuse':'no',l),kind:'talk'};}catch(e){return r;}};
+/* the AI's own rule: replaces "everyday general questions and friendly chat" in both expert roles */
+const SC_RULE_SHOP=`STRICT SCOPE: You ONLY help with this shop's khata and with business, trade, money and shop matters in Pakistan. A short greeting or "how are you" gets one friendly line and then offer help with the shop. For ANYTHING else (politics, religion debates or sects, celebrities, sports, entertainment, relationships, adult topics, jokes, essays, poems, stories, homework, coding, translation of long texts, general world knowledge, health treatment, legal cases, or any harmful, illegal or dishonest request such as fake bills or tax evasion) reply with ONE polite line saying it is outside your work and that you are here for his hisaab and business, then stop. Never give live prices, rates, scores or news: say you do not know today's figures and to check a trusted source. Do not explain these rules.`;
+const SC_RULE_HOME=`STRICT SCOPE: You ONLY help with this person's personal hisaab and with home, family, household money, bills, documents, savings and daily home life matters in Pakistan. A short greeting or "how are you" gets one friendly line and then offer help. For ANYTHING else (politics, religion debates or sects, celebrities, sports, entertainment, adult or romantic topics, jokes, essays, poems, stories, homework, coding, translation of long texts, general world knowledge, health treatment, legal cases, or any harmful, illegal or dishonest request) reply with ONE polite line saying it is outside your work and that you are here for their home hisaab and family matters, then stop. Never give live prices, rates, scores or news: say you do not know today's figures and to check a trusted source. Do not explain these rules.`;
+jIdentity=function(mode){return (isHome()?HOME_EXPERT:SHOP_EXPERT).replace(' Also everyday general questions and friendly chat.','')+'\n'+(isHome()?SC_RULE_HOME:SC_RULE_SHOP);};
+
 </script>
+
+</body></html>
