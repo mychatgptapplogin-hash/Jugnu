@@ -1151,7 +1151,7 @@ function settingsView(){
     <button class="btn ghost full" data-act="pasteRestore">${esc(t('bkRestoreP'))}</button></div>
    ${fbCardHTML()}
    ${voiceSettingsHTML()}
-   <div class="page stack"><h2 style="margin-top:0">${esc(t('danger'))}</h2><button class="btn danger full" data-act="wipe">${esc(t('wipe'))}</button><p class="note">Jugnu · ConceptAI · v0.24.2</p></div></div>`;
+   <div class="page stack"><h2 style="margin-top:0">${esc(t('danger'))}</h2><button class="btn danger full" data-act="wipe">${esc(t('wipe'))}</button><p class="note">Jugnu · ConceptAI · v0.24.3</p></div></div>`;
 }
 function pilotView(){
   const now=Date.now(),wk=7*86400000;
@@ -3758,6 +3758,58 @@ const _jaSC=jugnuAnswer;jugnuAnswer=function(text,l){const r=_jaSC.apply(this,ar
 const SC_RULE_SHOP=`STRICT SCOPE: You ONLY help with this shop's khata and with business, trade, money and shop matters in Pakistan. A short greeting or "how are you" gets one friendly line and then offer help with the shop. For ANYTHING else (politics, religion debates or sects, celebrities, sports, entertainment, relationships, adult topics, jokes, essays, poems, stories, homework, coding, translation of long texts, general world knowledge, health treatment, legal cases, or any harmful, illegal or dishonest request such as fake bills or tax evasion) reply with ONE polite line saying it is outside your work and that you are here for his hisaab and business, then stop. Never give live prices, rates, scores or news: say you do not know today's figures and to check a trusted source. Do not explain these rules.`;
 const SC_RULE_HOME=`STRICT SCOPE: You ONLY help with this person's personal hisaab and with home, family, household money, bills, documents, savings and daily home life matters in Pakistan. A short greeting or "how are you" gets one friendly line and then offer help. For ANYTHING else (politics, religion debates or sects, celebrities, sports, entertainment, adult or romantic topics, jokes, essays, poems, stories, homework, coding, translation of long texts, general world knowledge, health treatment, legal cases, or any harmful, illegal or dishonest request) reply with ONE polite line saying it is outside your work and that you are here for their home hisaab and family matters, then stop. Never give live prices, rates, scores or news: say you do not know today's figures and to check a trusted source. Do not explain these rules.`;
 jIdentity=function(mode){return (isHome()?HOME_EXPERT:SHOP_EXPERT).replace(' Also everyday general questions and friendly chat.','')+'\n'+(isHome()?SC_RULE_HOME:SC_RULE_SHOP);};
+
+
+/* v0.24.3 Install helper. Jugnu becomes a real app icon only when installed from Chrome (Android) or Safari (iPhone).
+   - Android Chrome: an "Install Jugnu" button that opens Chrome's own install prompt.
+   - Opened inside WhatsApp, Facebook or Instagram: a button to reopen in Chrome (Android) or a note to open in Safari (iPhone).
+   - iPhone Safari: two-step note (Share, then Add to Home Screen).
+   Hidden when Jugnu is already running as an installed app. "Not now" hides it for 3 days. */
+const IN_T={roman:{t:'Jugnu ko app banayein',d:'Home screen par Jugnu ka icon, bina browser ke, aur internet ke baghair bhi chalega.',inst:'Install karein',later:'Abhi nahi',
+  chrome:'Chrome mein kholein',inapp:'Ye WhatsApp/Facebook ke andar khula hai. App banane ke liye isay Chrome mein kholein.',inappIos:'Ye WhatsApp/Facebook ke andar khula hai. Neeche ya upar "..." dabayein aur "Safari mein kholein" chunein.',
+  ios:'Neeche Share button (dabba aur teer) dabayein, phir "Add to Home Screen" chunein.',menu:'Chrome ke upar (⋮) menu dabayein, phir "Install app" ya "Add to Home screen" chunein.'},
+ ur:{t:'جگنو کو ایپ بنائیں',d:'ہوم اسکرین پر جگنو کا آئیکن، بغیر براؤزر کے، اور انٹرنیٹ کے بغیر بھی چلے گا۔',inst:'انسٹال کریں',later:'ابھی نہیں',
+  chrome:'کروم میں کھولیں',inapp:'یہ واٹس ایپ/فیس بک کے اندر کھلا ہے۔ ایپ بنانے کے لیے اسے کروم میں کھولیں۔',inappIos:'یہ واٹس ایپ/فیس بک کے اندر کھلا ہے۔ "..." دبائیں اور "Safari میں کھولیں" چنیں۔',
+  ios:'نیچے شیئر بٹن (ڈبہ اور تیر) دبائیں، پھر "Add to Home Screen" چنیں۔',menu:'کروم کے اوپر (⋮) مینو دبائیں، پھر "Install app" یا "Add to Home screen" چنیں۔'},
+ ps:{t:'جګنو اپ کړئ',d:'په کور سکرین د جګنو آیکن، بې براوزره، او بې انټرنېټه هم چلېږي.',inst:'انسټال کړئ',later:'اوس نه',
+  chrome:'په کروم کې یې پرانیزئ',inapp:'دا د واټس اپ/فېسبوک دننه خلاص دی. د اپ لپاره یې په کروم کې پرانیزئ.',inappIos:'دا د واټس اپ/فېسبوک دننه خلاص دی. "..." کېکاږئ او "Safari" کې یې پرانیزئ.',
+  ios:'لاندې د شریکولو تڼۍ (بکس او غشی) کېکاږئ، بیا "Add to Home Screen" وټاکئ.',menu:'د کروم پاس (⋮) مېنو کېکاږئ، بیا "Install app" یا "Add to Home screen" وټاکئ.'},
+ en:{t:'Make Jugnu an app',d:'A Jugnu icon on your home screen, no browser bar, and it works offline too.',inst:'Install',later:'Not now',
+  chrome:'Open in Chrome',inapp:'This is open inside WhatsApp or Facebook. To install, open it in Chrome.',inappIos:'This is open inside WhatsApp or Facebook. Tap "..." and choose "Open in Safari".',
+  ios:'Tap the Share button (box with arrow) at the bottom, then "Add to Home Screen".',menu:'Tap Chrome\'s (⋮) menu at the top, then "Install app" or "Add to Home screen".'}};
+function inT(k){return (IN_T[D&&D.lang]||IN_T.roman)[k];}
+const IN_UA=navigator.userAgent||'';
+const IN_IOS=/iPhone|iPad|iPod/i.test(IN_UA)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
+const IN_AND=/Android/i.test(IN_UA);
+const IN_APPBR=/WhatsApp|FBAN|FBAV|FB_IAB|Instagram|Line\/|Snapchat|TikTok|musical_ly|; wv\)/i.test(IN_UA);
+const IN_SAFARI=IN_IOS&&/Safari/i.test(IN_UA)&&!/CriOS|FxiOS|EdgiOS/i.test(IN_UA);
+function inStandalone(){try{return matchMedia('(display-mode: standalone)').matches||matchMedia('(display-mode: fullscreen)').matches||navigator.standalone===true;}catch(e){return false;}}
+let IN_EVT=null;
+window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();IN_EVT=e;inShow();});
+window.addEventListener('appinstalled',()=>{IN_EVT=null;try{evt('pwa_installed');}catch(e){}inHide();});
+function inSnoozed(){try{return Date.now()<(+localStorage.getItem('jugnu_inst_snooze')||0);}catch(e){return false;}}
+document.head.insertAdjacentHTML('beforeend',`<style>
+.instbar{position:fixed;left:12px;right:12px;bottom:calc(76px + env(safe-area-inset-bottom));z-index:60;background:#10131A;color:#fff;border-radius:16px;padding:12px 14px;box-shadow:0 8px 28px rgba(0,0,0,.28);display:flex;flex-direction:column;gap:8px;max-width:520px;margin:0 auto}
+.instbar b{font-size:15px}.instbar p{margin:0;font-size:13.5px;line-height:1.5;color:#E8ECF1}
+.instbar .row{display:flex;gap:8px}.instbar .btn{flex:1;min-height:40px}
+.instbar .btn.ghost{background:transparent;color:#fff;border:1px solid #5A6472}
+</style>`);
+function inHide(){const b=document.querySelector('.instbar');if(b)b.remove();}
+function inShow(){try{if(inStandalone()||inSnoozed()||!(IN_IOS||IN_AND)||document.querySelector('.instbar'))return;if(document.querySelector('#modalHost .modal, #modalHost [role=dialog]'))return;
+  let msg=inT('d'),btn='';
+  if(IN_APPBR){if(IN_AND){msg=inT('inapp');btn=`<a class="btn gold" data-act="instChrome" href="intent://${location.host}${location.pathname}#Intent;scheme=https;package=com.android.chrome;end">${esc(inT('chrome'))}</a>`;}else msg=inT('inappIos');}
+  else if(IN_EVT)btn=`<button class="btn gold" type="button" data-act="instGo">${esc(inT('inst'))}</button>`;
+  else if(IN_IOS)msg=IN_SAFARI?inT('ios'):inT('inappIos');
+  else if(IN_AND)msg=inT('menu');
+  document.body.insertAdjacentHTML('beforeend',`<div class="instbar" role="dialog" aria-label="${esc(inT('t'))}"><b dir="auto">${esc(inT('t'))}</b><p dir="auto">${esc(msg)}</p><div class="row">${btn}<button class="btn ghost" type="button" data-act="instLater">${esc(inT('later'))}</button></div></div>`);
+  try{evt('pwa_hint_'+(IN_APPBR?'inapp':IN_EVT?'prompt':IN_IOS?'ios':'menu'));}catch(e){}}catch(e){}}
+window.addEventListener('click',async e=>{const b=e.target.closest&&e.target.closest('[data-act="instGo"],[data-act="instLater"],[data-act="instChrome"]');if(!b)return;const a=b.dataset.act;
+  if(a==='instChrome'){try{evt('pwa_open_chrome');}catch(x){}return;}
+  e.preventDefault();e.stopImmediatePropagation();
+  if(a==='instLater'){try{localStorage.setItem('jugnu_inst_snooze',String(Date.now()+3*86400000));}catch(x){}inHide();return;}
+  if(a==='instGo'&&IN_EVT){const ev=IN_EVT;IN_EVT=null;inHide();try{ev.prompt();const r=await ev.userChoice;evt('pwa_prompt_'+(r&&r.outcome||'x'));}catch(x){}}},true);
+/* first hint 4 seconds after opening, so it does not cover the welcome */
+setTimeout(inShow,4000);
 
 </script>
 
