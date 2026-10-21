@@ -4,6 +4,10 @@
 <title>Jugnu</title>
 <meta name="theme-color" content="#0B5D45">
 <link rel="manifest" href="manifest.webmanifest">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Jugnu">
 <link rel="apple-touch-icon" href="icon-192.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Nastaliq+Urdu:wght@400;600;700&family=Noto+Naskh+Arabic:wght@400;600;700&family=Sora:wght@400;600;700&display=swap">
@@ -1151,7 +1155,7 @@ function settingsView(){
     <button class="btn ghost full" data-act="pasteRestore">${esc(t('bkRestoreP'))}</button></div>
    ${fbCardHTML()}
    ${voiceSettingsHTML()}
-   <div class="page stack"><h2 style="margin-top:0">${esc(t('danger'))}</h2><button class="btn danger full" data-act="wipe">${esc(t('wipe'))}</button><p class="note">Jugnu · ConceptAI · v0.24.3</p></div></div>`;
+   <div class="page stack"><h2 style="margin-top:0">${esc(t('danger'))}</h2><button class="btn danger full" data-act="wipe">${esc(t('wipe'))}</button><p class="note">Jugnu · ConceptAI · v0.24.4</p></div></div>`;
 }
 function pilotView(){
   const now=Date.now(),wk=7*86400000;
@@ -3598,7 +3602,7 @@ const _renderGT=render;render=function(){_renderGT();try{
   if(gateNeeded()){document.body.classList.remove('night','jlight');$('app').innerHTML=gateView();$('tabHost').innerHTML='';$('fabHost').innerHTML='';const hb=$('hbtns');if(hb)hb.innerHTML='';bindGate();return;}
   if(accGet())document.querySelectorAll('#app [data-act="accLogin"]').forEach(e=>e.remove());
   gatePrefill();}catch(e){}};
-window.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('[data-act="gateKid"]');if(!b)return;e.preventDefault();e.stopImmediatePropagation();S.startMode='stu';render();},true);
+window.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('[data-act="gateKid"]');if(!b)return;e.preventDefault();e.stopImmediatePropagation();kidGate();},true);
 /* the old optional sign-up pop-ups are no longer needed */
 acctPrompt=function(){};
 try{render();}catch(e){}
@@ -3811,6 +3815,27 @@ window.addEventListener('click',async e=>{const b=e.target.closest&&e.target.clo
 /* first hint 4 seconds after opening, so it does not cover the welcome */
 setTimeout(inShow,4000);
 
+
+/* v0.24.4 (1) "Bachay ke liye?" on the login screen now always opens the kids' code page, even on a phone that already has
+   someone's hisaab: Jugnu first asks, keeps that hisaab as a backup on the phone, then opens the kids page.
+   (2) iPhone Chrome gets the right install steps. */
+const KG={roman:{t:'Is phone par pehle se hisaab hai',d:'Bachay ka account banane se ye hisaab is phone se hat kar ek backup mein mehfooz ho jayega (aur agar login kiya tha to cloud par bhi hai). Behtar hai bachay ke apne phone par banayein.',y:'Haan, bachay ka account banayein',n:'Wapis'},
+ ur:{t:'اس فون پر پہلے سے حساب ہے',d:'بچے کا اکاؤنٹ بنانے سے یہ حساب اس فون سے ہٹ کر ایک بیک اپ میں محفوظ ہو جائے گا (اور اگر لاگ ان کیا تھا تو کلاؤڈ پر بھی ہے)۔ بہتر ہے بچے کے اپنے فون پر بنائیں۔',y:'ہاں، بچے کا اکاؤنٹ بنائیں',n:'واپس'},
+ ps:{t:'په دې تلیفون کې دمخه حساب شته',d:'د ماشوم اکاونټ جوړول به دا حساب له دې تلیفون څخه لرې او په بیک اپ کې خوندي کړي (او که ننوتلي وئ، په کلاوډ کې هم شته). غوره دا ده چې د ماشوم په خپل تلیفون جوړ شي.',y:'هو، د ماشوم اکاونټ جوړ کړئ',n:'بېرته'},
+ en:{t:'This phone already has a hisaab',d:'Making a child account will move this hisaab off the phone into a saved backup (and it is in the cloud too if you were logged in). It is better to do this on the child\'s own phone.',y:'Yes, make the child account',n:'Back'}};
+function kg(k){return (KG[D.lang]||KG.roman)[k];}
+function kidGo(){if(D.shop&&!D.shop.studentOnly){try{localStorage.setItem('jugnu_khata_bak_'+Date.now(),JSON.stringify(D));}catch(e){}const lang=D.lang;D=Object.assign(blank(),{lang});save();}
+  S.startMode='stu';closeModal();render();try{window.scrollTo(0,0);}catch(e){}}
+window.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('[data-act="kidGoYes"]');if(!b)return;e.preventDefault();e.stopImmediatePropagation();kidGo();},true);
+function kidGate(){
+  if(D.shop&&!D.shop.studentOnly&&hasData(D)){modal(`<h1 dir="auto">${esc(kg('t'))}</h1><p dir="auto">${esc(kg('d'))}</p><button class="btn full" data-act="kidGoYes">${esc(kg('y'))}</button><button class="btn ghost full" data-act="closeModal">${esc(kg('n'))}</button>`);return;}
+  kidGo();}
+/* iPhone Chrome can also add to home screen (share button at the top) */
+const _inTKG=inT;inT=function(k){if(k==='inappIos'&&IN_IOS&&/CriOS/i.test(IN_UA)&&!/WhatsApp|FBAN|FBAV|Instagram/i.test(IN_UA))return ({roman:'Upar Share button (dabba aur teer) dabayein, phir "Add to Home Screen" chunein. Kaam na kare to Safari mein kholein.',ur:'اوپر شیئر بٹن (ڈبہ اور تیر) دبائیں، پھر "Add to Home Screen" چنیں۔ کام نہ کرے تو Safari میں کھولیں۔',ps:'پورته د شریکولو تڼۍ کېکاږئ، بیا "Add to Home Screen" وټاکئ. که کار ونکړ، په Safari کې یې پرانیزئ.',en:'Tap the Share button at the top, then "Add to Home Screen". If that does not work, open it in Safari.'})[D.lang]||'';return _inTKG(k);};
+
+
+/* the old account pop-up must never open over the login screen or the kids page */
+const _acctModalKG=acctModal;acctModal=function(m){try{if(m==='new'&&(gateNeeded()||S.startMode==='stu'||!D.shop||D.shop.studentOnly))return;}catch(e){}return _acctModalKG.apply(this,arguments);};
 </script>
 
 </body></html>
