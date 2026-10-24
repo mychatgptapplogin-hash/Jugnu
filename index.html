@@ -1155,7 +1155,7 @@ function settingsView(){
     <button class="btn ghost full" data-act="pasteRestore">${esc(t('bkRestoreP'))}</button></div>
    ${fbCardHTML()}
    ${voiceSettingsHTML()}
-   <div class="page stack"><h2 style="margin-top:0">${esc(t('danger'))}</h2><button class="btn danger full" data-act="wipe">${esc(t('wipe'))}</button><p class="note">Jugnu · ConceptAI · v0.24.4</p></div></div>`;
+   <div class="page stack"><h2 style="margin-top:0">${esc(t('danger'))}</h2><button class="btn danger full" data-act="wipe">${esc(t('wipe'))}</button><p class="note">Jugnu · ConceptAI · v0.26.0</p></div></div>`;
 }
 function pilotView(){
   const now=Date.now(),wk=7*86400000;
@@ -2062,7 +2062,7 @@ async function uSend(q){q=String(q||'').trim();if(!q||jBusy)return;hbNote(q,'u')
   uPush({who:'ai',text:r||ft('uNeedNet',l),l});jState(r?'happy':'idle');setTimeout(()=>{if(!jBusy)jState('idle');},1300);jBusy=false;}
 async function askTutor(q,l,p){
   try{const gloss=(l==='ps'||/[ښږځڅړټډګېۍ]/.test(q))?await psGloss(q):null;const lib=await libFind(q,p,guessSub(q));const hist=uChat().filter(m=>m.text).slice(-11,-1).map(m=>(m.who==='me'?'Student: ':'Ustad: ')+m.text).join('\n');
-    const prompt=`You are Ustad Jugnu, a kind, patient tutor for a Pakistani school student named ${p.name}. ${sylPrompt(p)}${libBlock(lib)}
+    const prompt=`You are Ustad Jugnu, a kind, patient tutor for a Pakistani school student named ${p.name}. ${sylPrompt(p)}${libBlock(lib)}${learnPrompt(p)}
 Rules:
 - Be accurate. Never invent chapter numbers, page numbers, exercise numbers, dates or exam statistics. If you are not sure something is in this student's book, say so and ask them to check the book.
 - Reply ONLY in ${LNAME[l]}, the same language and script the student used. Technical terms and formulas may stay in English as in the textbook.
@@ -2080,9 +2080,10 @@ Recent chat:
 ${hist||'(none)'}
 Student's new message: """${q}"""${gloss?`
 Urdu meaning of the student's Pashto (from a Pashto translator, to help you understand): """${gloss}"""`:''}
-Reply with only JSON like {"reply":"...","used":[]} where "used" lists the numbers of the library passages you used (empty if none).`;
+Reply with only JSON like {"reply":"...","used":[],"sub":"","topic":"","check":"none","mistake":"none","style":""} where "used" lists the numbers of the library passages you used (empty if none); "sub" is one of maths, physics, chemistry, biology, english, urdu, pashto, islamiat, pakst, cs, other; "topic" is the school topic in 1 to 4 English words as in a textbook (for example "Linear equations", "Photosynthesis", "Past tense"); "check" is right, partly or wrong ONLY if the student gave their own answer or solution to check, otherwise none; "mistake" is careless, method or concept if the student\'s answer was not right (careless = small slip like sign or arithmetic, method = wrong steps, concept = does not understand the idea), otherwise none; "style" is the main way you explained: example, story, steps, definition, visual or analogy.`;
     let r=null;try{r=await aiJSON(prompt,'@cf/openai/gpt-oss-120b');}catch(e1){if(e1&&['not_granted','unavailable','capability_disabled','capability_removed'].includes(e1.code))throw e1;r=null;}
     if(!r||typeof r.reply!=='string'||!r.reply.trim())r=await aiJSON(prompt);
+    try{if(r&&typeof r.reply==='string'&&r.reply.trim())learnNote(r);}catch(e){}
     return r&&typeof r.reply==='string'&&r.reply.trim()?r.reply.trim().slice(0,1200)+libCite(lib,r.used,l):null;
   }catch(err){if(err&&['not_granted','unavailable','capability_disabled','capability_removed'].includes(err.code)){SAMPLE=null;updMode();}return null;}
 }
@@ -3836,6 +3837,170 @@ const _inTKG=inT;inT=function(k){if(k==='inappIos'&&IN_IOS&&/CriOS/i.test(IN_UA)
 
 /* the old account pop-up must never open over the login screen or the kids page */
 const _acctModalKG=acctModal;acctModal=function(m){try{if(m==='new'&&(gateNeeded()||S.startMode==='stu'||!D.shop||D.shop.studentOnly))return;}catch(e){}return _acctModalKG.apply(this,arguments);};
+
+/* v0.25.0 Ustad learning map, step 1: topic-level tracking.
+   Every quiz answer and every tutor conversation is tagged with a subject and topic. Jugnu keeps, on the child's phone only,
+   how often each topic was practised, how often the child got it right, and the kind of mistake (careless, method, concept).
+   The Progress screen and the parent's report now show strong topics and topics that need practice. No personality labels. */
+const LMAP_T={roman:{t:'Topics',strong:'Mazboot',weak:'Mehnat chahiye',none:'Abhi kaafi data nahi. Quiz dein aur sawal poochein, phir yahan topics nazar aayenge.',mist:'Aksar ghalti',m_careless:'jaldi mein (dhyan)',m_method:'tareeqe mein',m_concept:'samajh mein',rs:'\n• Mazboot topics: {s}',rw:'\n• Mehnat chahiye: {s}'},
+ ur:{t:'موضوعات',strong:'مضبوط',weak:'محنت چاہیے',none:'ابھی کافی ڈیٹا نہیں۔ کوئز دیں اور سوال پوچھیں، پھر یہاں موضوعات نظر آئیں گے۔',mist:'اکثر غلطی',m_careless:'جلدی میں (دھیان)',m_method:'طریقے میں',m_concept:'سمجھ میں',rs:'\n• مضبوط موضوعات: {s}',rw:'\n• محنت چاہیے: {s}'},
+ ps:{t:'موضوعات',strong:'پیاوړي',weak:'زیار ته اړتیا',none:'لا کافي معلومات نشته. کوئز ورکړئ او پوښتنې وکړئ، بیا به دلته موضوعات ښکاره شي.',mist:'ډېره تېروتنه',m_careless:'په بیړه کې (پام)',m_method:'په طریقه کې',m_concept:'په پوهه کې',rs:'\n• پیاوړي موضوعات: {s}',rw:'\n• زیار ته اړتیا: {s}'},
+ en:{t:'Topics',strong:'Strong',weak:'Needs practice',none:'Not enough data yet. Take quizzes and ask questions, and topics will appear here.',mist:'Most common mistake',m_careless:'careless (attention)',m_method:'method',m_concept:'concept',rs:'\n• Strong topics: {s}',rw:'\n• Needs practice: {s}'}};
+function lmt(k,l){l=l||D.lang;return (LMAP_T[l]||LMAP_T.roman)[k];}
+const LSUBS=['maths','physics','chemistry','biology','english','urdu','pashto','islamiat','pakst','cs'];
+/* topics for the built-in quiz questions */
+const QB_TOPIC=[['maths',/π|circle|radius/i,'Circles'],['maths',/\(a ?\+ ?b\)|²/i,'Algebraic identities'],['maths',/triangle|hypotenuse|angle/i,'Triangles'],['maths',/√/,'Square roots'],['maths',/x ?=|\dx/i,'Linear equations'],
+ ['physics',/SI unit|unit of/i,'Units'],['physics',/law/i,'Laws and formulas'],['physics',/speed|acceleration|gravity|velocity/i,'Motion'],
+ ['chemistry',/symbol|formula|salt/i,'Symbols and formulas'],['chemistry',/atomic/i,'Atomic structure'],['chemistry',/pH|acid|base/i,'Acids and bases'],['chemistry',/air|gas/i,'Air and gases'],
+ ['biology',/cell|mitochondria/i,'Cells'],['biology',/photosynth|pigment|leaves|chlorophyll/i,'Plants and photosynthesis'],['biology',/heart|blood/i,'Human body'],
+ ['english',/plural|tense|"she ___|article|___ honest/i,'Grammar'],['english',/synonym|antonym/i,'Vocabulary']];
+function qbTopic(q){if(!q)return 'General';for(const [s,r,t] of QB_TOPIC)if(q[0]===s&&r.test(q[1]))return t;return 'General';}
+function learnOf(p){p.learn=p.learn||{t:{}};p.learn.t=p.learn.t||{};return p.learn;}
+function learnTopic(t){t=String(t||'').replace(/[^\p{L}\p{N} ,&()'/-]/gu,' ').replace(/\s+/g,' ').trim().slice(0,40);if(!t)return 'General';return t.charAt(0).toUpperCase()+t.slice(1);}
+function learnRec(p,sub,topic,res,mistake){if(!p)return;sub=LSUBS.includes(sub)?sub:'other';topic=learnTopic(topic);const L=learnOf(p);const k=sub+'|'+topic.toLowerCase();
+  const T=L.t[k]=L.t[k]||{s:sub,t:topic,n:0,c:0,a:0,m:{},last:''};
+  if(res==='ask')T.a++;else{T.n++;if(res==='right')T.c+=1;else if(res==='partly')T.c+=0.5;}
+  if(mistake&&['careless','method','concept'].includes(mistake))T.m[mistake]=(T.m[mistake]||0)+1;
+  T.last=todayISO();
+  const ks=Object.keys(L.t);if(ks.length>60){ks.sort((a,b)=>String(L.t[a].last).localeCompare(String(L.t[b].last)));delete L.t[ks[0]];}
+  save();}
+/* strong = 3+ tries and 75%+ right; needs practice = 2+ tries and under 55% right */
+function learnSummary(p){const L=learnOf(p);const all=Object.values(L.t);
+  const scored=all.filter(x=>x.n>=2).map(x=>Object.assign({},x,{p:Math.round(x.c/x.n*100)}));
+  const strong=scored.filter(x=>x.n>=3&&x.p>=75).sort((a,b)=>b.p-a.p||b.n-a.n).slice(0,6);
+  const weak=scored.filter(x=>x.p<55).sort((a,b)=>a.p-b.p||b.n-a.n).slice(0,6);
+  const mc={};all.forEach(x=>Object.entries(x.m||{}).forEach(([k,v])=>mc[k]=(mc[k]||0)+v));const mt=Object.entries(mc).sort((a,b)=>b[1]-a[1])[0];
+  return{scored,strong,weak,mistake:mt&&mt[1]>=3?mt[0]:null,asked:all.filter(x=>x.a>0).sort((a,b)=>b.a-a.a).slice(0,5)};}
+function learnName(x,l){return subName(x.s,l)+': '+x.t;}
+/* quiz answers */
+const _uPickL=uAnswerPick;uAnswerPick=function(mi,opt){try{const m=uChat()[mi];const Q=S.quiz;if(m&&m.quiz&&m.quiz.pick==null&&Q){const q=QB[m.quiz.qi];if(q)learnRec(activeP(),q[0],qbTopic(q),opt===q[3]?'right':'wrong',null);}}catch(e){}return _uPickL.apply(this,arguments);};
+/* tutor conversations: the tutor also reports the subject, topic, and (when the child gave an answer) whether it was right */
+const _askTutorL=askTutor;askTutor=async function(q,l,p){LEARN_P=p;LEARN_Q=q;try{return await _askTutorL.apply(this,arguments);}finally{LEARN_P=null;}};
+let LEARN_P=null,LEARN_Q='';
+function learnNote(r){try{const p=LEARN_P;if(!p||!r)return;const sub=String(r.sub||'').toLowerCase();const top=r.topic;if(!top)return;
+  const ck=String(r.check||'none').toLowerCase();learnRec(p,sub,top,['right','partly','wrong'].includes(ck)?ck:'ask',ck==='right'?null:String(r.mistake||'').toLowerCase());}catch(e){}}
+/* Progress screen: topics card */
+function learnCardHTML(p,l){const S2=learnSummary(p);
+  if(!S2.strong.length&&!S2.weak.length)return `<div class="page"><h2 style="margin-top:0">${esc(lmt('t',l))}</h2><p class="soft" dir="auto">${esc(lmt('none',l))}</p></div>`;
+  const bar=x=>`<div class="sbar"><span dir="auto">${esc(learnName(x,l))}</span><div class="sb"><i style="width:${Math.max(4,x.p)}%;background:${x.p>=75?'var(--wasooli)':x.p>=55?'var(--amber)':'var(--udhaar)'}"></i></div><b class="num">${x.p}%</b></div>`;
+  return `<div class="page stack"><h2 style="margin-top:0">${esc(lmt('t',l))}</h2>
+   ${S2.weak.length?`<h3 style="margin:4px 0" dir="auto">${esc(lmt('weak',l))}</h3>${S2.weak.map(bar).join('')}`:''}
+   ${S2.strong.length?`<h3 style="margin:8px 0 4px" dir="auto">${esc(lmt('strong',l))}</h3>${S2.strong.map(bar).join('')}`:''}
+   ${S2.mistake?`<p class="note" dir="auto">${esc(lmt('mist',l))}: ${esc(lmt('m_'+S2.mistake,l))}</p>`:''}</div>`;}
+const _progressViewL=progressView;progressView=function(){let h=_progressViewL.apply(this,arguments);try{const p=activeP();const card=learnCardHTML(p,D.lang);const i=h.lastIndexOf('<div class="page"><pre class="rep"');h=i>0?h.slice(0,i)+card+h.slice(i):h.replace(/<\/div>$/,card+'</div>');}catch(e){}return h;};
+/* parent report (same phone, and the weekly report sent to the parent's phone) */
+const _famReportL=famReport;famReport=function(p,l){let tx=_famReportL.apply(this,arguments);try{l=l||D.lang;const S2=learnSummary(p);
+  const add=(S2.strong.length?fill(lmt('rs',l),{s:S2.strong.slice(0,4).map(x=>learnName(x,l)).join(', ')}):'')+(S2.weak.length?fill(lmt('rw',l),{s:S2.weak.slice(0,4).map(x=>learnName(x,l)).join(', ')}):'');
+  if(add){const i=tx.lastIndexOf('\n\n');tx=i>0?tx.slice(0,i)+add+tx.slice(i):tx+add;}}catch(e){}return tx;};
+const _sbRpcL=sbRpc;sbRpc=function(fn,body,auth){try{if(fn==='kid_report'&&body&&body.p_report){const p=kidStudent();if(p){const S2=learnSummary(p);body.p_report.tp={s:S2.strong.slice(0,5).map(x=>({s:x.s,t:x.t,p:x.p})),w:S2.weak.slice(0,5).map(x=>({s:x.s,t:x.t,p:x.p})),m:S2.mistake};}}}catch(e){}return _sbRpcL.apply(this,arguments);};
+const _kidRepModalL=kidRepModal;kidRepModal=function(k){const r=_kidRepModalL.apply(this,arguments);try{const tp=k&&k.report&&k.report.tp;const l=D.lang;const st=document.querySelector('#modalHost .stack');
+  if(tp&&st&&((tp.s&&tp.s.length)||(tp.w&&tp.w.length))){const li=a=>a.map(x=>`<li dir="auto">${esc(subName(x.s,l)+': '+x.t)} <b class="num">${x.p}%</b></li>`).join('');
+    st.insertAdjacentHTML('beforeend',`<div><h2 style="margin:6px 0">${esc(lmt('t',l))}</h2>${tp.w&&tp.w.length?`<p dir="auto"><b>${esc(lmt('weak',l))}</b></p><ul>${li(tp.w)}</ul>`:''}${tp.s&&tp.s.length?`<p dir="auto"><b>${esc(lmt('strong',l))}</b></p><ul>${li(tp.s)}</ul>`:''}${tp.m?`<p class="note" dir="auto">${esc(lmt('mist',l))}: ${esc(lmt('m_'+tp.m,l))}</p>`:''}</div>`);}}catch(e){}return r;};
+
+
+/* v0.25.1 Ustad learning map, step 2: the tutor adapts to each child.
+   - Before every answer the tutor gets a short note on this child: topics that need practice, strong topics, the usual kind of mistake,
+     which explanation styles worked or did not, and whether the child prefers small steps. It uses it quietly and never labels the child.
+   - Jugnu learns which explanation style works: after an explanation, "samajh nahi aaya" counts against that style, "samajh aa gaya" or a
+     correct next answer counts for it.
+   - Quizzes lean towards weak topics (up to 3 of 5 questions), and after a quiz Jugnu offers practice on the weakest topic. */
+const AD_STYLES=['example','story','steps','definition','visual','analogy'];
+const AD_NO=/(samajh nahi|samjh nahi|samaj nahi|nahi samjha|nahi samjhi|nahi samjh|samajh nahi aaya|dobara samjha|phir se samjha|didn'?t understand|dont understand|do not understand|not clear|confus|سمجھ نہیں|نہیں سمجھ|دوبارہ سمجھا|پوه نه شوم|نه پوهېږم)/i;
+const AD_OK=/(samajh aa gaya|samajh aa gayi|samajh gaya|samajh gayi|samjh gaya|samjh gayi|samajh aagaya|got it|understood|clear ho gaya|ab samajh|سمجھ آ گیا|سمجھ گیا|سمجھ گئی|پوه شوم)/i;
+function adStyle(p,ok){const L=learnOf(p);const s=L.lastStyle;if(!s||Date.now()-s.at>45*60000)return;L.style=L.style||{};const o=L.style[s.s]=L.style[s.s]||{ok:0,no:0};o[ok?'ok':'no']++;L.ex=L.ex||{n:0,no:0};if(!ok)L.ex.no++;L.lastStyle=null;save();}
+function learnPrompt(p){try{const S2=learnSummary(p);const L=learnOf(p);const out=[];
+  if(S2.weak.length)out.push('Topics this student still finds hard: '+S2.weak.slice(0,5).map(x=>x.t+' ('+x.s+')').join(', ')+'.');
+  if(S2.strong.length)out.push('Topics this student is good at: '+S2.strong.slice(0,5).map(x=>x.t+' ('+x.s+')').join(', ')+'.');
+  if(S2.mistake)out.push({careless:'Usual mistake: careless slips (signs, arithmetic, copying). Remind them to check each step.',method:'Usual mistake: wrong method or missing steps. Show the method step by step and ask them to do one step themselves.',concept:'Usual mistake: the core idea is not clear. Start from the basic idea with a simple real-life example before any formula.'}[S2.mistake]);
+  const st=Object.entries(L.style||{}).map(([k,v])=>({k,sc:(v.ok+1)/(v.ok+v.no+2),n:v.ok+v.no})).filter(x=>x.n>=2).sort((a,b)=>b.sc-a.sc);
+  if(st.length){const good=st.filter(x=>x.sc>=0.6).map(x=>x.k),bad=st.filter(x=>x.sc<=0.4).map(x=>x.k);if(good.length)out.push('Explanation styles that worked for this student: '+good.join(', ')+'. Prefer them.');if(bad.length)out.push('Styles that did not work well: '+bad.join(', ')+'. Avoid them unless asked.');}
+  const ex=L.ex||{n:0,no:0};if(ex.n>=3&&ex.no/ex.n>=0.4)out.push('This student often needs things explained again: use very short sentences, one small step at a time, and check after each step.');
+  if(!out.length)return '';
+  return '\nWhat you know about how this student learns (use it quietly to teach better; never mention these notes, never call the student weak or slow):\n- '+out.join('\n- ')+'\n- If the question is on a hard topic, go slower and add one extra worked example. If it is on a strong topic, keep it brief and offer one slightly harder question.\n';}catch(e){return '';}}
+/* remember the style the tutor used, and count the next answer for or against it */
+const _learnNoteA=learnNote;learnNote=function(r){_learnNoteA(r);try{const p=LEARN_P;if(!p||!r)return;const L=learnOf(p);const ck=String(r.check||'').toLowerCase();
+  if(ck==='right')adStyle(p,true);else if(ck==='wrong')adStyle(p,false);
+  const s=String(r.style||'').toLowerCase();if(AD_STYLES.includes(s)){L.lastStyle={s,at:Date.now()};L.ex=L.ex||{n:0,no:0};L.ex.n++;save();}}catch(e){}};
+const _uSendA=uSend;uSend=async function(q){try{const p=activeP();const t=String(q||'');if(p&&p.type==='student'){if(AD_NO.test(t))adStyle(p,false);else if(AD_OK.test(t))adStyle(p,true);}}catch(e){}return _uSendA.apply(this,arguments);};
+/* quizzes lean towards weak topics */
+startQuiz=function(sub,l){const p=activeP();let weak=[];try{weak=learnSummary(p).weak.filter(x=>x.s===sub).map(x=>x.t.toLowerCase());}catch(e){}
+  const all=QB.map((q,i)=>q[0]===sub?i:-1).filter(i=>i>=0).sort(()=>Math.random()-.5);
+  const w=all.filter(i=>weak.includes(qbTopic(QB[i]).toLowerCase())).slice(0,3);const pool=w.concat(all.filter(i=>!w.includes(i))).slice(0,5).sort(()=>Math.random()-.5);
+  S.quiz={pid:D.active,sub,list:pool,i:0,score:0,l};uPush({who:'ai',text:fill(ft('qStart',l),{s:subName(sub,l)}),l});uPush({who:'ai',quiz:{qi:pool[0],pick:null},l});};
+/* after a quiz: offer practice on the weakest topic of that subject */
+const AD_T={roman:{off:'{t} par thodi aur practice karein?',btn:'{t} practice',ask:'Mujhe {t} ki practice karao, pehle aasaan sawal se shuru karo.'},
+ ur:{off:'{t} پر تھوڑی اور پریکٹس کریں؟',btn:'{t} پریکٹس',ask:'مجھے {t} کی پریکٹس کراؤ، پہلے آسان سوال سے شروع کرو۔'},
+ ps:{off:'په {t} څه نوره تمرین وکړو؟',btn:'{t} تمرین',ask:'ما ته د {t} تمرین راکړه، لومړی له اسانه پوښتنې پیل وکړه.'},
+ en:{off:'Practise {t} a little more?',btn:'Practise {t}',ask:'Help me practise {t}, starting with an easy question.'}};
+function adT(k,l){return (AD_T[l]||AD_T.roman)[k];}
+const _uPickA=uAnswerPick;uAnswerPick=function(mi,opt){const Q=S.quiz;const sub=Q&&Q.sub,l=Q&&Q.l;const last=Q&&Q.i===Q.list.length-1;const r=_uPickA.apply(this,arguments);
+  try{if(last&&!S.quiz&&sub){const wk=learnSummary(activeP()).weak.filter(x=>x.s===sub)[0];if(wk)setTimeout(()=>uPush({who:'ai',text:fill(adT('off',l),{t:wk.t}),btns:[{act:'lmPractice',id:wk.t,label:fill(adT('btn',l),{t:wk.t})}],l}),900);}}catch(e){}return r;};
+window.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('[data-act="lmPractice"]');if(!b)return;e.preventDefault();e.stopImmediatePropagation();uSend(fill(adT('ask',D.lang),{t:b.dataset.id||''}));},true);
+
+
+/* v0.26.0 KP Board question bank and chapter notes, offline.
+   For a child on KP Board Class 9 or 10, Jugnu downloads bank-kp.json once (about 135 KB) and keeps that class on the phone.
+   Quizzes then come from the child's own class, chapter by chapter, with a one-line reason after each answer; every chapter is a topic
+   in the learning map. Chapter notes (key points and formulas) work without internet: "Physics notes", "Kinematics notes", or any
+   question that matches a chapter while offline. */
+SUBJ.genmaths={roman:'General Maths',ur:'جنرل ریاضی',ps:'عمومي ریاضي',en:'General Maths'};
+const BK_KEY='jugnu_bank_kp',BK_URL='bank-kp.json';
+const QBX={};let BK=null;
+const BKT={roman:{why:'Wajah',notes:'{t}: aham nukaat',f:'Formulas',pick:'Kis chapter ke notes chahiye?',pickS:'Kis subject ke notes chahiye?',none:'Is ke notes abhi mere paas nahi. Internet ho to main tafseel se samjha doon.',offNote:'(Internet nahi, ye chapter ke notes hain)',chip:'Chapter notes'},
+ ur:{why:'وجہ',notes:'{t}: اہم نکات',f:'فارمولے',pick:'کس باب کے نوٹس چاہییں؟',pickS:'کس مضمون کے نوٹس چاہییں؟',none:'اس کے نوٹس ابھی میرے پاس نہیں۔ انٹرنیٹ ہو تو میں تفصیل سے سمجھا دوں۔',offNote:'(انٹرنیٹ نہیں، یہ باب کے نوٹس ہیں)',chip:'باب کے نوٹس'},
+ ps:{why:'لامل',notes:'{t}: مهم ټکي',f:'فورمولونه',pick:'د کوم څپرکي نوټونه غواړې؟',pickS:'د کوم مضمون نوټونه غواړې؟',none:'د دې نوټونه اوس زما سره نشته. که انټرنېټ وي، په تفصیل سره به یې درته ووایم.',offNote:'(انټرنېټ نشته، دا د څپرکي نوټونه دي)',chip:'د څپرکي نوټونه'},
+ en:{why:'Why',notes:'{t}: key points',f:'Formulas',pick:'Which chapter\'s notes do you want?',pickS:'Notes for which subject?',none:'I do not have notes for this yet. When you are online I can explain it in detail.',offNote:'(No internet, here are the chapter notes)',chip:'Chapter notes'}};
+function bkChip(){try{if(S.screen==='ustad'&&BK&&isStudent()){const c=document.querySelector('.jhome .jchips, .jchips');if(c&&!c.querySelector('[data-act="bkNotesChip"]'))c.insertAdjacentHTML('beforeend',`<button class="jchip" data-act="bkNotesChip">${esc(bkt('chip'))}</button>`);}}catch(e){}}
+function bkt(k,l){return (BKT[l||D.lang]||BKT.roman)[k];}
+function bkFor(p){try{const s=sylOf(p);return s.board==='kp'&&(s.cls==='9'||s.cls==='10')?s.cls:null;}catch(e){return null;}}
+function bkLoadLocal(){try{const o=JSON.parse(localStorage.getItem(BK_KEY)||'null');if(o&&o.q)return o;}catch(e){}return null;}
+function bkApply(o,cls){if(!o||!o.q)return;BK=o;const have=new Set(Object.values(QBX).map(x=>x.key));
+  o.q.filter(x=>String(x.c)===String(cls)).forEach(x=>{const key=x.c+'|'+x.s+'|'+x.q;if(have.has(key))return;QB.push([x.s,x.q,x.o,x.a]);QBX[QB.length-1]={key,t:x.t,e:x.e,c:String(x.c),ch:x.ch,lv:x.lv};});setTimeout(bkChip,0);}
+async function bkEnsure(){const p=activeP();if(!p||p.type!=='student')return;const cls=bkFor(p);if(!cls)return;
+  let o=bkLoadLocal();if(o&&o.cls===cls){bkApply(o,cls);if(Date.now()-(o.at||0)<7*86400000||!online())return;}
+  if(!online())return;try{const r=await fetch(BK_URL,{cache:'no-cache'});if(!r.ok)return;const full=await r.json();
+    const mine={v:full.v,board:full.board,cls,at:Date.now(),q:full.q.filter(x=>String(x.c)===cls),notes:full.notes.filter(x=>String(x.c)===cls),chapters:full.chapters.filter(x=>String(x.c)===cls)};
+    try{localStorage.setItem(BK_KEY,JSON.stringify(mine));}catch(e){}bkApply(mine,cls);}catch(e){}}
+/* topics: bank questions use their chapter name */
+const _qbTopicB=qbTopic;qbTopic=function(q){try{const i=QB.indexOf(q);if(i>=0&&QBX[i])return QBX[i].t;}catch(e){}return _qbTopicB(q);};
+/* quizzes: prefer the child's class bank for that subject, still leaning towards weak chapters */
+const _startQuizB=startQuiz;startQuiz=function(sub,l){const p=activeP();const cls=bkFor(p);
+  const bankIdx=cls?QB.map((q,i)=>q[0]===sub&&QBX[i]&&QBX[i].c===cls?i:-1).filter(i=>i>=0):[];
+  if(bankIdx.length<5)return _startQuizB(sub,l);
+  let weak=[];try{weak=learnSummary(p).weak.filter(x=>x.s===sub).map(x=>x.t.toLowerCase());}catch(e){}
+  const all=bankIdx.sort(()=>Math.random()-.5);const w=all.filter(i=>{const t=QBX[i].t.toLowerCase();return weak.some(x=>t.includes(x)||x.includes(t));}).slice(0,3);
+  const pool=w.concat(all.filter(i=>!w.includes(i))).slice(0,5).sort(()=>Math.random()-.5);
+  S.quiz={pid:D.active,sub,list:pool,i:0,score:0,l};uPush({who:'ai',text:fill(ft('qStart',l),{s:subName(sub,l)}),l});uPush({who:'ai',quiz:{qi:pool[0],pick:null},l});};
+/* after each bank answer: one-line reason */
+const _uPickB=uAnswerPick;let BK_WHY=null;uAnswerPick=function(mi,opt){try{const m=uChat()[mi];const x=m&&m.quiz&&m.quiz.pick==null?QBX[m.quiz.qi]:null;if(x&&x.e)BK_WHY={text:bkt('why',(S.quiz&&S.quiz.l)||D.lang)+': '+x.e,l:(S.quiz&&S.quiz.l)||D.lang};}catch(e){}
+  try{return _uPickB.apply(this,arguments);}finally{BK_WHY=null;}};
+const _uPushB=uPush;uPush=function(m){const r=_uPushB.apply(this,arguments);try{if(BK_WHY&&m&&m.who==='ai'&&!m.quiz){const w=BK_WHY;BK_WHY=null;_uPushB({who:'ai',text:w.text,l:w.l});}}catch(e){}return r;};
+/* chapter notes, offline */
+function bkNotesFor(sub){return BK&&BK.notes?BK.notes.filter(n=>!sub||n.s===sub):[];}
+function bkNoteText(n,l){return fill(bkt('notes',l),{t:subName(n.s,l)+': '+n.t})+'\n'+n.p.map(x=>'• '+x).join('\n')+(n.f&&n.f.length?'\n'+bkt('f',l)+':\n'+n.f.map(x=>'  '+x).join('\n'):'');}
+function bkMatch(q){if(!BK||!BK.notes)return null;const s=String(q).toLowerCase();let best=null,bs=0;
+  for(const n of BK.notes){const words=n.t.toLowerCase().split(/[^a-z0-9]+/).filter(w=>w.length>=4&&!['and','the','with','related','introduction'].includes(w));
+    let sc=0;words.forEach(w=>{if(s.includes(w))sc+=2;});if(sc&&s.includes(n.s.slice(0,4)))sc++;if(sc>bs){bs=sc;best=n;}}
+  return bs>=2?best:null;}
+const NOTES_RX=/(notes|note|khulasa|khulaasa|summary|key points|aham nukaat|نوٹس|خلاصہ|اہم نکات|نوټونه|لنډیز)/i;
+const _uSendB=uSend;uSend=async function(q){try{const p=activeP();const t=String(q||'');
+  if(p&&p.type==='student'&&BK&&!jBusy&&!(S.examQ||S.examSolve)){const l=detectLang(t);const n=bkMatch(t);
+    const wantNotes=NOTES_RX.test(t);
+    if((wantNotes&&n)||(!aiOn()&&n&&!RXU.quiz.test(' '+t.toLowerCase()+' '))){uPush({who:'me',text:t,l});uPush({who:'ai',text:(aiOn()?'':bkt('offNote',l)+'\n')+bkNoteText(n,l),l});markStudy(p,true);try{learnRec(p,n.s,n.t,'ask',null);}catch(e){}return;}
+    if(wantNotes){const sub=/phys|فزکس/i.test(t)?'physics':/chem|کیمس/i.test(t)?'chemistry':/bio|بیالو/i.test(t)?'biology':/general|genmath|جنرل/i.test(t)?'genmaths':/math|ریاضی/i.test(t)?'maths':null;
+      const all=bkNotesFor(sub);if(all.length){uPush({who:'me',text:t,l});if(!sub){const subs=[...new Set(all.map(x=>x.s))];uPush({who:'ai',text:bkt('pickS',l),btns:subs.map(s=>({act:'bkNoteSub',id:s,label:subName(s,l)})),l});}else bkNoteList(sub,l);return;}}}}catch(e){}
+  return _uSendB.apply(this,arguments);};
+function bkNoteList(sub,l){const list=bkNotesFor(sub);uPush({who:'ai',text:bkt('pick',l),btns:list.map(x=>({act:'bkNote',id:x.s+'|'+x.ch,label:x.t})),l});}
+window.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('[data-act="bkNote"],[data-act="bkNotesChip"],[data-act="bkNoteSub"]');if(!b)return;e.preventDefault();e.stopImmediatePropagation();const l=D.lang;
+  if(b.dataset.act==='bkNotesChip'){uSend(bkt('chip',l));return;}if(b.dataset.act==='bkNoteSub'){bkNoteList(b.dataset.id,l);return;}
+  const [s,ch]=String(b.dataset.id||'').split('|');const n=bkNotesFor(s).find(x=>String(x.ch)===ch);if(!n)return;uPush({who:'ai',text:bkNoteText(n,l),l});try{learnRec(activeP(),n.s,n.t,'ask',null);}catch(x){}},true);
+/* subject detection also knows General Maths */
+const _subjOfB=subjOf;subjOf=function(s){if(/(general math|genmath|g\.? ?math|جنرل ریاضی|عمومي ریاضي)/i.test(s))return 'genmaths';return _subjOfB(s);};
+/* load when the student opens Ustad, and after the syllabus changes */
+const _renderB=render;render=function(){_renderB();try{bkChip();if(D.shop&&isStudent()&&!BK_BUSY){BK_BUSY=true;bkEnsure().finally(()=>{BK_BUSY=false;});}}catch(e){}};
+let BK_BUSY=false;
+try{const p=activeP&&activeP();const c=p&&bkFor(p);const o=bkLoadLocal();if(c&&o&&o.cls===c)bkApply(o,c);}catch(e){}
+
 </script>
 
 </body></html>
