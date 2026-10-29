@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.webmanifest">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="Jugnu">
 <link rel="apple-touch-icon" href="icon-192.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -1155,7 +1155,7 @@ function settingsView(){
     <button class="btn ghost full" data-act="pasteRestore">${esc(t('bkRestoreP'))}</button></div>
    ${fbCardHTML()}
    ${voiceSettingsHTML()}
-   <div class="page stack"><h2 style="margin-top:0">${esc(t('danger'))}</h2><button class="btn danger full" data-act="wipe">${esc(t('wipe'))}</button><p class="note">Jugnu · ConceptAI · v0.28.2</p></div></div>`;
+   <div class="page stack"><h2 style="margin-top:0">${esc(t('danger'))}</h2><button class="btn danger full" data-act="wipe">${esc(t('wipe'))}</button><p class="note">Jugnu · ConceptAI · v0.28.3</p></div></div>`;
 }
 function pilotView(){
   const now=Date.now(),wk=7*86400000;
@@ -4242,6 +4242,30 @@ const _jSend282=jSend;jSend=async function(q){try{const t=String(q||'').trim();
     try{jPush({who:'me',text:t,l});const btns=[{act:'hReport',id:'',label:bt('view',l)},{act:'budStart',id:'',label:bt('redo',l)}];if(aiOn())btns.unshift({act:'budAI',id:'',label:bt('aiBtn',l)});
       jPush({who:'ai',text:budPlan(D.budget,l),btns,l,mood:'happy'});}finally{jBusy=false;}return;}}catch(e){}
   return _jSend282.apply(this,arguments);};
+
+
+/* v0.28.3 UI fixes.
+   (1) Dukaan / Ghar switch looks the same on every tab: the small icon on Khata, Report and Settings is replaced by the same
+       "Dukaan | Ghar" pill as on the Jugnu screen.
+   (2) Switching keeps you on the tab you were on (Khata stays Khata, Report stays Report) instead of always jumping to chat,
+       and shows a short note of which hisaab is open.
+   (3) iPhone: the top of the app no longer slides under the clock and notch, so the Wapis buttons can be tapped
+       (status bar no longer drawn over the app; safe-area space added at the top). */
+(function(){const m=document.querySelector('meta[name="apple-mobile-web-app-status-bar-style"]');if(m)m.setAttribute('content','default');
+  const st=document.createElement('style');st.textContent=`
+  body{padding-top:env(safe-area-inset-top,0px)}
+  header{top:0!important}
+  .d2space.hdr{margin-top:0;background:rgba(255,255,255,.92);padding:3px}
+  .d2space.hdr button{min-height:34px;padding:4px 10px;font-size:13px}
+  .d2space.hdr button .ic{width:16px;height:16px;vertical-align:-3px}
+  @media (max-width:340px){.d2space.hdr button{padding:4px 7px;font-size:12px}}
+  .fab{white-space:nowrap}`;document.head.appendChild(st);})();
+const SW_T={roman:{shop:'Dukaan ka hisaab khula hai',home:'Ghar ka hisaab khula hai'},ur:{shop:'دکان کا حساب کھلا ہے',home:'گھر کا حساب کھلا ہے'},ps:{shop:'د دوکان حساب خلاص دی',home:'د کور حساب خلاص دی'},en:{shop:'Shop hisaab open',home:'Home hisaab open'}};
+const _render283=render;render=function(){_render283();try{const hb=$('hbtns');const ic=hb&&hb.querySelector('.d2spbtn');
+  if(ic&&D.alt&&D.shop&&!D.shop.studentOnly){ic.remove();if(!hb.querySelector('.d2space'))hb.insertAdjacentHTML('afterbegin',spToggleHTML().replace('class="d2space"','class="d2space hdr"'));}}catch(e){}};
+const _spSwap283=spSwap;spSwap=function(){const prev=S.screen;const keep=['khata','pilot','settings'].includes(prev)?prev:(['customer','entry'].includes(prev)?'khata':null);
+  _spSwap283.apply(this,arguments);try{if(keep&&D.shop){S.screen=keep;render();}const k=spKind(D);toast((SW_T[D.lang]||SW_T.roman)[k==='home'?'home':'shop']);}catch(e){}};
+try{render();}catch(e){}
 
 </script>
 
