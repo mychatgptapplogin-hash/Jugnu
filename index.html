@@ -1155,7 +1155,7 @@ function settingsView(){
     <button class="btn ghost full" data-act="pasteRestore">${esc(t('bkRestoreP'))}</button></div>
    ${fbCardHTML()}
    ${voiceSettingsHTML()}
-   <div class="page stack"><h2 style="margin-top:0">${esc(t('danger'))}</h2><button class="btn danger full" data-act="wipe">${esc(t('wipe'))}</button><p class="note">Jugnu · ConceptAI · v0.28.3</p></div></div>`;
+   <div class="page stack"><h2 style="margin-top:0">${esc(t('danger'))}</h2><button class="btn danger full" data-act="wipe">${esc(t('wipe'))}</button><p class="note">Jugnu · ConceptAI · v0.28.4</p></div></div>`;
 }
 function pilotView(){
   const now=Date.now(),wk=7*86400000;
@@ -4265,6 +4265,33 @@ const _render283=render;render=function(){_render283();try{const hb=$('hbtns');c
   if(ic&&D.alt&&D.shop&&!D.shop.studentOnly){ic.remove();if(!hb.querySelector('.d2space'))hb.insertAdjacentHTML('afterbegin',spToggleHTML().replace('class="d2space"','class="d2space hdr"'));}}catch(e){}};
 const _spSwap283=spSwap;spSwap=function(){const prev=S.screen;const keep=['khata','pilot','settings'].includes(prev)?prev:(['customer','entry'].includes(prev)?'khata':null);
   _spSwap283.apply(this,arguments);try{if(keep&&D.shop){S.screen=keep;render();}const k=spKind(D);toast((SW_T[D.lang]||SW_T.roman)[k==='home'?'home':'shop']);}catch(e){}};
+try{render();}catch(e){}
+
+
+/* v0.28.4 Clear "Login" option on the front screen. Login needs only mobile number and PIN; it never creates a new account.
+   (On iPhone the home-screen app keeps its own storage, separate from Safari, so people who signed up in Safari must log in once.) */
+const GL={roman:{have:'Pehle se account hai? Login karein',neu:'Naya account banayein',t:'Login karein',s:'Apna mobile number aur PIN likhein. Aap ka sara hisaab wapis aa jayega.',bad:'Number ya PIN ghalat hai. Dobara check karein.',go:'Login'},
+ ur:{have:'پہلے سے اکاؤنٹ ہے؟ لاگ ان کریں',neu:'نیا اکاؤنٹ بنائیں',t:'لاگ ان کریں',s:'اپنا موبائل نمبر اور پن لکھیں۔ آپ کا سارا حساب واپس آ جائے گا۔',bad:'نمبر یا پن غلط ہے۔ دوبارہ چیک کریں۔',go:'لاگ ان'},
+ ps:{have:'مخکې اکاونټ لرئ؟ ننوځئ',neu:'نوی اکاونټ جوړ کړئ',t:'ننوځئ',s:'خپله موبایل شمېره او پن ولیکئ. ټول حساب به مو بېرته راشي.',bad:'شمېره یا پن غلط دی. بیا یې وګورئ.',go:'ننوځئ'},
+ en:{have:'Already have an account? Log in',neu:'Create a new account',t:'Log in',s:'Enter your mobile number and PIN. All your hisaab will come back.',bad:'Wrong number or PIN. Please check again.',go:'Log in'}};
+function glt(k){return (GL[D.lang]||GL.roman)[k];}
+const _gateView284=gateView;gateView=function(){const h=_gateView284();
+  const sw=`<button class="btn ghost full" type="button" data-act="gSwitch" style="font-weight:700">${esc(S.gLogin?glt('neu'):glt('have'))}</button>`;
+  return S.gLogin?h.replace('</form>','</form>'+sw):h.replace('<form id="gateForm"',sw+'<form id="gateForm"');};
+const _bindGate284=bindGate;bindGate=function(){_bindGate284();const f=$('gateForm');if(!f||!S.gLogin)return;
+  try{const g=document.querySelector('#app .gate');const b=g.querySelector('.d2bub b');if(b)b.textContent=glt('t');const p=g.querySelector('p.soft');if(p)p.textContent=glt('s');
+    ['gNm','gCt'].forEach(id=>{const el=$(id);if(el)el.closest('div').hidden=true;});const n=f.querySelector('#gPin+.note');if(n)n.hidden=true;
+    f.querySelectorAll('[id^="gWa"],.wabox').forEach(x=>x.hidden=true);$('gGo').textContent=glt('go');}catch(e){}
+  f.onsubmit=async e=>{e.preventDefault();e.stopImmediatePropagation&&e.stopImmediatePropagation();const err=$('gErr'),go=$('gGo');
+    const show=m=>{err.textContent=m;err.hidden=false;go.disabled=false;go.textContent=glt('go');};
+    const ph=normPK($('gPh').value),pin=$('gPin').value.trim();
+    if(!ph)return show(at('badPh'));if(!/^\d{4,6}$/.test(pin))return show(at('badPin'));if(!online())return show(gt('net'));
+    go.disabled=true;go.textContent=at('wait');err.hidden=true;
+    try{const lr=await sbLogin(ph,pin);if(lr.err)return show(lr.err==='wrong'?glt('bad'):at('fail'));evt('signin');
+      try{const a=accGet();const r=await sbRest('profiles?select=name,city&id=eq.'+a.uid);const pr=r&&r[0];if(pr&&(pr.name||pr.city)){D.me={name:pr.name||'',city:pr.city||''};save0();}}catch(x){}
+      S.gLogin=false;await afterLogin(false);render();
+    }catch(x){show(at('fail'));}};};
+window.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('[data-act="gSwitch"]');if(!b)return;e.preventDefault();e.stopImmediatePropagation();S.gLogin=!S.gLogin;render();try{window.scrollTo(0,0);}catch(x){}},true);
 try{render();}catch(e){}
 
 </script>
