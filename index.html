@@ -1155,7 +1155,7 @@ function settingsView(){
     <button class="btn ghost full" data-act="pasteRestore">${esc(t('bkRestoreP'))}</button></div>
    ${fbCardHTML()}
    ${voiceSettingsHTML()}
-   <div class="page stack"><h2 style="margin-top:0">${esc(t('danger'))}</h2><button class="btn danger full" data-act="wipe">${esc(t('wipe'))}</button><p class="note">Jugnu · ConceptAI · v0.28.1</p></div></div>`;
+   <div class="page stack"><h2 style="margin-top:0">${esc(t('danger'))}</h2><button class="btn danger full" data-act="wipe">${esc(t('wipe'))}</button><p class="note">Jugnu · ConceptAI · v0.28.2</p></div></div>`;
 }
 function pilotView(){
   const now=Date.now(),wk=7*86400000;
@@ -4231,6 +4231,17 @@ const _ja281=jugnuAnswer;jugnuAnswer=function(text,l){const r=_ja281.apply(this,
   try{if(isHome()&&r&&!r.entry&&SAVE_RX.test(String(text))&&(r.text===jt('dont',l||detectLang(text))))return{text:nextTip(l||detectLang(text)),kind:'idea'};}catch(e){}return r;};
 try{const NS={roman:'Abhi koi bacha jura nahi. Settings mein "Bachay" se code banayein aur bachay ke phone par wohi code likhein.',ur:'ابھی کوئی بچہ جڑا نہیں۔ سیٹنگز میں "بچے" سے کوڈ بنائیں اور بچے کے فون پر وہی کوڈ لکھیں۔',ps:'تراوسه هېڅ ماشوم نه دی نښلول شوی. په سېټنګز کې له "ماشومان" برخې کوډ جوړ کړئ او د ماشوم په تلیفون کې همدا کوډ ولیکئ.',en:'No child linked yet. In Settings, open "Children" to make a code, then enter that code on the child\'s phone.'};
   Object.keys(NS).forEach(k=>{if(FS[k])FS[k].noStu=NS[k];});}catch(e){}
+
+
+/* v0.28.2 Asking to see the budget ("mera budget batao", "budget dikhao") shows the saved budget with a "make it again" button,
+   instead of starting the budget questions from scratch. "budget banao / naya budget / budget badlo" still starts a new one. */
+const BUD_VIEW=/(batao|bataen|bataein|dikhao|dikha|dekhna|dekhao|kya hai|kitna hai|show|see|view|my budget|mera budget|میرا بجٹ|بتاؤ|دکھاؤ|وښایه|راته ووایه)/i;
+const BUD_NEW=/(banao|bana do|banaen|banayein|naya|nayi|new|make|create|dobara|phir se|badlo|badal|change|update|بناؤ|نیا|دوبارہ|بدلو|جوړ|نوی)/i;
+const _jSend282=jSend;jSend=async function(q){try{const t=String(q||'').trim();
+  if(t&&!jBusy&&isHome()&&D.budget&&!S.bud&&BUD_RX.test(t)&&BUD_VIEW.test(t)&&!BUD_NEW.test(t)){const l=detectLang(t);jBusy=true;
+    try{jPush({who:'me',text:t,l});const btns=[{act:'hReport',id:'',label:bt('view',l)},{act:'budStart',id:'',label:bt('redo',l)}];if(aiOn())btns.unshift({act:'budAI',id:'',label:bt('aiBtn',l)});
+      jPush({who:'ai',text:budPlan(D.budget,l),btns,l,mood:'happy'});}finally{jBusy=false;}return;}}catch(e){}
+  return _jSend282.apply(this,arguments);};
 
 </script>
 
