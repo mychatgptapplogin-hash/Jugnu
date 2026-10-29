@@ -707,7 +707,7 @@ const J={
 const jt0=(k,l)=>((J[l||D.lang]||J.ur)[k])||J.en[k];
 const isHome=()=>!!(D&&D.shop&&D.shop.kind==='home');
 const HOME_ADDR=/(Seth ji|seth ji|سیٹھ جی|مالک صاحب)/g;
-const jt=(k,l)=>{const v=jt0(k,l);if(!isHome())return v;if(k==='greet')return ({roman:'Assalam o alaikum! Main Jugnu hoon, aap ka hisaab kitaab rakhne wala. Kisi ko paise diye, kisi se liye, ghar ka kharcha, committee: bas bol dein.',ur:'السلام علیکم! میں جگنو ہوں، آپ کا حساب کتاب رکھنے والا۔ کسی کو پیسے دیے، کسی سے لیے، گھر کا خرچہ، کمیٹی: بس بول دیں۔',ps:'السلام علیکم! زه جګنو یم، ستاسو حساب کتاب ساتم. چا ته مو پیسې ورکړې، له چا مو واخیستې، د کور لګښت، کمېټي: یوازې ووایاست.',en:'Assalam o alaikum! I am Jugnu, I keep your accounts. Money you gave or took, home expenses, committee: just tell me.'})[l||D.lang]||v;if(typeof v==='string')return v.replace(HOME_ADDR,'ji');if(Array.isArray(v))return v.map(x=>typeof x==='string'?x.replace(HOME_ADDR,'ji'):x);return v;};
+const jt=(k,l)=>{const v=jt0(k,l);if(!isHome())return v;{const H=(typeof HOME_J!=='undefined'&&HOME_J)?(HOME_J[l||D.lang]||HOME_J.roman):null;if(H&&H[k]!==undefined)return H[k];}if(k==='greet')return ({roman:'Assalam o alaikum! Main Jugnu hoon, aap ka hisaab kitaab rakhne wala. Kisi ko paise diye, kisi se liye, ghar ka kharcha, committee: bas bol dein.',ur:'السلام علیکم! میں جگنو ہوں، آپ کا حساب کتاب رکھنے والا۔ کسی کو پیسے دیے، کسی سے لیے، گھر کا خرچہ، کمیٹی: بس بول دیں۔',ps:'السلام علیکم! زه جګنو یم، ستاسو حساب کتاب ساتم. چا ته مو پیسې ورکړې، له چا مو واخیستې، د کور لګښت، کمېټي: یوازې ووایاست.',en:'Assalam o alaikum! I am Jugnu, I keep your accounts. Money you gave or took, home expenses, committee: just tell me.'})[l||D.lang]||v;if(typeof v==='string')return v.replace(HOME_ADDR,'ji');if(Array.isArray(v))return v.map(x=>typeof x==='string'?x.replace(HOME_ADDR,'ji'):x);return v;};
 const tL=(k,l)=>((T[l||D.lang]||T.ur)[k])||T.en[k]||k;
 const fill=(s,o)=>s.replace(/\{(\w)\}/g,(m,k)=>o[k]!=null?o[k]:m);
 /* ---- Jugnu v0.4: small talk, shop health, business ideas (all offline) ---- */
@@ -1155,7 +1155,7 @@ function settingsView(){
     <button class="btn ghost full" data-act="pasteRestore">${esc(t('bkRestoreP'))}</button></div>
    ${fbCardHTML()}
    ${voiceSettingsHTML()}
-   <div class="page stack"><h2 style="margin-top:0">${esc(t('danger'))}</h2><button class="btn danger full" data-act="wipe">${esc(t('wipe'))}</button><p class="note">Jugnu · ConceptAI · v0.27.1</p></div></div>`;
+   <div class="page stack"><h2 style="margin-top:0">${esc(t('danger'))}</h2><button class="btn danger full" data-act="wipe">${esc(t('wipe'))}</button><p class="note">Jugnu · ConceptAI · v0.28.0</p></div></div>`;
 }
 function pilotView(){
   const now=Date.now(),wk=7*86400000;
@@ -4053,6 +4053,167 @@ const _sbFetchWA=sbFetch;sbFetch=async function(url,opt,ms){
   return _sbFetchWA(url,opt,ms);};
 (function(){const st=document.createElement('style');st.textContent=`.wa-ov{position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.45);display:flex;align-items:center;justify-content:center;padding:16px;overflow:auto}
 .wa-box{max-width:420px;width:100%;margin:auto}.wa-code{font:700 28px/1.2 ui-monospace,Menlo,Consolas,monospace;letter-spacing:2px;text-align:center;padding:14px;border:2px dashed currentColor;border-radius:12px}`;document.head.appendChild(st);})();
+
+/* v0.28.0 Ghar (personal) mode gets its own personality.
+   (1) Home wording: no "wasooli, bazaar, gaahak, Seth ji" in Ghar. Summaries talk about monthly kharcha, bachat and lena-dena.
+   (2) Report tab in Ghar: this month's aamdani, kharcha and bachat, kharcha by category against the budget, lena-dena, committees.
+   (3) Guided budget maker: "budget banao" asks income, fixed kharche, rozana kharche, then gives a plan with a saving target and tips,
+       saves the budget, and the Report tab tracks spending against it every month.
+   (4) Home saving tips (offline) and the AI gets the family budget as context. */
+var HOME_J={
+ roman:{sum:'Logon ne aap ko {b} dene hain. Is mahine ka kharcha aur bachat Report mein dekhein.',today:'Aaj logon ne aap ko {a} wapas kiye.',total:'Logon ne aap ko kul {a} dene hain ({c} log). Aap ne {d} dene hain.',
+  over:'In ki raqam 7 din se zyada purani hai: {l}. Yaad dila doon?',noOver:'Koi purani raqam baqi nahi.',noneOwe:'Is waqt kisi ne aap ko kuch nahi dena.',most:'Sab se zyada {n} ne dene hain: {a}. Yaad dila doon?',
+  ideaLead:'Aaj ka bachat ka mashwara:',greet:'Assalam o alaikum! Main Jugnu hoon, aap ke ghar ka hisaab aur bachat ka saathi. Kharcha likhwayein, lena-dena batayein, ya kahein "budget banao".'},
+ ur:{sum:'لوگوں نے آپ کو {b} دینے ہیں۔ اس مہینے کا خرچہ اور بچت رپورٹ میں دیکھیں۔',today:'آج لوگوں نے آپ کو {a} واپس کیے۔',total:'لوگوں نے آپ کو کل {a} دینے ہیں ({c} لوگ)۔ آپ نے {d} دینے ہیں۔',
+  over:'ان کی رقم 7 دن سے زیادہ پرانی ہے: {l}۔ یاد دلا دوں؟',noOver:'کوئی پرانی رقم باقی نہیں۔',noneOwe:'اس وقت کسی نے آپ کو کچھ نہیں دینا۔',most:'سب سے زیادہ {n} نے دینے ہیں: {a}۔ یاد دلا دوں؟',
+  ideaLead:'آج کا بچت کا مشورہ:',greet:'السلام علیکم! میں جگنو ہوں، آپ کے گھر کے حساب اور بچت کا ساتھی۔ خرچہ لکھوائیں، لین دین بتائیں، یا کہیں "بجٹ بناؤ"۔'},
+ ps:{sum:'خلک تاسو ته {b} درکوي. د دې میاشتې لګښت او سپما په راپور کې وګورئ.',today:'نن خلکو تاسو ته {a} بېرته درکړل.',total:'خلک تاسو ته ټول {a} درکوي ({c} کسان). تاسو {d} ورکول دي.',
+  over:'د دوی پیسې له 7 ورځو زړې دي: {l}. یادونه ورته وکړم؟',noOver:'هېڅ زړې پیسې پاتې نه دي.',noneOwe:'اوس څوک تاسو ته څه نه درکوي.',most:'تر ټولو زیات {n} درکوي: {a}. یادونه ورته وکړم؟',
+  ideaLead:'د نن ورځې د سپما مشوره:',greet:'السلام علیکم! زه جګنو یم، ستاسو د کور د حساب او سپما ملګری. لګښت ولیکئ، پور ووایاست، یا ووایاست "بجټ جوړ کړه".'},
+ en:{sum:'People owe you {b}. See this month\'s spending and savings in Report.',today:'Today people paid you back {a}.',total:'People owe you {a} in total ({c} people). You owe {d}.',
+  over:'These are older than 7 days: {l}. Shall I send a reminder?',noOver:'No old amounts pending.',noneOwe:'Nobody owes you anything right now.',most:'{n} owes you the most: {a}. Shall I send a reminder?',
+  ideaLead:'Today\'s saving tip:',greet:'Assalam o alaikum! I am Jugnu, your home hisaab and savings companion. Tell me your expenses, money you lent or borrowed, or say "make a budget".'}};
+const HOME_TIPS={
+ roman:['Har mahine tankhwa milte hi pehle bachat alag karein, phir kharcha. Chahe 5% hi kyun na ho.','Committee (BC) bachat ka acha tareeqa hai, lekin sirf bharosemand logon ke saath aur utni qist jitni aaram se de sakein.','Bijli ke units par nazar rakhein: slab badalte hi rate barh jata hai. AC aur istri ka waqt kam karein, LED bulb lagayein.','Gas geyser ko timer ya sirf zaroorat ke waqt chalayein. Sardiyon mein gas ka bill sab se zyada yahi barhata hai.','Ration mahine mein aik dafa list bana kar wholesale se lein. Roz roz ki khareedari mein faltu cheezein zyada aati hain.','Instalment (qiston) par cheezein lene se pehle kul qeemat dekhein. Aksar naqad se kaafi mehngi parti hain.','3 mahine ke kharche jitna "emergency fund" alag rakhein, taake bimari ya naukri ka masla aaye to qarz na lena pare.','Shaadi, Eid aur school admission jaise bare kharchon ke liye har mahine thodi raqam pehle se alag karte rahein.','Mobile packages aur subscriptions dekhein: jo istemal nahi hote, band karein.','Bachat ko ghar mein na rakhein. Bank ya National Savings jaisi mehfooz jagah rakhein (shariah compliant option bhi hain); faisla karne se pehle maloomat le lein.'],
+ ur:['ہر مہینے تنخواہ ملتے ہی پہلے بچت الگ کریں، پھر خرچہ۔ چاہے 5% ہی کیوں نہ ہو۔','کمیٹی بچت کا اچھا طریقہ ہے، لیکن صرف بھروسہ مند لوگوں کے ساتھ اور اتنی قسط جتنی آرام سے دے سکیں۔','بجلی کے یونٹس پر نظر رکھیں: سلیب بدلتے ہی ریٹ بڑھ جاتا ہے۔ اے سی اور استری کا وقت کم کریں، ایل ای ڈی بلب لگائیں۔','گیس گیزر کو ٹائمر یا صرف ضرورت کے وقت چلائیں۔ سردیوں میں گیس کا بل سب سے زیادہ یہی بڑھاتا ہے۔','راشن مہینے میں ایک دفعہ لسٹ بنا کر ہول سیل سے لیں۔','قسطوں پر چیزیں لینے سے پہلے کل قیمت دیکھیں۔ اکثر نقد سے کافی مہنگی پڑتی ہیں۔','تین مہینے کے خرچے جتنا ایمرجنسی فنڈ الگ رکھیں تاکہ قرض نہ لینا پڑے۔','شادی، عید اور اسکول داخلے جیسے بڑے خرچوں کے لیے ہر مہینے تھوڑی رقم الگ کرتے رہیں۔','موبائل پیکج اور سبسکرپشن دیکھیں: جو استعمال نہیں ہوتے، بند کریں۔','بچت گھر میں نہ رکھیں۔ بینک یا نیشنل سیونگز جیسی محفوظ جگہ رکھیں؛ فیصلے سے پہلے معلومات لے لیں۔'],
+ ps:['هره میاشت چې معاش راشي، لومړی سپما جلا کړئ، بیا لګښت. که څه هم 5% وي.','کمېټي د سپما ښه لار ده، خو یوازې د باوري خلکو سره او هومره قسط چې په اسانۍ یې ورکړئ.','د برېښنا یونټونو ته پام وکړئ: سلیب چې بدل شي نرخ لوړېږي. AC او استرۍ لږ وکاروئ، LED ګروپونه ولګوئ.','ګیس ګیزر یوازې د اړتیا پر وخت وچلوئ. په ژمي کې د ګیس بل همدا زیاتوي.','راشن میاشت کې یو ځل د لیست سره له عمده پلورونکي واخلئ.','په قسطونو د شیانو اخیستو مخکې ټوله بیه وګورئ. ډېری وخت له نغدو ګرانه وي.','د درې میاشتو لګښت په اندازه بیړني فنډ جلا وساتئ چې پور ته اړتیا نه شي.','د واده، اختر او ښوونځي داخلې لپاره هره میاشت لږ پیسې جلا کوئ.','د موبایل پیکجونه او ګډونونه وګورئ: کوم چې نه کارول کېږي، بند یې کړئ.','سپما په کور کې مه ساتئ. په بانک یا ملي سپما کې یې خوندي کړئ؛ له پرېکړې مخکې معلومات واخلئ.'],
+ en:['Each month, set savings aside as soon as income arrives, then spend. Even 5% is a start.','A committee (BC) is a good way to save, but only with trusted people and an instalment you can pay easily.','Watch electricity units: crossing a slab raises the rate. Cut AC and iron time, use LED bulbs.','Run the gas geyser on a timer or only when needed. In winter it is usually the biggest part of the gas bill.','Buy monthly ration once, from a list, at wholesale. Daily shopping adds extras.','Before buying on instalments, check the total price. It is often much more than cash.','Keep an emergency fund of about 3 months of expenses so you do not have to borrow when something goes wrong.','Put aside a little each month for big costs like weddings, Eid and school admissions.','Check mobile packages and subscriptions: cancel what you do not use.','Do not keep savings at home. Use a bank or National Savings (shariah compliant options exist); get information before deciding.']};
+/* jt in Ghar mode: home wording first */
+const _nextTipG=nextTip;nextTip=function(l){if(!isHome())return _nextTipG(l);l=l||D.lang;const tips=HOME_TIPS[l]||HOME_TIPS.roman;const i=(D.htipI||0)%tips.length;D.htipI=i+1;save();return jt('ideaLead',l)+'\n'+tips[i];};
+/* ---------- expense categories ---------- */
+const HCAT=[['bijli',/bijli|bijl|electric|wapda|k-?electric|pesco|iesco|lesco|mepco|fesco|gepco|hesco|qesco|بجلی|برېښنا/i],['gas',/\bgas\b|sui|sngpl|ssgc|cylinder|lpg|گیس|ګیس/i],['kiraya',/kiraya|kiraaya|rent|کرایہ|کرایه/i],['taleem',/school|fees?|fee|tuition|college|university|kitab|books|taleem|سکول|فیس|ټیوشن|ښوونځ/i],['ration',/ration|sabzi|doodh|milk|atta|aata|ghee|cheeni|grocery|gosht|chicken|fruit|phal|sauda|راشن|سبزی|دودھ|آٹا|شیدې|غوښه/i],['transport',/petrol|diesel|rickshaw|bus|taxi|careem|uber|indrive|transport|fuel|کرایہ گاڑی|پٹرول|پټرول/i],['sehat',/dawai|dawa|medicine|doctor|hospital|clinic|test|lab|دوائی|ڈاکٹر|دوا|ډاکټر/i],['mobile',/mobile|internet|wifi|load|package|ptcl|net bill|موبائل|انٹرنیٹ/i],['committee',/committee|kameti|\bbc\b|کمیٹی|کمېټي/i],['ghar',/repair|plumber|electrician|furniture|safai|maid|maasi|kaam wali|مرمت|صفائی/i],['shaadi',/shaadi|shadi|wedding|tohfa|gift|eid|eidi|شادی|عید|واده|اختر/i]];
+const HCAT_T={roman:{bijli:'Bijli',gas:'Gas',kiraya:'Kiraya',taleem:'Taleem / school',ration:'Ration / khana',transport:'Transport / petrol',sehat:'Sehat / dawai',mobile:'Mobile / internet',committee:'Committee',ghar:'Ghar ki marammat',shaadi:'Shaadi / Eid / tohfe',other:'Doosre'},
+ ur:{bijli:'بجلی',gas:'گیس',kiraya:'کرایہ',taleem:'تعلیم / اسکول',ration:'راشن / کھانا',transport:'ٹرانسپورٹ / پٹرول',sehat:'صحت / دوائی',mobile:'موبائل / انٹرنیٹ',committee:'کمیٹی',ghar:'گھر کی مرمت',shaadi:'شادی / عید / تحفے',other:'دوسرے'},
+ ps:{bijli:'برېښنا',gas:'ګیس',kiraya:'کرایه',taleem:'زده کړه / ښوونځی',ration:'راشن / خواړه',transport:'ټرانسپورټ / پټرول',sehat:'روغتیا / درمل',mobile:'موبایل / انټرنېټ',committee:'کمېټي',ghar:'د کور ترمیم',shaadi:'واده / اختر / ډالۍ',other:'نور'},
+ en:{bijli:'Electricity',gas:'Gas',kiraya:'Rent',taleem:'Education / school',ration:'Groceries / food',transport:'Transport / fuel',sehat:'Health / medicine',mobile:'Mobile / internet',committee:'Committee',ghar:'Home repairs',shaadi:'Weddings / Eid / gifts',other:'Other'}};
+function hcat(text){const s=String(text||'');for(const [k,r] of HCAT)if(r.test(s))return k;return 'other';}
+function hcatName(k,l){return (HCAT_T[l||D.lang]||HCAT_T.roman)[k]||k;}
+function hMonth(){return todayISO().slice(0,7);}
+function hSpend(mon){const g={};let tot=0;D.entries.filter(e=>e.type==='expense'&&String(e.date||'').slice(0,7)===mon).forEach(e=>{const c=cust(e.cid)||{};const k=hcat((e.note||'')+' '+(c.name||''));g[k]=(g[k]||0)+e.amount;tot+=e.amount;});return{g,tot};}
+function hIncome(mon){const i=D.entries.filter(e=>e.type==='sale'&&String(e.date||'').slice(0,7)===mon).reduce((s,e)=>s+e.amount,0);return i||(D.budget&&D.budget.income)||0;}
+/* ---------- budget maker ---------- */
+const BT={roman:{start:'Chaliye aap ka mahana budget banate hain. 3 chhote sawal.\n1) Aap ke ghar ki mahana aamdani kitni hai? (tankhwa, karobar, kiraya waghera mila kar)\nJaise: "tankhwa 80000" ya "80k"',
+  fixed:'2) Ab har mahine ke pakke kharche likhein, comma laga kar:\nJaise: "kiraya 25000, bijli 6000, gas 3000, school fees 8000, committee 10000"\nKoi nahi to "nahi" likhein.',
+  daily:'3) Ab rozana ke kharche, mahine ke hisaab se:\nJaise: "ration 30000, doodh 6000, petrol 8000, mobile 2000"',
+  again:'Raqam samajh nahi aayi. Number ke saath likhein, jaise "80000" ya "80k".',cancel:'Theek hai, budget rehne dete hain. Jab chahein "budget banao" likhein.',
+  head:'Aap ka mahana budget:',inc:'Aamdani',fix:'Pakke kharche',day:'Rozana kharche',sav:'Bachat',spent:'Kul kharcha',
+  good:'Shabash! Aap aamdani ka {p}% bacha rahe hain.',low:'Bachat sirf {p}% hai. Koshish karein ke kam az kam 10% (Rs {t}) har mahine alag karein.',neg:'Kharcha aamdani se Rs {n} zyada hai. Is ka matlab qarz ya bachat se nikal raha hai.',
+  cut:'Kahan kami ho sakti hai: {l}. In mein 10 se 15% kami se Rs {n} bach sakte hain.',emer:'Emergency fund ka hadaf: Rs {n} (3 mahine ka kharcha).',
+  saved:'Budget save ho gaya. Report tab mein har mahine budget ke muqable asal kharcha nazar aayega. Bas kharcha likhwate rahein, jaise "bijli bill 6000".',tipsH:'Aap ke liye mashware:',
+  aiBtn:'AI se mazeed mashwara',aiQ:'Mere is budget ko dekh kar bachat ke 3 pakistani tareeqe batao.',redo:'Budget dobara banao',view:'Report dekhein'},
+ ur:{start:'چلیے آپ کا ماہانہ بجٹ بناتے ہیں۔ 3 چھوٹے سوال۔\n1) آپ کے گھر کی ماہانہ آمدنی کتنی ہے؟ (تنخواہ، کاروبار، کرایہ وغیرہ ملا کر)\nجیسے: "تنخواہ 80000"',
+  fixed:'2) اب ہر مہینے کے پکے خرچے لکھیں، کومہ لگا کر:\nجیسے: "کرایہ 25000، بجلی 6000، گیس 3000، سکول فیس 8000، کمیٹی 10000"\nکوئی نہیں تو "نہیں" لکھیں۔',
+  daily:'3) اب روزانہ کے خرچے، مہینے کے حساب سے:\nجیسے: "راشن 30000، دودھ 6000، پٹرول 8000، موبائل 2000"',
+  again:'رقم سمجھ نہیں آئی۔ نمبر کے ساتھ لکھیں، جیسے "80000"۔',cancel:'ٹھیک ہے، بجٹ رہنے دیتے ہیں۔ جب چاہیں "بجٹ بناؤ" لکھیں۔',
+  head:'آپ کا ماہانہ بجٹ:',inc:'آمدنی',fix:'پکے خرچے',day:'روزانہ خرچے',sav:'بچت',spent:'کل خرچہ',
+  good:'شاباش! آپ آمدنی کا {p}% بچا رہے ہیں۔',low:'بچت صرف {p}% ہے۔ کوشش کریں کہ کم از کم 10% (Rs {t}) ہر مہینے الگ کریں۔',neg:'خرچہ آمدنی سے Rs {n} زیادہ ہے۔ یعنی یہ قرض یا بچت سے نکل رہا ہے۔',
+  cut:'کہاں کمی ہو سکتی ہے: {l}۔ ان میں 10 سے 15% کمی سے Rs {n} بچ سکتے ہیں۔',emer:'ایمرجنسی فنڈ کا ہدف: Rs {n} (3 مہینے کا خرچہ)۔',
+  saved:'بجٹ محفوظ ہو گیا۔ رپورٹ میں ہر مہینے بجٹ کے مقابلے اصل خرچہ نظر آئے گا۔ بس خرچہ لکھواتے رہیں۔',tipsH:'آپ کے لیے مشورے:',
+  aiBtn:'اے آئی سے مزید مشورہ',aiQ:'میرے اس بجٹ کو دیکھ کر بچت کے 3 طریقے بتاؤ۔',redo:'بجٹ دوبارہ بناؤ',view:'رپورٹ دیکھیں'},
+ ps:{start:'راځئ ستاسو میاشتنی بجټ جوړ کړو. 3 لنډې پوښتنې.\n1) د کور میاشتنی عاید څومره دی؟ (معاش، کاروبار، کرایه یوځای)\nلکه: "معاش 80000"',
+  fixed:'2) اوس د هرې میاشتې ثابت لګښتونه ولیکئ، په کامې سره:\nلکه: "کرایه 25000، برېښنا 6000، ګیس 3000، د ښوونځي فیس 8000، کمېټي 10000"\nکه نه وي، "نه" ولیکئ.',
+  daily:'3) اوس ورځني لګښتونه، د میاشتې په حساب:\nلکه: "راشن 30000، شیدې 6000، پټرول 8000، موبایل 2000"',
+  again:'پیسې پوه نشوم. د شمېرې سره ولیکئ، لکه "80000".',cancel:'سمه ده، بجټ پرېږدو. هر وخت "بجټ جوړ کړه" ولیکئ.',
+  head:'ستاسو میاشتنی بجټ:',inc:'عاید',fix:'ثابت لګښتونه',day:'ورځني لګښتونه',sav:'سپما',spent:'ټول لګښت',
+  good:'شاباس! تاسو د عاید {p}% سپموئ.',low:'سپما یوازې {p}% ده. هڅه وکړئ لږ تر لږه 10% (Rs {t}) هره میاشت جلا کړئ.',neg:'لګښت له عاید څخه Rs {n} زیات دی. دا له پور یا سپما څخه ځي.',
+  cut:'چېرته کمښت کېدای شي: {l}. په دې کې 10 تر 15% کمښت Rs {n} سپموي.',emer:'د بیړني فنډ هدف: Rs {n} (د 3 میاشتو لګښت).',
+  saved:'بجټ خوندي شو. په راپور کې به هره میاشت د بجټ په پرتله اصلي لګښت ښکاري. یوازې لګښت لیکئ.',tipsH:'ستاسو لپاره مشورې:',
+  aiBtn:'له AI نه نوره مشوره',aiQ:'زما دې بجټ ته په کتو د سپما 3 لارې ووایه.',redo:'بجټ بیا جوړ کړه',view:'راپور وګورئ'},
+ en:{start:'Let\'s make your monthly budget. 3 quick questions.\n1) What is your household\'s monthly income? (salary, business, rent and so on together)\nFor example: "salary 80000" or "80k"',
+  fixed:'2) Now your fixed monthly costs, separated by commas:\nFor example: "rent 25000, electricity 6000, gas 3000, school fees 8000, committee 10000"\nWrite "none" if there are none.',
+  daily:'3) Now day-to-day costs, per month:\nFor example: "groceries 30000, milk 6000, fuel 8000, mobile 2000"',
+  again:'I could not read an amount. Write a number, like "80000" or "80k".',cancel:'OK, we will leave the budget for now. Say "make a budget" any time.',
+  head:'Your monthly budget:',inc:'Income',fix:'Fixed costs',day:'Day-to-day costs',sav:'Savings',spent:'Total spending',
+  good:'Well done! You save {p}% of your income.',low:'Savings are only {p}%. Try to set aside at least 10% (Rs {t}) every month.',neg:'You spend Rs {n} more than you earn. That gap comes from loans or savings.',
+  cut:'Where you can cut: {l}. A 10 to 15% cut there saves about Rs {n}.',emer:'Emergency fund goal: Rs {n} (3 months of spending).',
+  saved:'Budget saved. The Report tab will show actual spending against it every month. Just keep recording expenses, like "electricity bill 6000".',tipsH:'Tips for you:',
+  aiBtn:'More advice from AI',aiQ:'Looking at my budget, give me 3 practical ways to save in Pakistan.',redo:'Make the budget again',view:'See report'}};
+function bt(k,l){return (BT[l||D.lang]||BT.roman)[k];}
+const BUD_RX=/(budget|bajat|bujet|بجٹ|بجټ)/i;
+const BUD_STOP=/^(cancel|stop|band|chhoro|chorro|rehne do|rehnay do|rahne do|nahi chahiye|بند|رہنے دو|پرېږده)\b/i;
+function budAmt(s){s=toAsciiDigits(String(s)).toLowerCase().replace(/,(?=\d{3}\b)/g,'');const m=s.match(/(\d+(?:\.\d+)?)\s*(k\b|hazar|hazaar|hzar|ہزار|زره|lakh|lac|laakh|لاکھ|لک)?/);if(!m)return 0;let v=parseFloat(m[1]);const u=m[2]||'';
+  if(/^k$|hazar|hazaar|hzar|ہزار|زره/.test(u))v*=1000;else if(/lakh|lac|laakh|لاکھ|لک/.test(u))v*=100000;return Math.round(v);}
+function budItems(text){const out=[];String(text||'').split(/[,،;\n]+|\s+aur\s+|\s+and\s+|\s+اور\s+|\s+او\s+/i).forEach(ch=>{const a=budAmt(ch);if(!a)return;
+  let n=toAsciiDigits(ch).replace(/(\d+(?:\.\d+)?)\s*(k\b|hazar|hazaar|hzar|ہزار|زره|lakh|lac|laakh|لاکھ|لک)?/gi,'').replace(/\b(rs|rupay|rupees|rupee|ka|ki|ke|kay|ko|per month|mahana|monthly)\b/gi,'').replace(/[:=\-]+/g,' ').replace(/\s+/g,' ').trim();
+  if(!n)n=hcatName('other');out.push({n:n.slice(0,30),a,cat:hcat(n)});});return out;}
+function budPlan(B,l){const fix=B.fixed.reduce((s,x)=>s+x.a,0),day=B.daily.reduce((s,x)=>s+x.a,0),spent=fix+day,inc=B.income,sav=inc-spent,p=inc?Math.round(sav/inc*100):0;
+  const L=[bt('head',l),'• '+bt('inc',l)+': '+rs(inc),'• '+bt('fix',l)+': '+rs(fix)+(B.fixed.length?' ('+B.fixed.map(x=>x.n+' '+num(x.a)).join(', ')+')':''),'• '+bt('day',l)+': '+rs(day)+(B.daily.length?' ('+B.daily.map(x=>x.n+' '+num(x.a)).join(', ')+')':''),'• '+bt('sav',l)+': '+rs(sav)+(inc?' ('+p+'%)':''),''];
+  if(sav<0)L.push(fill(bt('neg',l),{n:num(-sav)}));else if(p<10)L.push(fill(bt('low',l),{p,t:num(Math.round(inc*0.1))}));else L.push(fill(bt('good',l),{p}));
+  const flex=B.daily.concat(B.fixed.filter(x=>['bijli','gas','mobile','transport','shaadi','other'].includes(x.cat))).sort((a,b)=>b.a-a.a).slice(0,2);
+  if(flex.length&&(sav<0||p<15))L.push(fill(bt('cut',l),{l:flex.map(x=>x.n).join(', '),n:num(Math.round(flex.reduce((s,x)=>s+x.a,0)*0.12))}));
+  L.push(fill(bt('emer',l),{n:num(spent*3)}));
+  const T=HOME_TIPS[l]||HOME_TIPS.roman;const pick=[0];const cats=new Set(B.fixed.concat(B.daily).map(x=>x.cat));if(cats.has('bijli'))pick.push(2);if(cats.has('gas'))pick.push(3);if(cats.has('ration'))pick.push(4);if(cats.has('committee'))pick.push(1);if(pick.length<3)pick.push(6);
+  L.push('',bt('tipsH',l),...[...new Set(pick)].slice(0,3).map(i=>'• '+T[i]));return L.join('\n');}
+function budStart(l){S.bud={step:1,l,income:0,fixed:[],daily:[]};return bt('start',l);}
+function budStep(q,l){const B=S.bud;const t=String(q||'').trim();
+  if(BUD_STOP.test(t)){S.bud=null;return{text:bt('cancel',l)};}
+  if(B.step===1){const items=budItems(t);const a=items.reduce((s,x)=>s+x.a,0)||budAmt(t);if(!a)return{text:bt('again',l)};B.income=a;B.step=2;return{text:bt('fixed',l)};}
+  if(B.step===2){B.fixed=/^(nahi|nahin|none|no|koi nahi|نہیں|نه)\b/i.test(t)?[]:budItems(t);B.step=3;return{text:bt('daily',l)};}
+  if(B.step===3){B.daily=/^(nahi|nahin|none|no|koi nahi|نہیں|نه)\b/i.test(t)?[]:budItems(t);
+    D.budget={income:B.income,fixed:B.fixed,daily:B.daily,at:Date.now(),month:hMonth()};save();S.bud=null;evt('budget_made');
+    const btns=[{act:'hReport',id:'',label:bt('view',l)}];if(aiOn())btns.unshift({act:'budAI',id:'',label:bt('aiBtn',l)});
+    return{text:budPlan(D.budget,l)+'\n\n'+bt('saved',l),btns};}
+  return null;}
+const _jSendG=jSend;jSend=async function(q){q=String(q||'').trim();if(!q||jBusy||!isHome())return _jSendG.apply(this,arguments);
+  const l=detectLang(q);
+  if(S.bud||BUD_RX.test(q)&&!/\d{3,}/.test(q)){jBusy=true;try{jPush({who:'me',text:q,l});jState('thinking');await sleep(350);
+      const r=S.bud?budStep(q,l):{text:budStart(l)};if(r)jPush({who:'ai',text:r.text,btns:r.btns,l,mood:'happy'});jState('idle');}finally{jBusy=false;}return;}
+  return _jSendG.apply(this,arguments);};
+window.addEventListener('click',e=>{const r=e.target.closest&&e.target.closest('[data-act="hReport"]');if(r){e.preventDefault();e.stopImmediatePropagation();go('pilot');return;}
+  const b=e.target.closest&&e.target.closest('[data-act="budAI"],[data-act="budStart"]');if(!b)return;e.preventDefault();e.stopImmediatePropagation();const l=D.lang;
+  if(b.dataset.act==='budStart'){S.bud=null;if(S.screen!=='jugnu'){S.screen='jugnu';render();}setTimeout(()=>jSend(({roman:'Budget banao',ur:'بجٹ بناؤ',ps:'بجټ جوړ کړه',en:'Make a budget'})[l]||'Budget banao'),120);return;}
+  jSend(bt('aiQ',l));},true);
+/* the AI knows the family budget and this month's spending */
+const _jIdentityG=jIdentity;jIdentity=function(mode){let s=_jIdentityG.apply(this,arguments);try{if(isHome()){const mon=hMonth(),sp=hSpend(mon),B=D.budget;
+  s+='\nThis month so far: spending Rs '+num(sp.tot)+(Object.keys(sp.g).length?' ('+Object.entries(sp.g).map(([k,v])=>hcatName(k,'en')+' '+num(v)).join(', ')+')':'')+'.';
+  if(B)s+='\nFamily budget: monthly income Rs '+num(B.income)+'; fixed costs '+B.fixed.map(x=>x.n+' '+num(x.a)).join(', ')+'; day-to-day costs '+B.daily.map(x=>x.n+' '+num(x.a)).join(', ')+'. Use these numbers in advice about budget and savings.';
+  else s+='\nNo budget yet. If the user asks for a budget or savings plan, suggest they type "budget banao" so Jugnu can ask their income and expenses.';}}catch(e){}return s;};
+/* ---------- Report tab in Ghar ---------- */
+const HR={roman:{t:'Ghar ka hisaab',mon:'Is mahine',inc:'Aamdani',exp:'Kharcha',sav:'Bachat',over:'Kharcha aamdani se zyada',byCat:'Kharcha kahan hua',vsB:'budget',noExp:'Is mahine abhi koi kharcha nahi likha. Jugnu ko bolein: "doodh 300" ya "bijli bill 6000".',
+  ld:'Lena-dena',lene:'Logon ne aap ko dene hain',dene:'Aap ne dene hain',none:'Koi nahi',bud:'Budget banao',budEdit:'Budget badlo',budNo:'Abhi budget nahi bana. Budget banane se Jugnu aap ka har mahine ka kharcha budget ke muqable dikhayega.',noInc:'Aamdani likhne ke liye budget banayein ya "tankhwa 80000 mili" likhwayein.'},
+ ur:{t:'گھر کا حساب',mon:'اس مہینے',inc:'آمدنی',exp:'خرچہ',sav:'بچت',over:'خرچہ آمدنی سے زیادہ',byCat:'خرچہ کہاں ہوا',vsB:'بجٹ',noExp:'اس مہینے ابھی کوئی خرچہ نہیں لکھا۔ جگنو کو بولیں: "دودھ 300" یا "بجلی بل 6000"۔',
+  ld:'لین دین',lene:'لوگوں نے آپ کو دینے ہیں',dene:'آپ نے دینے ہیں',none:'کوئی نہیں',bud:'بجٹ بناؤ',budEdit:'بجٹ بدلو',budNo:'ابھی بجٹ نہیں بنا۔ بجٹ بنانے سے جگنو ہر مہینے کا خرچہ بجٹ کے مقابلے دکھائے گا۔',noInc:'آمدنی لکھنے کے لیے بجٹ بنائیں یا "تنخواہ 80000 ملی" لکھوائیں۔'},
+ ps:{t:'د کور حساب',mon:'دا میاشت',inc:'عاید',exp:'لګښت',sav:'سپما',over:'لګښت له عاید زیات',byCat:'لګښت چېرته وشو',vsB:'بجټ',noExp:'دا میاشت لا هېڅ لګښت نه دی لیکل شوی. جګنو ته ووایاست: "شیدې 300".',
+  ld:'پور ورکړه او اخیستنه',lene:'خلک تاسو ته درکوي',dene:'تاسو ورکول دي',none:'هېڅوک نه',bud:'بجټ جوړ کړه',budEdit:'بجټ بدل کړه',budNo:'لا بجټ نه دی جوړ. د بجټ سره به جګنو هره میاشت لګښت د بجټ په پرتله وښيي.',noInc:'د عاید لپاره بجټ جوړ کړئ یا ولیکئ "معاش 80000 راغی".'},
+ en:{t:'Home accounts',mon:'This month',inc:'Income',exp:'Spending',sav:'Savings',over:'Spending above income',byCat:'Where the money went',vsB:'budget',noExp:'No expenses recorded this month yet. Tell Jugnu: "milk 300" or "electricity bill 6000".',
+  ld:'Lent and borrowed',lene:'People owe you',dene:'You owe',none:'Nobody',bud:'Make a budget',budEdit:'Change budget',budNo:'No budget yet. With a budget, Jugnu shows each month\'s spending against it.',noInc:'To record income, make a budget or tell Jugnu "salary 80000 received".'}};
+function hr(k,l){return (HR[l||D.lang]||HR.roman)[k];}
+function homeReportHTML(){const l=D.lang,mon=hMonth(),sp=hSpend(mon),inc=hIncome(mon),sav=inc-sp.tot,B=D.budget;
+  const bcat={};if(B)B.fixed.concat(B.daily).forEach(x=>{bcat[x.cat]=(bcat[x.cat]||0)+x.a;});
+  const cats=[...new Set(Object.keys(sp.g).concat(Object.keys(bcat)))].sort((a,b)=>(sp.g[b]||0)-(sp.g[a]||0));
+  const bar=k=>{const s=sp.g[k]||0,b=bcat[k]||0,max=Math.max(b,s,1),pc=Math.round(s/max*100),col=b&&s>b?'var(--udhaar)':(b&&s>b*0.85?'var(--amber)':'var(--wasooli)');
+    const K=n=>n>=1000?(Math.round(n/100)/10).toString().replace(/\.0$/,'')+'k':String(n);return `<div class="sbar hbar"><span dir="auto">${esc(hcatName(k,l))}</span><div class="sb"><i style="width:${Math.max(3,pc)}%;background:${col}"></i></div><b class="num" style="white-space:nowrap">${K(s)}${b?' / '+K(b):''}</b></div>`;};
+  const ppl=D.customers.filter(c=>c.type==='customer'||c.type==='supplier').map(c=>({c,b:balance(c.id)}));
+  const lene=ppl.filter(x=>x.b>0).sort((a,b)=>b.b-a.b),dene=ppl.filter(x=>x.b<0).sort((a,b)=>a.b-b.b);
+  const li=a=>a.length?a.slice(0,4).map(x=>`<div class="today"><span dir="auto">${esc(nameFor(x.c,l))}</span><b class="num">${rs(Math.abs(x.b))}</b></div>`).join(''):`<p class="soft small">${esc(hr('none',l))}</p>`;
+  return `<div class="page stack hrep"><h1 style="margin:0" dir="auto">${esc(hr('t',l))}</h1><p class="soft small" style="margin:0" dir="auto">${esc(hr('mon',l))}</p>
+    <div class="tiles"><div class="tile"><small>${esc(hr('inc',l))}</small><b class="num">${inc?num(inc):'-'}</b></div><div class="tile"><small>${esc(hr('exp',l))}</small><b class="num">${num(sp.tot)}</b></div><div class="tile"><small>${esc(hr('sav',l))}</small><b class="num" style="color:${sav<0?'var(--udhaar)':'var(--wasooli)'}">${inc?num(sav):'-'}</b></div></div>
+    ${!inc?`<p class="note" dir="auto">${esc(hr('noInc',l))}</p>`:(sav<0?`<p class="warnbox" dir="auto">${esc(hr('over',l))}: Rs ${num(-sav)}</p>`:'')}
+    <button class="btn ${B?'ghost':''} full" data-act="budStart">${esc(B?hr('budEdit',l):hr('bud',l))}</button>${B?'':`<p class="note" dir="auto">${esc(hr('budNo',l))}</p>`}</div>
+   <div class="page stack"><h2 style="margin-top:0" dir="auto">${esc(hr('byCat',l))}${B?` <small class="soft">(${esc(hr('exp',l))} / ${esc(hr('vsB',l))})</small>`:''}</h2>${cats.length?cats.map(bar).join(''):`<p class="soft" dir="auto">${esc(hr('noExp',l))}</p>`}</div>
+   <div class="page stack"><h2 style="margin-top:0" dir="auto">${esc(hr('ld',l))}</h2><h3 style="margin:2px 0" dir="auto">${esc(hr('lene',l))}</h3>${li(lene)}<h3 style="margin:8px 0 2px" dir="auto">${esc(hr('dene',l))}</h3>${li(dene)}</div>`;}
+const _pilotViewG=pilotView;pilotView=function(){const h=_pilotViewG.apply(this,arguments);if(!isHome())return h;
+  try{const i=h.indexOf('<div class="page stack"><h1>');const keep=i>0?h.slice(0,i):h;return keep.replace('<div class="stack">','<div class="stack">'+homeReportHTML())+'</div>';}catch(e){return h;}};
+/* home chips: budget first, saving tips always (offline tips work too) */
+const _jChipsG=jugnuChipList;jugnuChipList=function(){const L=_jChipsG.apply(this,arguments);if(!isHome())return L;const l=D.lang;
+  const b={k:'h_budget',c:'h_budget',b:D.budget?0.9:2.5,t:D.budget?hr('budEdit',l):hr('bud',l),q:hr('bud',l),act:'budStart'};
+  const tip={k:'h_tip',c:'h_tip',b:1.05,t:({roman:'Bachat ke tips',ur:'بچت کے ٹپس',ps:'د سپما لارښوونې',en:'Saving tips'})[l]||'Bachat ke tips',q:'',act:'hTip'};
+  return [b,tip].concat(L.filter(x=>x.k!=='h_save'||aiOn()));};
+window.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('[data-act="hTip"]');if(!b)return;e.preventDefault();e.stopImmediatePropagation();const l=D.lang;jPush({who:'me',text:b.textContent.trim(),l});jPush({who:'ai',text:nextTip(l),l,mood:'happy'});},true);
+/* offline replies in Ghar: saving and health questions get home answers */
+const _jaH=jugnuAnswer;jugnuAnswer=function(text,l){const r=_jaH.apply(this,arguments);try{if(!isHome()||!r)return r;
+  if(r.kind==='health'){const a=d2HomeAnswer('month',l||detectLang(text));if(a)return{text:a.text,kind:'talk'};}
+  if(r.kind==='idea'&&!aiOn())return{text:nextTip(l||detectLang(text)),kind:'idea'};
+  l=l||detectLang(text);const s=' '+String(text).toLowerCase()+' ';
+  if(r.text===jt('dont',l)&&!r.entry){
+    if(/(wapas|wapis|waapas|returned|paid back|واپس|بېرته)/.test(s)){const td=todayISO();const a=D.entries.filter(e=>e.type==='payment'&&e.date===td).reduce((t,e)=>t+e.amount,0);return{text:fill(jt('today',l),{a:rs(a)}),kind:'talk'};}
+    if(/(udhaa?r|baqi|baaqi|baqaya|lene|dene|lena|dena|kis ne|kis ko|owe|ادھار|باقی|لینے|دینے|پور)/.test(s)){const a=d2HomeAnswer('lene',l),b=d2HomeAnswer('dene',l);return{text:[a&&a.text,b&&b.text].filter(Boolean).join('\n\n'),kind:'talk'};}
+    if(/(kharch|kharcha|spend|spent|خرچ|لګښت)/.test(s)){const a=d2HomeAnswer('month',l);if(a)return{text:a.text,kind:'talk'};}
+    if(!aiOn()&&/(bachat|bacha|bachaun|save|saving|بچت|سپما)/.test(s))return{text:nextTip(l),kind:'idea'};}
+ }catch(e){}return r;};
+try{if(isHome()&&S.chat&&S.chat.length<=2&&S.chat.every(m=>m.who==='ai'))S.chat=[];CHIP_CACHE={};}catch(e){}
+try{render();}catch(e){}
+
 </script>
 
 </body></html>
