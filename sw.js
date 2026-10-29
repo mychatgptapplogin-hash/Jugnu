@@ -1,6 +1,6 @@
 /* Jugnu offline worker: keeps the app, PDF tool and fonts on the phone after the first visit,
    and receives text or voice notes shared from WhatsApp (Share > Jugnu). */
-const CACHE='jugnu-v63';
+const CACHE='jugnu-v64';
 const SHARE='jugnu-share';
 const MODELS='jugnu-models'; // big voice model files: kept across app updates
 const CORE=['./','./index.html','./manifest.webmanifest','./icon-192.png','./icon-512.png'];

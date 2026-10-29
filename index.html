@@ -1155,7 +1155,7 @@ function settingsView(){
     <button class="btn ghost full" data-act="pasteRestore">${esc(t('bkRestoreP'))}</button></div>
    ${fbCardHTML()}
    ${voiceSettingsHTML()}
-   <div class="page stack"><h2 style="margin-top:0">${esc(t('danger'))}</h2><button class="btn danger full" data-act="wipe">${esc(t('wipe'))}</button><p class="note">Jugnu · ConceptAI · v0.28.0</p></div></div>`;
+   <div class="page stack"><h2 style="margin-top:0">${esc(t('danger'))}</h2><button class="btn danger full" data-act="wipe">${esc(t('wipe'))}</button><p class="note">Jugnu · ConceptAI · v0.28.1</p></div></div>`;
 }
 function pilotView(){
   const now=Date.now(),wk=7*86400000;
@@ -4213,6 +4213,24 @@ const _jaH=jugnuAnswer;jugnuAnswer=function(text,l){const r=_jaH.apply(this,argu
  }catch(e){}return r;};
 try{if(isHome()&&S.chat&&S.chat.length<=2&&S.chat.every(m=>m.who==='ai'))S.chat=[];CHIP_CACHE={};}catch(e){}
 try{render();}catch(e){}
+
+
+/* v0.28.1 Ghar mode polish.
+   (1) Home expenses are filed under "Ghar kharcha", never "Dukaan kharcha" (old home accounts with the shop name are renamed).
+   (2) Saving questions in Ghar get a home saving tip even without internet.
+   (3) The children note points to Settings > Bachay (code), not the old button.
+   (4) Safety: a record with a missing date can no longer stop the Report screen from opening. */
+const HOME_EXP={roman:'Ghar kharcha',ur:'گھر کا خرچہ',ps:'د کور لګښت',en:'Home expenses'};
+const SHOP_EXP={roman:'Dukaan kharcha',ur:'دکان کا خرچہ',ps:'د دوکان لګښت',en:'Shop expenses'};
+['roman','ur','ps','en'].forEach(k=>{try{Object.defineProperty(EXP_ACC,k,{configurable:true,enumerable:true,get:()=>isHome()?HOME_EXP[k]:SHOP_EXP[k]});}catch(e){}});
+function homeExpRename(){try{if(!D.shop||!isHome())return;const shopNames=Object.values(SHOP_EXP);let ch=false;(D.customers||[]).forEach(c=>{if(shopNames.includes(c.name)){const k=Object.keys(SHOP_EXP).find(x=>SHOP_EXP[x]===c.name)||'roman';c.name=HOME_EXP[k];ch=true;}});if(ch)save();}catch(e){}}
+homeExpRename();
+const _todayISO281=todayISO;todayISO=function(d){if(d&&!(d instanceof Date&&!isNaN(d.getTime())))d=new Date();return _todayISO281(d);};
+const SAVE_RX=/(bachat|bachaun|bachaon|bachana|bacha sakta|bacha sakti|saving|save money|kharcha kam|paise bacha|بچت|بچا|خرچہ کم|سپما|وسپموم)/i;
+const _ja281=jugnuAnswer;jugnuAnswer=function(text,l){const r=_ja281.apply(this,arguments);
+  try{if(isHome()&&r&&!r.entry&&SAVE_RX.test(String(text))&&(r.text===jt('dont',l||detectLang(text))))return{text:nextTip(l||detectLang(text)),kind:'idea'};}catch(e){}return r;};
+try{const NS={roman:'Abhi koi bacha jura nahi. Settings mein "Bachay" se code banayein aur bachay ke phone par wohi code likhein.',ur:'ابھی کوئی بچہ جڑا نہیں۔ سیٹنگز میں "بچے" سے کوڈ بنائیں اور بچے کے فون پر وہی کوڈ لکھیں۔',ps:'تراوسه هېڅ ماشوم نه دی نښلول شوی. په سېټنګز کې له "ماشومان" برخې کوډ جوړ کړئ او د ماشوم په تلیفون کې همدا کوډ ولیکئ.',en:'No child linked yet. In Settings, open "Children" to make a code, then enter that code on the child\'s phone.'};
+  Object.keys(NS).forEach(k=>{if(FS[k])FS[k].noStu=NS[k];});}catch(e){}
 
 </script>
 
